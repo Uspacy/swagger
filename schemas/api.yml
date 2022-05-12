@@ -1,0 +1,824 @@
+openapi: '3.0.n'
+info:
+  title: Uspacy api
+  version: 1.0.0
+servers:
+  - url: 'https://api.example.com/v1'
+tags:
+  - name: usersService
+  - name: authService
+  - name: departmentsService
+
+paths:
+  #users
+  /users/:
+    get:
+      description: Get users list. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        # - $ref: '#/components/parameters/queryUsers'
+        - $ref: '#/components/parameters/filterUsers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/SignUpDto'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+              example:
+                data:
+                  id: "123123123"
+                  email: rar.stas@gmail.com
+                  firstName: Stas
+                  lastName: Raranetskyi
+                  phone: ""
+                  position: ""
+                  active: true
+                  departmentsIds: []
+                  birthday: 0
+                  showBirthYear: true
+                  roles:
+                    - USER
+                  socialMedia: []
+          description: Created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /users/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - usersService
+      description: Get user by id. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update user data by id. Available only for authorized users
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /users/{userId}/deactivate/:
+    post:
+      description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+              example:
+                data:
+                  id: "123123123"
+                  email: rar.stas@gmail.com
+                  firstName: Stas
+                  lastName: Raranetskyi
+                  phone: "+3801234567"
+                  position: CTO
+                  active: false
+                  departmentsIds: ["1111", "2222"]
+                  birthday: 1652370685
+                  showBirthYear: true
+                  roles:
+                    - OWNER
+                    - ADMIN
+                  socialMedia:
+                    - name: facebook
+                      link: https://facebook.com
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /users/{userId}/activate/:
+    post:
+      description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /users/{userId}/updateRoles/:
+    patch:
+      description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/UpdateRolesDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /users/{userId}/updatePosition/:
+    patch:
+      description: Update user roles by id. Available only for users with admin permissions. Returns user data with new position
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/UpdateUserPosition'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /users/{userId}/changePassword/:
+    patch:
+      description: Update user roles by id. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/ChangePasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # auth
+  /auth/signIn/:
+    description: Sign in user by email, password. Returns token, refreshToken
+    post:
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/SignInDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Token'
+  /auth/confirmEmail/:
+    description: Confirm email user. Returns token, refreshToken
+    post:
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/ConfirmEmailDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Token'
+  /auth/refreshToken/:
+    description: refreshToken exprired token. Returns new token
+    post:
+      tags:
+        - authService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Token'
+
+  # departments
+  /departments/:
+    get:
+      description: Get departments list. Available only for authorized users.
+      tags:
+        - departmentsService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/queryDepartments'
+        # - $ref: '#/components/parameters/filterDepartments'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create department. Available only for users with admin permissions
+      tags:
+        - departmentsService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /departments/{departmentId}:
+    get:
+      description: Get department by id. Available only for authorized users.
+      tags:
+        - departmentsService
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description:
+        Update department data (set head department, move users, set parent department)
+        Available only for head parent department or users with admin permissions. Returns updated department data
+      tags:
+        - departmentsService
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/DepartmentPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    Forbidden:
+      description: Forbidden
+
+  parameters:
+    userId:
+      name: userId
+      in: path
+      description: User id
+      required: true
+      schema:
+        type: string
+    departmentId:
+      name: departmentId
+      in: path
+      description: Department id
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: current page
+      required: false
+      schema:
+        type: integer
+      default: 1
+      example: 1
+    list:
+      name: list
+      in: query
+      description: how many items should be per page
+      required: false
+      schema:
+        type: number
+      example: 10
+      default: 20
+    query:
+      name: query
+      in: query
+      description: search query
+      required: false
+      schema:
+        type: string
+      example: "some query string"
+      default: ""
+    filter:
+      name: filter
+      in: query
+      description: Fields, corresponding to the available list of entity.
+      required: false
+      style: deepObject
+      schema:
+        type: object
+    filterUsers:
+      allOf:
+        - $ref: '#/components/parameters/filter'
+        - type: object
+          description: Fields, corresponding to the available list of fields user.
+          example:
+            email: rar.stas@gmail.com
+            firstName: Stas
+            lastName: Raranetskyi
+            phone: "+3801234567"
+            position: CTO
+            active: true
+            departmentsIds: ["1111", "2222"]
+            roles:
+              - OWNER
+              - ADMIN
+    queryUsers:
+      allOf:
+        - $ref: '#/components/parameters/query'
+        - type: string
+          description: Search by email, firstName, lastName
+          example: rar.stas@gmail.com
+    filterDepartments:
+      allOf:
+        - $ref: '#/components/parameters/filter'
+        - type: object
+          description: Fields, corresponding to the available list of fields department.
+          example:
+            name: "Frontend department"
+            headId: "1111"
+            parentDepartmentId: "1111"
+            usersIds: ["1111", "2222", "3333"]
+    queryDepartments:
+      allOf:
+        - $ref: '#/components/parameters/query'
+        - type: string
+          description: Search by name department
+          example: Frontend department
+
+  schemas:
+    # common
+    Meta:
+      type: object
+      properties:
+        total:
+          type: number
+        page:
+          type: number
+        list:
+          type: number
+      description: Forbidden
+      example:
+        total: 100
+        page: 1
+        list: 10
+
+    #users
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        position:
+          type: string
+        phone:
+          type: string
+        active:
+          type: boolean
+        birthday:
+          type: number
+        showBirthYear:
+          type: boolean
+          default: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Roles'
+        departmentsIds:
+          type: array
+          items:
+            type: string
+        socialMedia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialMedia'
+      example:
+        id: "123123123"
+        email: rar.stas@gmail.com
+        firstName: Stas
+        lastName: Raranetskyi
+        phone: "+3801234567"
+        position: CTO
+        active: true
+        departmentsIds: ["1111", "2222"]
+        birthday: 1652370685
+        showBirthYear: true
+        roles:
+          - OWNER
+          - ADMIN
+        socialMedia:
+          - name: facebook
+            link: https://facebook.com
+    UpdateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        birthday:
+          type: number
+        showBirthYear:
+          type: boolean
+          default: false
+        departmentsIds:
+          type: array
+          items:
+            type: string
+        socialMedia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialMedia'
+      example:
+        email: rar.stas@gmail.com
+        firstName: Stas
+        lastName: Raranetskyi
+        phone: "+3801234567"
+        birthday: 1652370685
+        showBirthYear: true
+        socialMedia:
+          - name: facebook
+            link: https://facebook.com
+        departmentsIds: ['111', '222']
+    UpdateRolesDto:
+      type: array
+      items:
+        $ref: '#/components/schemas/Roles'
+    UpdateUserPosition:
+      type: object
+      properties:
+        position:
+          type: string
+      example:
+        position: CTO
+    Roles:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+        - OWNER
+      example:
+        OWNER, ADMIN, USER
+
+    #auth
+    SocialMedia:
+
+      type: object
+      properties:
+        name:
+          type: string
+        link:
+          type: string
+      example:
+        - name: facebook
+          link: https://facebook.com
+        - name: instagram
+          link: https://www.instagram.com
+    Token:
+      type: object
+      properties:
+        expireInSeconds:
+          type: number
+        jwt:
+          type: string
+        refreshToken:
+          type: string
+      example:
+        expireInSeconds: 720
+        jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
+        refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
+    SignUpDto:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        password:
+          type: string
+      example:
+        email: rar.stas@gmail.com
+        password: "12345678"
+        firstName: Stas
+        lastName: Raranetskyi
+    JWT:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        workspaceId:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Roles'
+      example:
+        email: rar.stas@gmail.com
+        id: "123123123"
+        firstName: Stas
+        lastName: Raranetskyi
+        workspaceId: "123123"
+        roles:
+          - OWNER
+          - ADMIN
+    SignInDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: rar.stas@gmail.com
+        password: "12345678"
+    ConfirmEmailDto:
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+      example:
+        email: rar.stas@gmail.com
+        token: r6pvb5pllte
+    ChangePasswordDto:
+      type: object
+      properties:
+        password:
+          type: string
+      example:
+        password: "12345678"
+
+    # Departments
+    Department:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        headId:
+          type: string
+        parentDepartmentId:
+          type: string
+          nulable: true
+          default: null
+        usersIds:
+          type: string
+      example:
+        id: "22222"
+        name: "Frontend department"
+        headId: "1111"
+        parentDepartmentId: "1111"
+        usersIds: ["1111", "2222", "3333"]
+    DepartmentPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        headId:
+          type: string
+        parentDepartmentId:
+          type: string
+          nulable: true
+          default: null
+        usersIds:
+          type: string
+      example:
+        name: "Frontend department"
+        headId: "1111"
+        parentDepartmentId: "1111"
+        usersIds: ["1111", "2222", "3333"]
+
