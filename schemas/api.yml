@@ -3,15 +3,16 @@ info:
   title: Uspacy api
   version: 1.0.0
 servers:
-  - url: 'https://api.example.com/v1'
+  - url: http://127.0.0.1:8000
 tags:
   - name: usersService
   - name: authService
   - name: departmentsService
+  - name: newsFeedService
 
 paths:
-  #users
-  /users/:
+  # users begin
+  /company/v1/users/:
     get:
       description: Get users list. Available only for authorized users.
       tags:
@@ -59,23 +60,23 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    $ref: '#/components/schemas/User'
-              example:
-                data:
-                  id: "123123123"
-                  email: rar.stas@gmail.com
-                  firstName: Stas
-                  lastName: Raranetskyi
-                  phone: ""
-                  position: ""
-                  active: true
-                  departmentsIds: []
-                  birthday: 0
-                  showBirthYear: true
-                  roles:
-                    - USER
-                  socialMedia: []
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          position:
+                            example: ''
+                          phone:
+                            example: ''
+                          birthday:
+                            example: 0
+                          roles:
+                            example: '["USER"]'
+                          departmentsIds:
+                            example: "[]"
+                          socialMedia:
+                            example: "[]"
+
           description: Created
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -83,7 +84,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /users/{userId}/:
+  /company/v1/users/{userId}/:
     parameters:
       - $ref: '#/components/parameters/userId'
     get:
@@ -115,10 +116,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                data:
-                  type: object
-                  $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UpdateUserDto'
       responses:
         '200':
           description: OK
@@ -132,7 +130,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /users/{userId}/deactivate/:
+  /company/v1/users/{userId}/deactivate/:
     post:
       description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
       tags:
@@ -148,33 +146,19 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    $ref: '#/components/schemas/User'
-              example:
-                data:
-                  id: "123123123"
-                  email: rar.stas@gmail.com
-                  firstName: Stas
-                  lastName: Raranetskyi
-                  phone: "+3801234567"
-                  position: CTO
-                  active: false
-                  departmentsIds: ["1111", "2222"]
-                  birthday: 1652370685
-                  showBirthYear: true
-                  roles:
-                    - OWNER
-                    - ADMIN
-                  socialMedia:
-                    - name: facebook
-                      link: https://facebook.com
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          active:
+                            example: false
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /users/{userId}/activate/:
+  /company/v1/users/{userId}/activate/:
     post:
       description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
       tags:
@@ -198,7 +182,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /users/{userId}/updateRoles/:
+  /company/v1/users/{userId}/updateRoles/:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
       tags:
@@ -221,17 +205,24 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          roles:
+                            allOf:
+                            - type: string
+                              example:
+                                - ADMIN
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /users/{userId}/updatePosition/:
+  /company/v1/users/{userId}/updatePosition/:
     patch:
-      description: Update user roles by id. Available only for users with admin permissions. Returns user data with new position
+      description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
       tags:
         - usersService
       parameters:
@@ -252,21 +243,26 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          position:
+                            example: new position
+
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /users/{userId}/changePassword/:
+  /company/v1/users/{userId}/changePassword/:
     patch:
-      description: Update user roles by id. Available only for authorized users.
-      tags:
-        - usersService
       parameters:
         - $ref: '#/components/parameters/userId'
+      description: Update user password by id. Available only for users with admin permissions.
+      tags:
+        - usersService
       requestBody:
         required: true
         content:
@@ -289,9 +285,57 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+  /company/v1/users/me/:
+    get:
+      tags:
+        - usersService
+      description: Get self profile. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/changePassword/:
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/ChangeSelfPasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # users end
 
-  # auth
-  /auth/signIn/:
+  # auth begin
+  /company/v1/auth/signIn/:
     description: Sign in user by email, password. Returns token, refreshToken
     post:
       tags:
@@ -314,7 +358,7 @@ paths:
                   data:
                     type: object
                     $ref: '#/components/schemas/Token'
-  /auth/confirmEmail/:
+  /company/v1/auth/confirmEmail/:
     description: Confirm email user. Returns token, refreshToken
     post:
       tags:
@@ -337,7 +381,7 @@ paths:
                   data:
                     type: object
                     $ref: '#/components/schemas/Token'
-  /auth/refreshToken/:
+  /company/v1/auth/refreshToken/:
     description: refreshToken exprired token. Returns new token
     post:
       tags:
@@ -353,9 +397,10 @@ paths:
                   data:
                     type: object
                     $ref: '#/components/schemas/Token'
+  # auth end
 
-  # departments
-  /departments/:
+  # departments begin
+  /company/v1/departments/:
     get:
       description: Get departments list. Available only for authorized users.
       tags:
@@ -363,8 +408,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        - $ref: '#/components/parameters/queryDepartments'
-        # - $ref: '#/components/parameters/filterDepartments'
+        # - $ref: '#/components/parameters/queryDepartments'
+        - $ref: '#/components/parameters/filterDepartments'
       responses:
         '200':
           description: OK
@@ -405,13 +450,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /departments/{departmentId}:
+  /company/v1/departments/{departmentId}:
+    parameters:
+      - $ref: '#/components/parameters/departmentId'
     get:
       description: Get department by id. Available only for authorized users.
       tags:
         - departmentsService
-      parameters:
-        - $ref: '#/components/parameters/departmentId'
       responses:
         '200':
           description: OK
@@ -433,8 +478,6 @@ paths:
         Available only for head parent department or users with admin permissions. Returns updated department data
       tags:
         - departmentsService
-      parameters:
-        - $ref: '#/components/parameters/departmentId'
       requestBody:
         required: true
         content:
@@ -457,6 +500,239 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+    delete:
+      description:
+        Delete department. Available only for users with admin permissions.
+      tags:
+        - departmentsService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # departments end
+
+  # newsfeed begin
+  /newsfeed/v1/posts/:
+    get:
+      description: Get posts list. Available only for authorized users.
+      tags:
+        - newsFeedService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Post'
+                        - allOf:
+                            - $ref: '#/components/schemas/Post'
+                            - type: object
+                              properties:
+                                comments:
+                                  example: "[]"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create post. Available only for authorized users.
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdatePostDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/Post'
+                      - type: object
+                        properties:
+                          comments:
+                            example: "[]"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /newsfeed/v1/posts/{postId}/:
+    parameters:
+      - $ref: '#/components/parameters/postId'
+    patch:
+      description: Update post. Available only for author.
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdatePostDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete post. Available only for author or users with admin permissions.
+      tags:
+        - newsFeedService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /newsfeed/v1/posts/{postId}/comments/:
+    parameters:
+      - $ref: '#/components/parameters/postId'
+    get:
+      description: Get comments for post. Available only for authorized users and users who have access to the post
+      tags:
+        - newsFeedService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create comment for the post. Available only for authorized users and users who have access to the post
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCommentDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /newsfeed/v1/posts/{postId}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/postId'
+      - $ref: '#/components/parameters/commentId'
+    patch:
+      description: Update comment for the post. Available only for author.
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCommentDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete comment for the post. Available only for author or users with admin permissions.
+      tags:
+        - newsFeedService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # newsfeed end
 
 components:
   securitySchemes:
@@ -559,163 +835,175 @@ components:
         - type: string
           description: Search by name department
           example: Frontend department
-
+    postId:
+      name: postId
+      in: path
+      description: Post id
+      required: true
+      schema:
+        type: string
+    commentId:
+      name: commentId
+      in: path
+      description: Comment id
+      required: true
+      schema:
+        type: string
   schemas:
-    # common
+    # common begin
     Meta:
       type: object
       properties:
         total:
           type: number
+          example: 100
         page:
           type: number
+          example: 1
         list:
           type: number
-      description: Forbidden
-      example:
-        total: 100
-        page: 1
-        list: 10
+          example: 10
 
-    #users
+    Roles:
+      type: array
+      items:
+        type: string
+      example:
+        - OWNER
+        - USER
+    Email:
+      type: string
+      example: 'rar.stas@gmail.com'
+    Phone:
+      type: string
+      example: '+380123456789'
+    Date:
+      type: number
+      description: timestamp in seconds
+      default: 0
+      example: 1654180120
+    Files:
+      type: array
+      items:
+        type: string
+      example:
+        - path/to/image.jpg
+        - path/to/image.png
+    # common end
+
+    # users begin
     User:
       type: object
       properties:
         id:
           type: string
+          example: 1
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         firstName:
           type: string
+          example: Stas
         lastName:
           type: string
+          example: Raranetskyi
         position:
           type: string
+          example: CTO
         phone:
-          type: string
+          $ref: '#/components/schemas/Phone'
         active:
           type: boolean
         birthday:
-          type: number
+          $ref: '#/components/schemas/Date'
         showBirthYear:
           type: boolean
           default: false
+          example: true
         roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Roles'
+          $ref: '#/components/schemas/Roles'
         departmentsIds:
           type: array
           items:
             type: string
+          example:
+            - '1'
+            - '2'
         socialMedia:
-          type: array
-          items:
-            $ref: '#/components/schemas/SocialMedia'
-      example:
-        id: "123123123"
-        email: rar.stas@gmail.com
-        firstName: Stas
-        lastName: Raranetskyi
-        phone: "+3801234567"
-        position: CTO
-        active: true
-        departmentsIds: ["1111", "2222"]
-        birthday: 1652370685
-        showBirthYear: true
-        roles:
-          - OWNER
-          - ADMIN
-        socialMedia:
-          - name: facebook
-            link: https://facebook.com
+          $ref: '#/components/schemas/SocialMedia'
+
     UpdateUserDto:
       type: object
       properties:
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         firstName:
           type: string
+          example: Stas
         lastName:
           type: string
+          example: Raranetskyi
         phone:
-          type: string
+          $ref: '#/components/schemas/Phone'
         birthday:
-          type: number
+          $ref: '#/components/schemas/Date'
         showBirthYear:
           type: boolean
           default: false
+          example: true
         departmentsIds:
           type: array
           items:
             type: string
+          example:
+            - '1'
+            - '2'
         socialMedia:
-          type: array
-          items:
-            $ref: '#/components/schemas/SocialMedia'
-      example:
-        email: rar.stas@gmail.com
-        firstName: Stas
-        lastName: Raranetskyi
-        phone: "+3801234567"
-        birthday: 1652370685
-        showBirthYear: true
-        socialMedia:
-          - name: facebook
-            link: https://facebook.com
-        departmentsIds: ['111', '222']
+          $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
-      type: array
-      items:
-        $ref: '#/components/schemas/Roles'
+      allOf:
+        - $ref: '#/components/schemas/Roles'
+        - type: string
+          example:
+            - ADMIN
     UpdateUserPosition:
       type: object
       properties:
         position:
           type: string
       example:
-        position: CTO
-    Roles:
-      type: string
-      enum:
-        - USER
-        - ADMIN
-        - OWNER
-      example:
-        OWNER, ADMIN, USER
+        position: new position
+    # users begin
 
-    #auth
+    # auth
     SocialMedia:
 
-      type: object
-      properties:
-        name:
-          type: string
-        link:
-          type: string
-      example:
-        - name: facebook
-          link: https://facebook.com
-        - name: instagram
-          link: https://www.instagram.com
+      type: array
+      items:
+        object:
+        properties:
+          name:
+            type: string
+            example: facebook
+          link:
+            type: string
+            example: https://www.facebook.com
     Token:
       type: object
       properties:
         expireInSeconds:
           type: number
+          example: 720
         jwt:
           type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
         refreshToken:
           type: string
-      example:
-        expireInSeconds: 720
-        jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
-        refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
     SignUpDto:
       type: object
       properties:
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         firstName:
           type: string
         lastName:
@@ -723,7 +1011,7 @@ components:
         password:
           type: string
       example:
-        email: rar.stas@gmail.com
+        email:
         password: "12345678"
         firstName: Stas
         lastName: Raranetskyi
@@ -732,93 +1020,241 @@ components:
       properties:
         id:
           type: string
+          example: 1
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         firstName:
           type: string
+          example: Stas
         lastName:
           type: string
+          example: Raranetskyi
         workspaceId:
           type: string
+          example: 123123
         roles:
+          $ref: '#/components/schemas/Roles'
+        departmentsIds:
           type: array
           items:
-            $ref: '#/components/schemas/Roles'
-      example:
-        email: rar.stas@gmail.com
-        id: "123123123"
-        firstName: Stas
-        lastName: Raranetskyi
-        workspaceId: "123123"
-        roles:
-          - OWNER
-          - ADMIN
+            type: string
+          example:
+            - 1
+            - 2
+          description: All departments from the parent
     SignInDto:
       type: object
       properties:
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         password:
           type: string
-      example:
-        email: rar.stas@gmail.com
-        password: "12345678"
+          example: 12345678
     ConfirmEmailDto:
       type: object
       properties:
         email:
-          type: string
+          $ref: '#/components/schemas/Email'
         token:
           type: string
-      example:
-        email: rar.stas@gmail.com
-        token: r6pvb5pllte
+          example: r6pvb5pllte
     ChangePasswordDto:
       type: object
       properties:
         password:
           type: string
-      example:
-        password: "12345678"
+          password: 12345678
+    ChangeSelfPasswordDto:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          password: 12345678
+        newPassword:
+          type: string
+          password: 12345678
+    # auth end
 
-    # Departments
+    # Departments begin
     Department:
       type: object
       properties:
         id:
           type: string
+          example: 1
         name:
           type: string
+          example: Frontend department
         headId:
           type: string
+          example: 1
         parentDepartmentId:
           type: string
           nulable: true
           default: null
+          example: 1
         usersIds:
           type: string
-      example:
-        id: "22222"
-        name: "Frontend department"
-        headId: "1111"
-        parentDepartmentId: "1111"
-        usersIds: ["1111", "2222", "3333"]
+          example:
+            - '1'
+            - '2'
     DepartmentPatch:
       type: object
       properties:
         name:
           type: string
+          example: Frontend department
         headId:
           type: string
+          example: 1
         parentDepartmentId:
           type: string
           nulable: true
           default: null
+          example: 1
         usersIds:
           type: string
-      example:
-        name: "Frontend department"
-        headId: "1111"
-        parentDepartmentId: "1111"
-        usersIds: ["1111", "2222", "3333"]
+          example:
+            - '1'
+            - '2'
+    # Departments end
+
+    # news feed begin
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: Title post
+        # subject:
+        #   type: string
+        #   example: Subject post
+        message:
+          type: string
+          example: Message post
+        authorId:
+          type: string
+          example: 1
+        files:
+          $ref: '#/components/schemas/Files'
+        date:
+          $ref: '#/components/schemas/Date'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    RecipientsPost:
+      type: object
+      properties:
+        exclude:
+          type: object
+          description: A field by which you can exclude the viewing of a post for users and / or departments
+          properties:
+            departmentsIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "1"
+                - "2"
+              examples:
+                arrayDepartmentsIds:
+                  - "1"
+                  - "2"
+                empty: []
+            usersIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "1"
+                - "2"
+              examples:
+                arrayUsersIds:
+                  - "1"
+                  - "2"
+                empty: []
+        include:
+          type: object
+          description: A field by which you can include the viewing of a post for users and / or departments
+          properties:
+            departmentsIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "3"
+                - "4"
+              examples:
+                arrayDepartmentsIds:
+                  - "1"
+                  - "2"
+                empty: []
+            usersIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "3"
+                - "4"
+              examples:
+                arrayUsersIds:
+                  - "1"
+                  - "2"
+                empty: []
+    CreateUpdatePostDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Title post
+        message:
+          type: string
+          example: Message post
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        recipients:
+          $ref: '#/components/schemas/RecipientsPost'
+          # example:
+          #   exclude:
+          #     departmentsIds:
+          #       - "1"
+          #       - "2"
+          #     usersIds:
+          #       - "1"
+          #       - "2"
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        files:
+          $ref: '#/components/schemas/Files'
+        message:
+          type: string
+          example: Message comment
+        authorId:
+          type: string
+          example: 1
+        date:
+          $ref: '#/components/schemas/Date'
+    CreateUpdateCommentDto:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Message post
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+    # news feed end
 
