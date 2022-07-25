@@ -15,6 +15,25 @@
 				window.ui = SwaggerUIBundle({
 					url: `schemas/api.yml?v=${Date.now() / 180000 | 0}`,
 					dom_id: '#root',
+					plugins: [
+						{
+							statePlugins: {
+								spec: {
+									wrapActions: {
+										updateJsonSpec: function(oriAction, system) {
+											return (spec) => {
+												spec.servers = [
+													...(spec.servers || []),
+													{ url: window.location.origin }
+												];
+												return oriAction(spec)
+											}
+										}
+									}
+								}
+							}
+						}
+					]
 				});
 			};
 		</script>

@@ -9,6 +9,7 @@ tags:
   - name: authService
   - name: departmentsService
   - name: newsFeedService
+  - name: tasksService
 
 paths:
   # users begin
@@ -734,6 +735,102 @@ paths:
         - bearerAuth: []
   # newsfeed end
 
+  # tasks begin
+  /tasks/v1/tasks/:
+    get:
+      description: Get available tasks list. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateEditTaskDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      description: Get task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit task. Available only for authorized users and task maker.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateEditTaskDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # tasks end
+
 components:
   securitySchemes:
     bearerAuth:
@@ -846,6 +943,13 @@ components:
       name: commentId
       in: path
       description: Comment id
+      required: true
+      schema:
+        type: string
+    taskId:
+      name: tastId
+      in: path
+      description: Task id
       required: true
       schema:
         type: string
@@ -1257,4 +1361,83 @@ components:
             type: string
             format: binary
     # news feed end
+
+    # tasks begin
+
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        createdDate:
+          $ref: '#/components/schemas/Date'
+        responsible:
+          description: ID of responsible person
+          type: string
+          example: 1
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        canbanStage:
+          allOf:
+            - $ref: '#/components/schemas/TaskStatus'
+            - type: object
+              example:
+                id: 2
+                title: Ready for review
+        priority:
+          type: string
+          enum:
+            - Low
+            - Average
+            - High
+        files:
+          $ref: '#/components/schemas/Files'
+
+    CreateEditTaskDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        responsible:
+          description: ID of responsible person
+          type: string
+          example: 1
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        priority:
+          type: string
+          enum:
+            - Low
+            - Average
+            - High
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+
+    TaskStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: Work started
+
+    # tasks end
 
