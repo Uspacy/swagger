@@ -9,6 +9,7 @@ tags:
   - name: authService
   - name: departmentsService
   - name: newsFeedService
+  - name: tasksService
 
 paths:
   # users begin
@@ -450,7 +451,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/departments/{departmentId}:
+  /company/v1/departments/{departmentId}/:
     parameters:
       - $ref: '#/components/parameters/departmentId'
     get:
@@ -506,16 +507,8 @@ paths:
       tags:
         - departmentsService
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Department'
+        '204':
+          description: No content
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -620,15 +613,8 @@ paths:
       tags:
         - newsFeedService
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Post'
+        '204':
+          description: No content
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -639,6 +625,9 @@ paths:
     parameters:
       - $ref: '#/components/parameters/postId'
     get:
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
       description: Get comments for post. Available only for authorized users and users who have access to the post
       tags:
         - newsFeedService
@@ -650,8 +639,13 @@ paths:
               schema:
                 type: object
                 properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
                   data:
-                    $ref: '#/components/schemas/Comment'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -683,7 +677,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /newsfeed/v1/posts/{postId}/comments/{commentId}:
+  /newsfeed/v1/posts/{postId}/comments/{commentId}/:
     parameters:
       - $ref: '#/components/parameters/postId'
       - $ref: '#/components/parameters/commentId'
@@ -717,15 +711,8 @@ paths:
       tags:
         - newsFeedService
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Comment'
+        '204':
+          description: No content
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -733,6 +720,391 @@ paths:
       security:
         - bearerAuth: []
   # newsfeed end
+
+  # tasks begin
+  /tasks/v1/tasks/:
+    get:
+      description: Get available tasks list. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateEditTaskDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # /tasks/v1/tasks/statuses/:
+  #   get:
+  #     description: Delegate task by id. Available only for authorized users and user task maker or users with admin permissions.
+  #     tags:
+  #       - tasksService
+  #     responses:
+  #       '200':
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/TaskStatuses'
+
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #     security:
+  #       - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      description: Get task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit task by id. Available only for authorized users and task maker.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateEditTaskDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete task by id. Available only for authorized users and task maker.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # TODO temporary commented
+  # /tasks/v1/tasks/{taskId}/delegate/:
+  #   parameters:
+  #     - $ref: '#/components/parameters/taskId'
+  #   post:
+  #     description: Delegate task by id. Available only for authorized users and user task maker or users with admin permissions.
+  #     tags:
+  #       - tasksService
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               responsibleId:
+  #                 type: string
+  #                 description: ID of new responsible person
+  #                 example: 2
+  #     responses:
+  #       '200':
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: '#/components/schemas/Task'
+  #                 - type: object
+  #                   properties:
+  #                     responsibleId:
+  #                       type: string
+  #                       example: 2
+
+  #       '401':
+  #         $ref: '#/components/responses/UnauthorizedError'
+  #     security:
+  #       - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/comments/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      description: Get comments task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    $ref: '#/components/schemas/Meta'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create comment for task. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCommentDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Task'
+                  - type: object
+                    properties:
+                      responsibleId:
+                        type: string
+                        example: 2
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/comments/{commentId}/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+      - $ref: '#/components/parameters/commentId'
+    delete:
+      description: Delete comment to task by id. Available only for authorized users and author comment.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update comment for task. Available only for authorized users and author comment.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCommentDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Comment'
+                  - type: object
+                    properties:
+                      responsibleId:
+                        type: string
+                        example: 2
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/stages/:
+    get:
+      description: Get canban stages. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CanbanStage'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create canban stage. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CanbanStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 2
+                      afterId:
+                        type: string
+                        example: 1
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/stages/{stageId}/:
+    get:
+      description: Get canban stage by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CanbanStage'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update canban stage by id. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CanbanStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 2
+                      afterId:
+                        type: string
+                        example: 1
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Create comment for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/stages/{stageId}/moveTask/:
+    post:
+      description: Moving a task to stage
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveTaskCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # tasks end
 
 components:
   securitySchemes:
@@ -846,6 +1218,20 @@ components:
       name: commentId
       in: path
       description: Comment id
+      required: true
+      schema:
+        type: string
+    taskId:
+      name: taskId
+      in: path
+      description: Task id
+      required: true
+      schema:
+        type: string
+    stageId:
+      name: stageId
+      in: path
+      description: Stage id
       required: true
       schema:
         type: string
@@ -1257,4 +1643,150 @@ components:
             type: string
             format: binary
     # news feed end
+
+    # tasks begin
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        closedDate:
+          $ref: '#/components/schemas/Date'
+        createdBy:
+          type: string
+          example: 1
+        closedBy:
+          type: string
+          example: 1
+        createdDate:
+          $ref: '#/components/schemas/Date'
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        accomplicesIds:
+          type: array
+          items:
+            type: string
+          example: ["2", "3"]
+        auditorsIds:
+          type: array
+          items:
+            type: string
+          example: ["4", "5"]
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        canbanStageId:
+          type: string
+          example: 2
+        priority:
+          type: string
+          enum:
+            - Low
+            - Average
+            - High
+        files:
+          $ref: '#/components/schemas/Files'
+
+    CreateEditTaskDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        accomplicesIds:
+          type: array
+          items:
+            type: string
+          example: ["2", "3"]
+        auditorsIds:
+          type: array
+          items:
+            type: string
+          example: ["4", "5"]
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        priority:
+          type: string
+          enum:
+            - LOW
+            - AVERAGE
+            - HIGH
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+
+    TaskStatus:
+      type: string
+      enum:
+        - TO_DO
+        - IN_PROGRESS
+        - READY_FOR_REVIEW
+        - DONE
+        - BLOCKED
+
+    TaskStatuses:
+      type: array
+      items:
+        type: string
+      example:
+        - TO_DO
+        - IN_PROGRESS
+        - READY_FOR_REVIEW
+        - DONE
+        - BLOCKED
+
+    CanbanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: To do
+        color:
+          type: string
+          example: "#ff0000"
+        afterId:
+          type: string
+          description: The ID of the stage to add after.
+          example: 0
+
+    CreateEditCanbanStageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: In progress
+        color:
+          type: string
+          example: "#ff0000"
+        afterId:
+          type: string
+          description: The ID of the stage to add after.
+          example: 1
+    MoveTaskCanbanStageDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Task id
+          example: 1
+    # tasks end
 
