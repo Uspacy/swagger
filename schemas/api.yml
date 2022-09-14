@@ -2034,7 +2034,7 @@ components:
           example: <b>need use swagger-ui@4.x</b>
         status:
           $ref: '#/components/schemas/TaskStatus'
-        canbanStageId:
+        kanbanStageId:
           type: string
           example: 2
         priority:
