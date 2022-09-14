@@ -1361,6 +1361,62 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+
+  /tasks/v1/tasks/massEdit/complete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/massEdit/archive/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/massEdit/delete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   # tasks end
 
 components:
@@ -2141,6 +2197,15 @@ components:
           example: 1
         deadline:
           $ref: '#/components/schemas/Date'
+
+    MassEditIds:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example: ["1", "2"]
 
     # tasks end
 
