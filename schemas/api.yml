@@ -212,9 +212,9 @@ paths:
                         properties:
                           roles:
                             allOf:
-                            - type: string
-                              example:
-                                - ADMIN
+                              - type: string
+                                example:
+                                  - ADMIN
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -318,6 +318,31 @@ paths:
             schema:
               type: object
               $ref: '#/components/schemas/ChangeSelfPasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/search/:
+    get:
+      description: Search. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+        - $ref: '#/components/parameters/searchFirstName'
+        - $ref: '#/components/parameters/searchLastName'
       responses:
         '200':
           description: OK
@@ -730,6 +755,9 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/field_name'
+        - $ref: '#/components/parameters/sort_by'
+        - $ref: '#/components/parameters/order_by'
       responses:
         '200':
           description: OK
@@ -757,7 +785,14 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateEditTaskDto'
+              allOf:
+                - $ref: '#/components/schemas/CreateEditTaskDto'
+                - type: object
+                  properties:
+                    fixed:
+                      type: boolean
+                      default: false
+                      example: true
       responses:
         '200':
           description: OK
@@ -812,7 +847,18 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateEditTaskDto'
+              allOf:
+                - $ref: '#/components/schemas/CreateEditTaskDto'
+                - type: object
+                  properties:
+                    archive:
+                      type: boolean
+                      default: false
+                      example: true
+                    fixed:
+                      type: boolean
+                      default: false
+                      example: true
       responses:
         '200':
           description: OK
@@ -835,6 +881,23 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/denial/:
+    post:
+      description: Abandoning a task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDenial'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
   # TODO temporary commented
   # /tasks/v1/tasks/{taskId}/delegate/:
   #   parameters:
@@ -909,7 +972,15 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateCommentDto'
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCommentDto'
+                - type: object
+                  properties:
+                    denial:
+                      type: boolean
+                      default: false
+                      example: true
+                      description: When the comment is a rejection and the task is not accepted.
       responses:
         '200':
           description: OK
@@ -917,12 +988,15 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Task'
+                  - $ref: '#/components/schemas/Comment'
                   - type: object
                     properties:
                       responsibleId:
                         type: string
                         example: 2
+                      denial:
+                        type: boolean
+                        example: true
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -952,7 +1026,15 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateCommentDto'
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCommentDto'
+                - type: object
+                  properties:
+                    denial:
+                      type: boolean
+                      default: false
+                      example: true
+                      description: When the comment is a rejection and the task is not accepted.
       responses:
         '200':
           description: OK
@@ -966,6 +1048,9 @@ paths:
                       responsibleId:
                         type: string
                         example: 2
+                      denial:
+                        type: boolean
+                        example: true
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -1104,6 +1189,259 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /tasks/v1/tasks/{taskId}/checkList/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      description: Get comments task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/CheckList'
+                    - type: object
+                      properties:
+                        checkListItemIds:
+                          type: array
+                          items:
+                            type: string
+                          example: ["2", "3"]
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create check list for task. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCheckList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CheckList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+      - $ref: '#/components/parameters/checkListId'
+    patch:
+      description: Update check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCheckList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateUpdateCheckList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete check list to task by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/checkList/{checkListId}/:
+    parameters:
+      - $ref: '#/components/parameters/checkListId'
+    get:
+      description: Get items check list by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Check list item id
+                          example: 1
+                    - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create item check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CheckListItem'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Check list item id
+                        example: 1
+                  - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/checkList/{checkListId}/{checkListItemId}:
+    parameters:
+      - $ref: '#/components/parameters/checkListId'
+      - $ref: '#/components/parameters/checkListItemId'
+    delete:
+      description: Delete item to check list by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CheckListItem'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Check list item id
+                        example: 1
+                  - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+
+  /tasks/v1/tasks/massEdit/complete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/massEdit/archive/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/massEdit/delete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   # tasks end
 
 components:
@@ -1143,6 +1481,27 @@ components:
         type: integer
       default: 1
       example: 1
+    searchEmail:
+      name: email
+      in: query
+      required: false
+      schema:
+        type: string
+      example: rar.stas@gmail.com
+    searchFirstName:
+      name: firstName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Stas
+    searchLastName:
+      name: LastName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Raranetskyi
     list:
       name: list
       in: query
@@ -1235,6 +1594,45 @@ components:
       required: true
       schema:
         type: string
+    order_by:
+      name: order_by
+      in: query
+      description: sorting direction
+      required: false
+      schema:
+        type: string
+      default: desc
+      example: order_by=asc
+    field_name:
+      name: field_name
+      in: query
+      description: the field we are looking for
+      required: false
+      schema:
+        type: string
+      example: priority=Low
+    sort_by:
+      name: sort_by
+      in: query
+      description: the field by which to sort
+      required: false
+      schema:
+        type: string
+      example: sort_by=deadline
+    checkListId:
+      name: checkListId
+      in: path
+      description: Check List id
+      required: true
+      schema:
+        type: string
+    checkListItemId:
+      name: checkListItemId
+      in: path
+      description: Check List item id
+      required: true
+      schema:
+        type: string
   schemas:
     # common begin
     Meta:
@@ -1261,8 +1659,18 @@ components:
       type: string
       example: 'rar.stas@gmail.com'
     Phone:
-      type: string
-      example: '+380123456789'
+      type: array
+      items:
+        object:
+        properties:
+          type:
+            type: string
+            enum: [WORK, MOBILE, HOME]
+            example: WORK
+          value:
+            type: string
+            example: '+380123456789'
+
     Date:
       type: number
       description: timestamp in seconds
@@ -1295,6 +1703,21 @@ components:
         position:
           type: string
           example: CTO
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
         phone:
           $ref: '#/components/schemas/Phone'
         active:
@@ -1328,6 +1751,21 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
         phone:
           $ref: '#/components/schemas/Phone'
         birthday:
@@ -1682,7 +2120,7 @@ components:
           example: <b>need use swagger-ui@4.x</b>
         status:
           $ref: '#/components/schemas/TaskStatus'
-        canbanStageId:
+        kanbanStageId:
           type: string
           example: 2
         priority:
@@ -1691,6 +2129,25 @@ components:
             - Low
             - Average
             - High
+        acceptResult:
+          type: boolean
+          default: false
+          example: true
+        requiredResult:
+          type: boolean
+          default: false
+          example: true
+        resultCommentId:
+          type: string
+          example: 1
+        fixed:
+          type: boolean
+          default: false
+          example: true
+        archive:
+          type: boolean
+          default: false
+          example: false
         files:
           $ref: '#/components/schemas/Files'
 
@@ -1788,5 +2245,53 @@ components:
           type: string
           description: Task id
           example: 1
+
+    CreateDenial:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: No time
+
+    CreateUpdateCheckList:
+      type: object
+      properties:
+        title:
+          type: string
+          example: New check list
+
+    CheckList:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Check list id
+          example: 1
+        title:
+          type: string
+          example: New check list
+
+    CheckListItem:
+      type: object
+      properties:
+        title:
+          type: string
+          example: First item
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        deadline:
+          $ref: '#/components/schemas/Date'
+
+    MassEditIds:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example: ["1", "2"]
+
     # tasks end
 
