@@ -333,6 +333,31 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /company/v1/users/search/:
+    get:
+      description: Search. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+        - $ref: '#/components/parameters/searchFirstName'
+        - $ref: '#/components/parameters/searchLastName'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # users end
 
   # auth begin
@@ -1456,6 +1481,27 @@ components:
         type: integer
       default: 1
       example: 1
+    searchEmail:
+      name: email
+      in: query
+      required: false
+      schema:
+        type: string
+      example: rar.stas@gmail.com
+    searchFirstName:
+      name: firstName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Stas
+    searchLastName:
+      name: LastName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Raranetskyi
     list:
       name: list
       in: query
@@ -1613,8 +1659,18 @@ components:
       type: string
       example: 'rar.stas@gmail.com'
     Phone:
-      type: string
-      example: '+380123456789'
+      type: array
+      items:
+        object:
+        properties:
+          type:
+            type: string
+            enum: [WORK, MOBILE, HOME]
+            example: WORK
+          value:
+            type: string
+            example: '+380123456789'
+
     Date:
       type: number
       description: timestamp in seconds
@@ -1647,6 +1703,21 @@ components:
         position:
           type: string
           example: CTO
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
         phone:
           $ref: '#/components/schemas/Phone'
         active:
@@ -1680,6 +1751,21 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
         phone:
           $ref: '#/components/schemas/Phone'
         birthday:
