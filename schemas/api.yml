@@ -334,6 +334,38 @@ paths:
       security:
         - bearerAuth: []
 
+  /company/v1/users/forgotPassword/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/EmailPasswordDto'
+      responses:
+        '200':
+          description: OK
+
+  /company/v1/users/resetPassword/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/EmailPasswordTokenDto'
+      responses:
+        '200':
+          description: OK
+
   /company/v1/users/search/:
     get:
       description: Search. Available only for authorized users.
@@ -1897,6 +1929,23 @@ components:
         newPassword:
           type: string
           password: 12345678
+    EmailPasswordDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: example@gmail.com
+    EmailPasswordTokenDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          example: 12345678
+        token:
+          type: string
+          example: r6pvb5pllte
     # auth end
 
     # Departments begin
