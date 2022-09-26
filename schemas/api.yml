@@ -68,7 +68,7 @@ paths:
                           position:
                             example: ''
                           phone:
-                            example: ''
+                            example: "[]"
                           birthday:
                             example: 0
                           roles:
@@ -1695,6 +1695,9 @@ components:
       items:
         object:
         properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83mc2s'
           type:
             type: string
             enum: [WORK, MOBILE, HOME]
@@ -1837,6 +1840,9 @@ components:
       items:
         object:
         properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83bn2s'
           name:
             type: string
             example: facebook
