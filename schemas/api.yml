@@ -10,6 +10,7 @@ tags:
   - name: departmentsService
   - name: newsFeedService
   - name: tasksService
+  - name: filesService
 
 paths:
   # users begin
@@ -1476,6 +1477,150 @@ paths:
 
   # tasks end
 
+  # files begin
+
+  /files/v1/files:
+    get:
+      description: Lists the file info
+      tags:
+        - filesService
+      parameters:
+        - in: query
+          name: entity_type
+          schema:
+            $ref: '#/components/schemas/EntityTypes'
+          required: true
+          description: Entity type name
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+            format: int32
+          required: true
+          description: Entity ID of the file
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Upload one or more files
+      tags:
+        - filesService
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadContainer'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files/{id}:
+    get:
+      description: Shows the info about the file
+      tags:
+        - filesService
+      parameters:
+        - in: path
+          name: file_id
+          schema:
+            type: integer
+            format: int32
+          required: true
+          description: Numeric ID of the file to show
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_id:
+                  type: integer
+                  format: int32
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update the `entity_id` for one file or a group of files
+      tags:
+        - filesService
+      parameters:
+        - in: path
+          name: id
+          schema:
+            oneOf:
+              - type: integer
+                format: int32
+              - type: string
+                format: uuid
+          required: true
+          description: Numeric ID of the file to update or the UUID of the upload group
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Removes the uploaded file and info about it
+      tags:
+        - filesService
+      parameters:
+        - in: path
+          name: file_id
+          schema:
+            type: integer
+            format: int32
+          required: true
+          description: Numeric ID of the file to remove
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # files end
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2350,3 +2495,63 @@ components:
 
     # tasks end
 
+    # files begin
+
+    EntityTypes:
+      type: string
+      enum:
+        - comment
+        - post
+        - task
+
+    UploadContainer:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        entityType:
+          $ref: '#/components/schemas/EntityTypes'
+        entityId:
+          type: integer
+          format: int32
+      required:
+        - files
+        - entity_type
+
+    FileInfoDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        entityType:
+          $ref: '#/components/schemas/EntityTypes'
+          example: 'comment'
+        entityId:
+          type: integer
+          format: int32
+          example: 1
+        uploadId:
+          type: string
+          format: uuid
+          example: '369c4620-adee-4526-a0d8-a1db20bcf5b2'
+        originalFilename:
+          type: string
+          example: sample.jpg
+        lastModified:
+          type: integer
+          format: int64
+          example: 1664629542
+        size:
+          type: integer
+          format: int64
+          example: 123456
+        url:
+          type: string
+          example: 'https://aws.s3.amazonaws.com/my-bucket/example.jpg'
+
+    # files end
