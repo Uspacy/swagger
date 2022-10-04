@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Import-wizard
+  description: >-
+    Import wizard. Returns information about the number of entities and their import time from the selected portal
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /bitrix24:
+    post:
+      tags:
+        - bitrix24
+      description: >-
+        Receives data from the portal about the number of entities and the time
+        required for their import
+      requestBody:
+        description: The "BitrixEntities" array can be empty or missing. In this case, all entities will be sampled. If it is present, only those entities represented in it will be processed. In this way, you can make selective requests, and adjust the time in the "Time" field based on the current speed of bitrix24.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestB24'
+        required: true
+      responses:
+        '200':
+          description: ."Totals" is an array of entities that were passed in the request. The field "Name1" will have the value corresponding to the field "Name" of one of those that were passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref:  '#/components/schemas/ApiResponse'
+  /amo:
+    post:
+      tags:
+        - amo
+      description: >-
+        Receives data from the portal about the number of entities and the time
+        required for their import
+      requestBody:
+        description: The "AmoEntities" array can be empty or missing. In this case, all entities will be sampled. If it is present, only those entities represented in it will be processed. In this way, you can make selective requests, and adjust the time in the "Time" field based on the current speed of bitrix24. "AmoPage" is the value of the page number from which the program will start looking for the number of pages for this entity. "AmoRedirectURI" must match what was specified when creating the integration on the Amo portal. "AmoCode" Must be updated if there is a repeated request for the same client
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAmo'
+        required: true
+      responses:
+        '200':
+          description: ."Totals" is an array of entities that were passed in the request. The field "Name1" will have the value corresponding to the field "Name" of one of those that were passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    RequestB24:
+      type: object
+      properties:
+        BitrixWebhook:
+          type: string
+          example: https://Portal/rest/UserID/Secret
+        BitrixEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityB24'
+    EntityB24:
+      type: object
+      properties:
+        Name:
+          type: string
+          example: TaskList
+        Method:
+          type: string
+          example: tasks.task.list
+        Time:
+          type: integer
+          example: 4
+    RequestAmo:
+      type: object
+      properties:
+        AmoDomain:
+          type: string
+          example: name_portal_XXXX
+        AmoClientID:
+          type: string
+          example: XXXXX-YYYYYY-KKKKKKK-TTTTTT-FFFFFFF
+        AmoClientSecret:
+          type: string
+          example: XXXXXYYYYYYKKKKKKKTTTTTTFFFFFFF
+        AmoCode:
+          type: string
+          example: EEEEEEEEEEEEEEEYYYYYKKKKKKKTTTTTTFFFFFFF
+        AmoRedirectURI:
+          type: string
+          example: https://example.com
+        AmoPage:
+          type: integer
+          example: 1000
+        AmoEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityAmo'
+    EntityAmo:
+      type: object
+      properties:
+        Name:
+          type: string
+          example: ContactList
+        Method:
+          type: string
+          example: /api/v4/contacts
+        Time:
+          type: integer
+          example: 4
+    ApiResponse:
+      type: object
+      properties:
+        Totals:
+          type: object
+          properties:
+            Name1:
+              $ref: '#/components/schemas/EntityResponce'
+            Name2:
+              $ref: '#/components/schemas/EntityResponce'
+        Information:
+          type: object
+          properties:
+            ClientData:
+              type: string
+              example: Unmarshal client data successfully
+            InitClient:
+              type: string
+              example: Client initialized
+            UnmarshalData:
+              type: string
+              example: Unmarshal data successfully
+    EntityResponce:
+      type: object
+      properties:
+        Method:
+          type: string
+        Count:
+          type: integer
+        Time:
+          type: integer
+        Error:
+          type: string
