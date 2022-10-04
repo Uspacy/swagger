@@ -492,6 +492,13 @@ paths:
       description: Create department. Available only for users with admin permissions
       tags:
         - departmentsService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/DepartmentPatch'
       responses:
         '200':
           description: OK
@@ -2131,6 +2138,9 @@ components:
         headId:
           type: string
           example: 1
+        description:
+          type: string
+          example: example
         parentDepartmentId:
           type: string
           nulable: true
