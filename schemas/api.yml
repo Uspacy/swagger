@@ -1613,7 +1613,9 @@ paths:
   /comments/v1/comments/:
     get:
       description: >
-        Lists the comments related to some entity
+        Lists the comments related to some entity.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
       tags:
         - commentsService
       parameters:
@@ -1714,9 +1716,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
@@ -1728,7 +1727,13 @@ paths:
                             nextId:
                               type: integer
                               format: int32
+                              example: 3
+                              description: If NULL, this is the last comment if the (sub)thread
+                            prevId:
+                              type: integer
+                              format: int32
                               example: 1
+                              description: If NULL, this is the first comment if the (sub)thread
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
