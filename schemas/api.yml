@@ -1,4 +1,4 @@
-openapi: '3.0.n'
+openapi: '3.0.1'
 info:
   title: Uspacy api
   version: 1.0.0
@@ -8,6 +8,7 @@ tags:
   - name: usersService
   - name: authService
   - name: departmentsService
+  - name: rolesService
   - name: newsFeedService
   - name: tasksService
   - name: filesService
@@ -33,13 +34,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -53,32 +53,28 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/SignUpDto'
       responses:
         '201':
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    allOf:
-                      - $ref: '#/components/schemas/User'
-                      - type: object
-                        properties:
-                          position:
-                            example: ''
-                          phone:
-                            example: "[]"
-                          birthday:
-                            example: 0
-                          roles:
-                            example: '["USER"]'
-                          departmentsIds:
-                            example: "[]"
-                          socialMedia:
-                            example: "[]"
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      position:
+                        example: ''
+                      phone:
+                        example: "[]"
+                      birthday:
+                        example: 0
+                      roles:
+                        example: '["Employee"]'
+                      departmentsIds:
+                        example: "[]"
+                      socialMedia:
+                        example: "[]"
 
           description: Created
         '401':
@@ -100,11 +96,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -118,7 +110,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/UpdateUserDto'
       responses:
         '200':
@@ -126,9 +117,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -146,15 +135,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    allOf:
-                      - $ref: '#/components/schemas/User'
-                      - type: object
-                        properties:
-                          active:
-                            example: false
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      active:
+                        example: false
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -174,11 +160,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -197,7 +179,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/UpdateRolesDto'
       responses:
         '200':
@@ -205,18 +186,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    allOf:
-                      - $ref: '#/components/schemas/User'
-                      - type: object
-                        properties:
-                          roles:
-                            allOf:
-                              - type: string
-                                example:
-                                  - ADMIN
+                allOf:
+                  - $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -235,7 +206,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/UpdateUserPosition'
       responses:
         '200':
@@ -243,15 +213,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    allOf:
-                      - $ref: '#/components/schemas/User'
-                      - type: object
-                        properties:
-                          position:
-                            example: new position
+                $ref: '#/components/schemas/User'
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -271,7 +233,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/ChangePasswordDto'
       responses:
         '200':
@@ -279,11 +240,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -299,11 +256,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -318,7 +271,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/ChangeSelfPasswordDto'
       responses:
         '200':
@@ -326,16 +278,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /company/v1/users/forgotPassword/:
     post:
       description: Reset password. Available to unauthorized users.
@@ -346,12 +293,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/EmailPasswordDto'
       responses:
         '200':
           description: OK
-
   /company/v1/users/resetPassword/:
     post:
       description: Reset password. Available to unauthorized users.
@@ -362,12 +307,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/EmailPasswordTokenDto'
       responses:
         '200':
           description: OK
-
   /company/v1/users/search/:
     get:
       description: Search. Available only for authorized users.
@@ -386,8 +329,9 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
                     $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -405,7 +349,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/SignInDto'
       responses:
         '200':
@@ -413,11 +356,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Token'
+                $ref: '#/components/schemas/Token'
   /company/v1/auth/confirmEmail/:
     description: Confirm email user. Returns token, refreshToken
     post:
@@ -428,7 +367,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/ConfirmEmailDto'
       responses:
         '200':
@@ -436,11 +374,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Token'
+                $ref: '#/components/schemas/Token'
   /company/v1/auth/refreshToken/:
     description: refreshToken exprired token. Returns new token
     post:
@@ -452,11 +386,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Token'
+                $ref: '#/components/schemas/Token'
   # auth end
 
   # departments begin
@@ -478,13 +408,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Department'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -498,7 +427,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/DepartmentPatch'
       responses:
         '200':
@@ -506,11 +434,15 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Department'
+                allOf:
+                  - $ref: '#/components/schemas/Department'
+                  - type: object
+                    properties:
+                      roles:
+                        type: array
+                        items:
+                          type: string
+                        example: "[]"
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -530,11 +462,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Department'
+                $ref: '#/components/schemas/Department'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -550,7 +478,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: '#/components/schemas/DepartmentPatch'
       responses:
         '200':
@@ -558,11 +485,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/Department'
+                $ref: '#/components/schemas/Department'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -579,7 +502,175 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+  /company/v1/departments/{departmentId}/updateRoles/:
+    patch:
+      description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
+      tags:
+        - departmentsService
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRolesDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
   # departments end
+
+  # roles begin
+  /company/v1/permissions/:
+    get:
+      description: Get permissions list. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/roles/:
+    get:
+      description: Get role list. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleList'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create role. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleStore'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NewRoleList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/roles/{roleId}/:
+    parameters:
+      - $ref: '#/components/parameters/roleId'
+    get:
+      description: Get role by id. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RoleList'
+                  - type: object
+                    properties:
+                      permissions:
+                        $ref: '#/components/schemas/PermissionsAction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description:
+        Update role data. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RoleStore'
+                - type: object
+                  properties:
+                    usersIds:
+                      type: string
+                      example:
+                        - "1"
+                        - "2"
+                    departmentsIds:
+                      type: string
+                      example:
+                        - "1"
+                        - "2"
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RoleList'
+                  - type: object
+                    properties:
+                      permissions:
+                        $ref: '#/components/schemas/PermissionsAction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description:
+        Delete role. Only available to authorized users with the owner or administrator role.
+      tags:
+        - rolesService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # roles end
 
   # newsfeed begin
   /newsfeed/v1/posts/:
@@ -598,9 +689,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
@@ -612,6 +700,8 @@ paths:
                               properties:
                                 comments:
                                   example: "[]"
+                  meta:
+                    $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -631,15 +721,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    allOf:
-                      - $ref: '#/components/schemas/Post'
-                      - type: object
-                        properties:
-                          comments:
-                            example: "[]"
+                allOf:
+                  - $ref: '#/components/schemas/Post'
+                  - type: object
+                    properties:
+                      comments:
+                        example: "[]"
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -664,10 +751,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/Post'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -706,7 +790,6 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
                     $ref: '#/components/schemas/Meta'
                   data:
                     type: array
@@ -807,13 +890,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -845,23 +927,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  # /tasks/v1/tasks/statuses/:
-  #   get:
-  #     description: Delegate task by id. Available only for authorized users and user task maker or users with admin permissions.
-  #     tags:
-  #       - tasksService
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/TaskStatuses'
-
-  #       '401':
-  #         $ref: '#/components/responses/UnauthorizedError'
-  #     security:
-  #       - bearerAuth: []
   /tasks/v1/tasks/{taskId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -927,6 +992,8 @@ paths:
       description: Abandoning a task. Available only for authorized users.
       tags:
         - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
       requestBody:
         content:
           application/json:
@@ -939,42 +1006,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  # TODO temporary commented
-  # /tasks/v1/tasks/{taskId}/delegate/:
-  #   parameters:
-  #     - $ref: '#/components/parameters/taskId'
-  #   post:
-  #     description: Delegate task by id. Available only for authorized users and user task maker or users with admin permissions.
-  #     tags:
-  #       - tasksService
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               responsibleId:
-  #                 type: string
-  #                 description: ID of new responsible person
-  #                 example: 2
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               allOf:
-  #                 - $ref: '#/components/schemas/Task'
-  #                 - type: object
-  #                   properties:
-  #                     responsibleId:
-  #                       type: string
-  #                       example: 2
-
-  #       '401':
-  #         $ref: '#/components/responses/UnauthorizedError'
-  #     security:
-  #       - bearerAuth: []
   /tasks/v1/tasks/{taskId}/comments/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1109,9 +1140,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CanbanStage'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CanbanStage'
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -1152,16 +1186,15 @@ paths:
       description: Get canban stage by id. Available only for authorized users.
       tags:
         - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CanbanStage'
-
+                $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -1170,6 +1203,8 @@ paths:
       description: Update canban stage by id. Available only for authorized users.
       tags:
         - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
       requestBody:
         content:
           application/json:
@@ -1200,11 +1235,8 @@ paths:
       description: Create comment for task. Available only for authorized users.
       tags:
         - tasksService
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      parameters:
+        - $ref: '#/components/parameters/stageId'
       responses:
         '204':
           description: No content
@@ -1218,6 +1250,8 @@ paths:
       description: Moving a task to stage
       tags:
         - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
       requestBody:
         content:
           application/json:
@@ -1283,7 +1317,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1323,7 +1356,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /tasks/v1/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1381,7 +1413,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /tasks/v1/checkList/{checkListId}/{checkListItemId}:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1428,7 +1459,6 @@ paths:
       security:
         - bearerAuth: []
 
-
   /tasks/v1/tasks/massEdit/complete/:
     post:
       description: Bulk editing tasks
@@ -1446,7 +1476,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /tasks/v1/tasks/massEdit/archive/:
     post:
       description: Bulk editing tasks
@@ -1464,7 +1493,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /tasks/v1/tasks/massEdit/delete/:
     post:
       description: Bulk editing tasks
@@ -1859,6 +1887,13 @@ components:
       required: true
       schema:
         type: string
+    roleId:
+      name: roleId
+      in: path
+      description: Role id
+      required: true
+      schema:
+        type: string
     page:
       name: page
       in: query
@@ -1866,7 +1901,7 @@ components:
       required: false
       schema:
         type: integer
-      default: 1
+        default: 1
       example: 1
     searchEmail:
       name: email
@@ -1896,8 +1931,8 @@ components:
       required: false
       schema:
         type: number
+        default: 20
       example: 10
-      default: 20
     query:
       name: query
       in: query
@@ -1905,8 +1940,8 @@ components:
       required: false
       schema:
         type: string
+        default: ""
       example: "some query string"
-      default: ""
     filter:
       name: filter
       in: query
@@ -1988,7 +2023,7 @@ components:
       required: false
       schema:
         type: string
-      default: desc
+        default: desc
       example: order_by=asc
     field_name:
       name: field_name
@@ -2057,14 +2092,14 @@ components:
         type: string
       example:
         - OWNER
-        - USER
+        - Employee
+        - ADMIN
     Email:
       type: string
       example: 'rar.stas@gmail.com'
     Phone:
       type: array
       items:
-        object:
         properties:
           id:
             type: string
@@ -2192,9 +2227,6 @@ components:
     UpdateRolesDto:
       allOf:
         - $ref: '#/components/schemas/Roles'
-        - type: string
-          example:
-            - ADMIN
     UpdateUserPosition:
       type: object
       properties:
@@ -2206,10 +2238,8 @@ components:
 
     # auth
     SocialMedia:
-
       type: array
       items:
-        object:
         properties:
           id:
             type: string
@@ -2236,7 +2266,7 @@ components:
       type: object
       properties:
         email:
-          $ref: '#/components/schemas/Email'
+          type: string
         firstName:
           type: string
         lastName:
@@ -2244,7 +2274,7 @@ components:
         password:
           type: string
       example:
-        email:
+        email: "example@gmail.com"
         password: "12345678"
         firstName: Stas
         lastName: Raranetskyi
@@ -2296,16 +2326,16 @@ components:
       properties:
         password:
           type: string
-          password: 12345678
+          example: 12345678
     ChangeSelfPasswordDto:
       type: object
       properties:
         oldPassword:
           type: string
-          password: 12345678
+          example: 12345678
         newPassword:
           type: string
-          password: 12345678
+          example: 12345678
     EmailPasswordDto:
       type: object
       properties:
@@ -2340,7 +2370,6 @@ components:
           example: 1
         parentDepartmentId:
           type: string
-          nulable: true
           default: null
           example: 1
         usersIds:
@@ -2348,6 +2377,8 @@ components:
           example:
             - '1'
             - '2'
+        roles:
+          $ref: '#/components/schemas/Roles'
     DepartmentPatch:
       type: object
       properties:
@@ -2362,8 +2393,7 @@ components:
           example: example
         parentDepartmentId:
           type: string
-          nulable: true
-          default: null
+          default: ""
           example: 1
         usersIds:
           type: string
@@ -2474,14 +2504,6 @@ components:
             format: binary
         recipients:
           $ref: '#/components/schemas/RecipientsPost'
-          # example:
-          #   exclude:
-          #     departmentsIds:
-          #       - "1"
-          #       - "2"
-          #     usersIds:
-          #       - "1"
-          #       - "2"
     Comment:
       type: object
       properties:
@@ -2620,17 +2642,6 @@ components:
     TaskStatus:
       type: string
       enum:
-        - TO_DO
-        - IN_PROGRESS
-        - READY_FOR_REVIEW
-        - DONE
-        - BLOCKED
-
-    TaskStatuses:
-      type: array
-      items:
-        type: string
-      example:
         - TO_DO
         - IN_PROGRESS
         - READY_FOR_REVIEW
@@ -2785,6 +2796,247 @@ components:
 
     # files end
 
+    # roles begin
+    NewRoleList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: ADMIN
+        permissions:
+          $ref: '#/components/schemas/PermissionsAction'
+
+    PermissionsAction:
+      type: object
+      properties:
+        create:
+          type: string
+          example:
+            - crm.lead.create.mine
+            - crm.lead.create.allowed
+            - crm.lead.create.department
+        view:
+          type: string
+          example:
+            - crm.lead.view.mine
+            - crm.lead.view.allowed
+            - crm.lead.view.department
+        edit:
+          type: string
+          example:
+            - crm.lead.edit.mine
+            - crm.lead.edit.allowed
+            - crm.lead.edit.department
+        delete:
+          type: string
+          example:
+            - crm.lead.delete.mine
+            - crm.lead.delete.allowed
+            - crm.lead.delete.department
+        export:
+          type: string
+          example:
+            - crm.lead.export.mine
+            - crm.lead.export.allowed
+            - crm.lead.export.department
+
+    RoleList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: ADMIN
+        userlist:
+          $ref: '#/components/schemas/Userlist'
+        departmentlist:
+          $ref: '#/components/schemas/Departmentlist'
+
+    Departmentlist:
+      type: array
+      items:
+        $ref: '#/components/schemas/DepartmentForRole'
+
+    DepartmentForRole:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Employee
+        dateUpdate:
+          $ref: '#/components/schemas/Date'
+
+    Userlist:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserForRole'
+
+    UserForRole:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Stas
+        lastName:
+          type: string
+          example: Raranetskyi
+        avatar:
+          type: string
+          example: path to avatar
+        dateUpdate:
+          $ref: '#/components/schemas/Date'
+
+    RoleStore:
+      type: object
+      properties:
+        name:
+          type: string
+          example: ADMIN
+        permissions:
+          $ref: '#/components/schemas/PermissionsStore'
+
+    PermissionsStore:
+      type: array
+      items:
+        type: string
+      example:
+        - crm.lead.edit.mine
+        - crm.lead.delete.allowed
+        - crm.lead.edit.department
+
+    PermissionsList:
+      type: object
+      properties:
+        create:
+          type: string
+          example:
+            - crm.lead.create.allowed
+            - crm.contact.create.allowed
+            - crm.company.create.allowed
+            - crm.deal.create.allowed
+            - crm.invoice.create.allowed
+            - crm.product.create.allowed
+            - crm.activity.create.allowed
+            - hrm.hiring.create.allowed
+            - hrm.candidate.create.allowed
+            - hrm.department.create.allowed
+            - hrm.employee.create.allowed
+            - tasks.task.create.allowed
+            - tasks.board.create.allowed
+            - tasks.template.create.allowed
+        view:
+          type: string
+          example:
+            - crm.lead.view.allowed
+            - crm.lead.view.department
+            - crm.lead.view.mine
+            - crm.contact.view.allowed
+            - crm.contact.view.department
+            - crm.contact.view.mine
+            - crm.company.view.allowed
+            - crm.company.view.mine
+            - crm.deal.view.allowed
+            - crm.deal.view.mine
+            - crm.invoice.view.allowed
+            - crm.invoice.view.mine
+            - crm.product.view.allowed
+            - crm.activity.view.allowed
+            - crm.activity.view.mine
+            - hrm.hiring.view.allowed
+            - hrm.candidate.view.allowed
+            - hrm.department.view.allowed
+            - hrm.employee.view.allowed
+            - hrm.employee.view.mine
+            - tasks.task.view.allowed
+            - tasks.task.view.department
+            - tasks.task.view.mine
+            - tasks.board.view.allowed
+            - tasks.board.view.department
+            - tasks.template.view.allowed
+            - tasks.template.view.department
+        edit:
+          type: string
+          example:
+            - crm.lead.edit.allowed
+            - crm.lead.edit.department
+            - crm.lead.edit.mine
+            - crm.contact.edit.allowed
+            - crm.contact.edit.department
+            - crm.contact.edit.mine
+            - crm.company.edit.allowed
+            - crm.company.edit.mine
+            - crm.deal.edit.allowed
+            - crm.deal.edit.mine
+            - crm.invoice.edit.allowed
+            - crm.invoice.edit.mine
+            - crm.product.edit.allowed
+            - crm.activity.edit.allowed
+            - crm.activity.edit.mine
+            - hrm.hiring.edit.allowed
+            - hrm.candidate.edit.allowed
+            - hrm.department.edit.allowed
+            - hrm.employee.edit.allowed
+            - hrm.employee.edit.mine
+            - tasks.task.edit.allowed
+            - tasks.task.edit.department
+            - tasks.task.edit.mine
+            - tasks.board.edit.allowed
+            - tasks.board.edit.mine
+            - tasks.template.edit.allowed
+            - tasks.template.edit.mine
+            - news_feed.news.edit.allowed
+        delete:
+          type: string
+          example:
+            - crm.lead.delete.allowed
+            - crm.contact.delete.allowed
+            - crm.company.delete.allowed
+            - crm.deal.delete.allowed
+            - crm.invoice.delete.allowed
+            - crm.product.delete.allowed
+            - crm.activity.delete.allowed
+            - crm.activity.delete.mine
+            - hrm.hiring.delete.allowed
+            - hrm.candidate.delete.allowed
+            - hrm.department.delete.allowed
+            - hrm.employee.delete.allowed
+            - tasks.task.delete.allowed
+            - tasks.task.delete.mine
+            - tasks.board.delete.allowed
+            - tasks.board.delete.mine
+            - tasks.template.delete.allowed
+            - tasks.template.delete.mine
+            - news_feed.news.delete.allowed
+        export:
+          type: string
+          example:
+            - crm.lead.export.allowed
+            - crm.contact.export.allowed
+            - crm.company.export.allowed
+            - crm.deal.export.allowed
+            - crm.invoice.export.allowed
+            - crm.product.export.allowed
+            - crm.activity.export.allowed
+            - hrm.hiring.export.allowed
+            - hrm.candidate.export.allowed
+            - hrm.department.export.allowed
+            - hrm.employee.export.allowed
+            - tasks.task.export.allowed
+            - tasks.template.export.allowed
+
+    # roles end
+
     # comments begin
 
     CommentServiceDto:
@@ -2856,3 +3108,4 @@ components:
           example: Message post
 
     # comments end
+
