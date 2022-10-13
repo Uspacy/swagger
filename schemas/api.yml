@@ -1544,7 +1544,7 @@ paths:
           name: fileId
           schema:
             type: integer
-            format: int32
+            format: int64
           required: true
           description: Numeric ID of the file to show
       responses:
@@ -1567,7 +1567,7 @@ paths:
           schema:
             oneOf:
               - type: integer
-                format: int32
+                format: int64
               - type: string
                 format: uuid
           required: true
@@ -1595,7 +1595,7 @@ paths:
           name: fileId
           schema:
             type: integer
-            format: int32
+            format: int64
           required: true
           description: Numeric ID of the file to remove
       responses:
@@ -1675,7 +1675,7 @@ paths:
           required: false
           schema:
             type: integer
-            format: int32
+            format: int64
         - lastId:
           name: lastId
           in: query
@@ -1708,7 +1708,7 @@ paths:
           required: false
           schema:
             type: integer
-            format: int32
+            format: int64
       responses:
         '200':
           content:
@@ -1726,12 +1726,12 @@ paths:
                           properties:
                             nextId:
                               type: integer
-                              format: int32
+                              format: int64
                               example: 3
                               description: If NULL, this is the last comment if the (sub)thread
                             prevId:
                               type: integer
-                              format: int32
+                              format: int64
                               example: 1
                               description: If NULL, this is the first comment if the (sub)thread
         '401':
@@ -1768,7 +1768,7 @@ paths:
           name: commentId
           schema:
             type: integer
-            format: int32
+            format: int64
           required: true
           description: Numeric ID of the comment to show
       responses:
@@ -1790,7 +1790,7 @@ paths:
           name: commentId
           schema:
             type: integer
-            format: int32
+            format: int64
           required: true
           description: Numeric ID of the comment to show
       requestBody:
@@ -1818,7 +1818,7 @@ paths:
           name: commentId
           schema:
             type: integer
-            format: int32
+            format: int64
           required: true
           description: Numeric ID of the comment to delete
       responses:
@@ -2032,7 +2032,7 @@ components:
       name: entityId
       schema:
         type: integer
-        format: int32
+        format: int64
       required: true
       description: Entity ID
 
@@ -2745,7 +2745,7 @@ components:
           $ref: '#/components/schemas/EntityTypes'
         entityId:
           type: integer
-          format: int32
+          format: int64
       required:
         - files
         - entityType
@@ -2755,14 +2755,14 @@ components:
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 1
         entityType:
           $ref: '#/components/schemas/EntityTypes'
           example: 'post'
         entityId:
           type: integer
-          format: int32
+          format: int64
           example: 1
         uploadId:
           type: string
@@ -2792,14 +2792,14 @@ components:
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 1
         entityType:
           $ref: '#/components/schemas/EntityTypes'
           example: 'post'
         entityId:
           type: integer
-          format: int32
+          format: int64
           example: 1
         message:
           type: string
@@ -2823,8 +2823,9 @@ components:
       properties:
         reaction:
           type: integer
-          format: int32
-          example: 0x0001F601
+          format: int64
+          example: 128513
+          description: Represents the UNICODE symbol such as 0x0001F601
         count:
           type: integer
           format: int32
@@ -2838,7 +2839,7 @@ components:
           example: 'post'
         entityId:
           type: integer
-          format: int32
+          format: int64
           example: 1
         message:
           type: string
