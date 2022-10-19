@@ -336,6 +336,46 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /company/v1/users/uploadAvatar:
+    post:
+      description: Avatar upload. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - avatar
+                  properties:
+                    avatar:
+                      default: ''
+                      format: binary
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      responsibleId:
+                        type: string
+                        example: 2
+                      denial:
+                        type: boolean
+                        example: true
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # users end
 
   # auth begin
@@ -1648,27 +1688,27 @@ paths:
         - commentsService
       parameters:
         - allOf:
-          - $ref: '#/components/parameters/entityType'
-          - description: >
-              Entity type name.
-              If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-              And only the child comments are being sent in this case.
-              Use along with `childList` and `lastId` to paginate the child comments.
+            - $ref: '#/components/parameters/entityType'
+            - description: >
+                Entity type name.
+                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+                And only the child comments are being sent in this case.
+                Use along with `childList` and `lastId` to paginate the child comments.
         - $ref: '#/components/parameters/entityId'
         - allOf:
-          - $ref: '#/components/parameters/list'
-          - description: >
-              Use this to define the number of top level comments to retrieve.
-              Retrieve all if missing or retrieve the rest if `nextId` is present.
-          - example: 3
-          - default: 3
-          - required: false
+            - $ref: '#/components/parameters/list'
+            - description: >
+                Use this to define the number of top level comments to retrieve.
+                Retrieve all if missing or retrieve the rest if `nextId` is present.
+            - example: 3
+            - default: 3
+            - required: false
         - childList:
           name: childList
           in: query
           description: >
-              Use this to define the number of child comments to retrieve.
-              Retrieve all if missing or retrieve the rest if `lastId` is present.
+            Use this to define the number of child comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `lastId` is present.
           required: false
           schema:
             type: integer
@@ -1679,27 +1719,27 @@ paths:
           name: nextId
           in: query
           description: >
-              The top level comments are being paginated starting from the last page but in the ascending order.
-              This parameter used to point the topmost comment on the previous page. For example: to get the
-              previous page in the sample below `nextId` must be 22.
+            The top level comments are being paginated starting from the last page but in the ascending order.
+            This parameter used to point the topmost comment on the previous page. For example: to get the
+            previous page in the sample below `nextId` must be 22.
 
-              * comment-22
+            * comment-22
 
-              * comment-23
+            * comment-23
 
-              * comment-24
-
-
-              and the entire query should look like the following:
+            * comment-24
 
 
-              ```
-              ?entityType=post&entityId=123&list=3&childList=2&nextId=22
-              ```
+            and the entire query should look like the following:
 
 
-              This means: to get the previous 3 comments of the entity `post-123` along with the possible
-              child comments (no more then 2 child comments per parent) relating to the `comment-22`
+            ```
+            ?entityType=post&entityId=123&list=3&childList=2&nextId=22
+            ```
+
+
+            This means: to get the previous 3 comments of the entity `post-123` along with the possible
+            child comments (no more then 2 child comments per parent) relating to the `comment-22`
           required: false
           schema:
             type: integer
@@ -2599,6 +2639,10 @@ components:
           type: boolean
           default: false
           example: false
+        departmentId:
+          description: Department ID
+          type: string
+          example: 1
         files:
           $ref: '#/components/schemas/Files'
 
@@ -2638,6 +2682,11 @@ components:
           items:
             type: string
             format: binary
+        departmentId:
+          description: Department ID
+          default: 'current department id'
+          type: string
+          example: 1
 
     TaskStatus:
       type: string
