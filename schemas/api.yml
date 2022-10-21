@@ -1550,6 +1550,23 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+  /tasks/v1/delegation:
+    post:
+      description: Transfer tasks to another user. Available only for admin users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferTask'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
 
   # tasks end
 
@@ -2781,6 +2798,28 @@ components:
           items:
             type: string
           example: ["1", "2"]
+
+    TransferTask:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        newUserId:
+          type: string
+          example: 55
+        task:
+          type: object
+          properties:
+            owner:
+              type: boolean
+              example: true
+            responsible:
+              type: boolean
+              example: false
+      required:
+        - oldUserId
+        - newUserId
 
     # tasks end
 
