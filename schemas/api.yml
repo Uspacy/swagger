@@ -9,6 +9,7 @@ tags:
   - name: authService
   - name: departmentsService
   - name: rolesService
+  - name: inviteService
   - name: newsFeedService
   - name: tasksService
   - name: filesService
@@ -427,6 +428,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+  /company/v1/auth/register/:
+    post:
+      description: New user registration by invitation. Returns token, refreshToken
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationByInvitation'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
   # auth end
 
   # departments begin
@@ -711,6 +730,90 @@ paths:
       security:
         - bearerAuth: []
   # roles end
+
+  # invite begin
+  /company/v1/invites/email:
+    post:
+      description: Create invites. Only available to authorized users with the owner or administrator role.
+      tags:
+        - inviteService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitesStore'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email/batch:
+    post:
+      description: Create invites. Only available to authorized users with the owner or administrator role.
+      tags:
+        - inviteService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitesBatchStore'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/{userId}/repeatInvitation:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Resending an invitation. Only available to authorized users with the owner or administrator role.
+      tags:
+        - inviteService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+
+    delete:
+      description:
+        Delete invitation. Only available to authorized users with the owner or administrator role.
+      tags:
+        - inviteService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # invite begin
 
   # newsfeed begin
   /newsfeed/v1/posts/:
@@ -2154,6 +2257,47 @@ components:
     Email:
       type: string
       example: 'rar.stas@gmail.com'
+    multipleMainEmail:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: ''
+          type:
+            type: string
+            example: main
+          value:
+            type: string
+            example: 'stark@gmail.com'
+          main:
+            type: boolean
+            example: true
+    multipleEmail:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83mc2s'
+          type:
+            type: string
+            example: main
+          value:
+            type: string
+            example: 'stark@gmail.com'
+          main:
+            type: boolean
+            example: true
+      example:
+        - id: ''
+          type: main
+          value: stark@gmail.com
+          main: true
+        - id: '01gdnpddf5xgzxqvcn4x83mc2s'
+          type: work
+          value: benner@gmail.com
+          main: false
     Phone:
       type: array
       items:
@@ -2191,7 +2335,7 @@ components:
           type: string
           example: 1
         email:
-          $ref: '#/components/schemas/Email'
+          $ref: '#/components/schemas/multipleEmail'
         firstName:
           type: string
           example: Stas
@@ -2410,6 +2554,21 @@ components:
         token:
           type: string
           example: r6pvb5pllte
+
+    RegistrationByInvitation:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          example: 12345678
+        firstName:
+          type: string
+          example: Tony
+        lastName:
+          type: string
+          example: Stark
     # auth end
 
     # Departments begin
@@ -3196,4 +3355,51 @@ components:
           example: Message post
 
     # comments end
+
+    # invite begin
+    InvitesStore:
+      type: array
+      items:
+        $ref: '#/components/schemas/InviteExample'
+      example:
+        - email: stark@gmail.com
+          firstName: Tony
+          lastName: Stark
+        - email: benner@gmail.com
+          firstName: Bruce
+          lastName: Benner
+
+
+    InviteExample:
+      type: object
+      properties:
+        email:
+          type: string
+          example: stark@gmail.com
+        firstName:
+          type: string
+          example: Tony
+        lastName:
+          type: string
+          example: Stark
+
+    InvitesBatchStore:
+      type: array
+      items:
+        type: string
+      example:
+        - stark@gmail.com
+        - benner@gmail.com
+
+    Success:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: success
+
+    # invite end
 
