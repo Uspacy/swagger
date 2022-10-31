@@ -914,103 +914,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /newsfeed/v1/posts/{postId}/comments/:
-    parameters:
-      - $ref: '#/components/parameters/postId'
-    get:
-      parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/list'
-      description: Get comments for post. Available only for authorized users and users who have access to the post
-      tags:
-        - newsFeedService
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Comment'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      security:
-        - bearerAuth: []
-    post:
-      description: Create comment for the post. Available only for authorized users and users who have access to the post
-      tags:
-        - newsFeedService
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/CreateUpdateCommentDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Comment'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      security:
-        - bearerAuth: []
-  /newsfeed/v1/posts/{postId}/comments/{commentId}/:
-    parameters:
-      - $ref: '#/components/parameters/postId'
-      - $ref: '#/components/parameters/commentId'
-    patch:
-      description: Update comment for the post. Available only for author.
-      tags:
-        - newsFeedService
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/CreateUpdateCommentDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Comment'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      security:
-        - bearerAuth: []
-    delete:
-      description: Delete comment for the post. Available only for author or users with admin permissions.
-      tags:
-        - newsFeedService
-      responses:
-        '204':
-          description: No content
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      security:
-        - bearerAuth: []
   # newsfeed end
 
   # tasks begin
@@ -1685,6 +1588,7 @@ paths:
         - $ref: '#/components/parameters/entityId'
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1709,6 +1613,7 @@ paths:
               $ref: '#/components/schemas/UploadContainer'
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1737,6 +1642,7 @@ paths:
           description: Numeric ID of the file to show
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1762,6 +1668,7 @@ paths:
           description: Numeric ID of the file to update or the UUID of the upload group
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1807,7 +1714,9 @@ paths:
       tags:
         - commentsService
       parameters:
-        - allOf:
+        - name: entity_type
+          in: query
+          allOf:
             - $ref: '#/components/parameters/entityType'
             - description: >
                 Entity type name.
@@ -1899,6 +1808,7 @@ paths:
             format: int64
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1910,18 +1820,6 @@ paths:
                       allOf:
                         - $ref: '#/components/schemas/CommentServiceDto'
                         - $ref: '#/components/schemas/CommentExtrasServiceDto'
-                        - type: object
-                          properties:
-                            nextId:
-                              type: integer
-                              format: int64
-                              example: 3
-                              description: If NULL, this is the last comment if the (sub)thread
-                            prevId:
-                              type: integer
-                              format: int64
-                              example: 1
-                              description: If NULL, this is the first comment if the (sub)thread
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -1938,6 +1836,7 @@ paths:
               $ref: '#/components/schemas/CreateCommentServiceDto'
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1961,6 +1860,7 @@ paths:
           description: Numeric ID of the comment to show
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1989,6 +1889,7 @@ paths:
               $ref: '#/components/schemas/UpdateCommentServiceDto'
       responses:
         '200':
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2612,9 +2513,6 @@ components:
         title:
           type: string
           example: Title post
-        # subject:
-        #   type: string
-        #   example: Subject post
         message:
           type: string
           example: Message post
@@ -2622,13 +2520,17 @@ components:
           type: string
           example: 1
         files:
-          $ref: '#/components/schemas/Files'
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
         date:
           $ref: '#/components/schemas/Date'
         comments:
           type: array
           items:
-            $ref: '#/components/schemas/Comment'
+            allOf:
+              - $ref: '#/components/schemas/CommentServiceDto'
+              - $ref: '#/components/schemas/CommentExtrasServiceDto'
     RecipientsPost:
       type: object
       properties:
@@ -2704,33 +2606,6 @@ components:
             format: binary
         recipients:
           $ref: '#/components/schemas/RecipientsPost'
-    Comment:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 1
-        files:
-          $ref: '#/components/schemas/Files'
-        message:
-          type: string
-          example: Message comment
-        authorId:
-          type: string
-          example: 1
-        date:
-          $ref: '#/components/schemas/Date'
-    CreateUpdateCommentDto:
-      type: object
-      properties:
-        message:
-          type: string
-          example: Message post
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
     # news feed end
 
     # tasks begin
@@ -3000,8 +2875,9 @@ components:
           format: int64
           example: 1
         entityType:
-          $ref: '#/components/schemas/EntityTypes'
-          example: 'post'
+          allOf:
+          - $ref: '#/components/schemas/EntityTypes'
+          - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3023,7 +2899,7 @@ components:
           example: 123456
         url:
           type: string
-          example: 'https://aws.s3.amazonaws.com/my-bucket/example.jpg'
+          example: 'https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg'
 
     # files end
 
@@ -3278,8 +3154,9 @@ components:
           format: int64
           example: 1
         entityType:
-          $ref: '#/components/schemas/EntityTypes'
-          example: 'post'
+          allOf:
+          - $ref: '#/components/schemas/EntityTypes'
+          - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3300,6 +3177,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReactionServiceDto'
+        nextId:
+          type: integer
+          format: int64
+          example: 3
+          description: If NULL, this is the last comment if the (sub)thread
+        prevId:
+          type: integer
+          format: int64
+          example: 1
+          description: If NULL, this is the first comment if the (sub)thread
 
     ReactionServiceDto:
       type: object
@@ -3318,8 +3205,9 @@ components:
       type: object
       properties:
         entityType:
-          $ref: '#/components/schemas/EntityTypes'
-          example: 'post'
+          allOf:
+          - $ref: '#/components/schemas/EntityTypes'
+          - example: 'post'
         entityId:
           type: integer
           format: int64
