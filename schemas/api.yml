@@ -2257,22 +2257,6 @@ components:
     Email:
       type: string
       example: 'rar.stas@gmail.com'
-    multipleMainEmail:
-      type: array
-      items:
-        properties:
-          id:
-            type: string
-            example: ''
-          type:
-            type: string
-            example: main
-          value:
-            type: string
-            example: 'stark@gmail.com'
-          main:
-            type: boolean
-            example: true
     multipleEmail:
       type: array
       items:
