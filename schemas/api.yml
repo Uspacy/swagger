@@ -377,6 +377,62 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /company/v1/users/checkEmail/:
+    get:
+      description: Email existence check.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: email already exist
+        '204':
+          $ref: '#/components/responses/NoContent'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/getUsersByField/:
+    post:
+      description: Getting a list of users by filter. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/getUsersByField'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # users end
 
   # auth begin
@@ -732,6 +788,46 @@ paths:
   # roles end
 
   # invite begin
+  /company/v1/users/checkInvite/:
+    get:
+      description: Checking if an invitation exists.
+      tags:
+        - inviteService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '422':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          example: 'Invitation canceled, contact your space partner'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: []
   /company/v1/invites/email:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -776,7 +872,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/invites/{userId}/repeatInvitation:
+  /company/v1/invites/email/{userId}/repeatInvitation:
     parameters:
       - $ref: '#/components/parameters/userId'
 
@@ -962,13 +1058,26 @@ paths:
                       type: boolean
                       default: false
                       example: true
+                    groupId:
+                      description: Group ID
+                      default: 'current group id'
+                      type: string
+                      example: 11
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                allOf:
+                  - $ref: '#/components/schemas/Task'
+                  - type: object
+                    properties:
+                      groupId:
+                        description: Group ID
+                        default: 'current group id'
+                        type: string
+                        example: 11
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -1932,6 +2041,8 @@ components:
       description: Access token is missing or invalid
     Forbidden:
       description: Forbidden
+    NoContent:
+      description: No Content
 
   parameters:
     userId:
@@ -2320,6 +2431,17 @@ components:
           type: string
       example:
         position: new position
+    getUsersByField:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example:
+            - '1'
+            - '2'
+
     # users begin
 
     # auth
@@ -2678,6 +2800,10 @@ components:
           description: Department ID
           type: string
           example: 1
+        groupId:
+          description: Group ID
+          type: string
+          example: 1
         files:
           $ref: '#/components/schemas/Files'
 
@@ -2876,8 +3002,8 @@ components:
           example: 1
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3155,8 +3281,8 @@ components:
           example: 1
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3206,8 +3332,8 @@ components:
       properties:
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
