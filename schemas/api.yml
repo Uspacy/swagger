@@ -14,6 +14,7 @@ tags:
   - name: tasksService
   - name: filesService
   - name: commentsService
+  - name: groupService
 
 paths:
   # users begin
@@ -2029,6 +2030,300 @@ paths:
 
   # comments end
 
+  # group begin
+  /groups/v1/groups/:
+    get:
+      description: Get posts list. Available only for authorized users.
+      tags:
+        - groupService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/archived'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Group'
+                        - allOf:
+                            - $ref: '#/components/schemas/Group'
+                            - type: object
+                              properties:
+                                comments:
+                                  example: "[]"
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create group. Available only for authorized users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateGroupDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /groups/v1/groups/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    get:
+      description: Shows the group info. Available only for authorized users.
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update group. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateGroupDto'
+                - type: object
+                  properties:
+                    archival:
+                      example: true
+                      description: "true or false"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete group. Only available to group owner.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/delegation:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroup'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/attachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Adding a user to a group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/detachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Remove user from group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/joinGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Adding the current user to the group. Available to open groups or by invitation.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/leaveGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Remove the current user from the group..
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/:
+    get:
+      description: Getting a list of invitations to groups of the current user.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groupId:
+                    type: array
+                    items:
+                      type: string
+                    example: ["2", "5"]
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Sending invitations to groups. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendInviteToGroup'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    delete:
+      description: Refusal of an invitation. Only available to the current user.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # groups end
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2242,6 +2537,22 @@ components:
         format: int64
       required: true
       description: Entity ID
+    groupId:
+      name: groupId
+      in: path
+      description: Group id
+      required: true
+      schema:
+        type: string
+    archived:
+      name: archived
+      in: query
+      description: filter archived or non-archived group
+      required: false
+      schema:
+        type: boolean
+        default: false
+      example: true, false, 1, 0, yes, no, ""
 
   schemas:
     # common begin
@@ -3400,4 +3711,122 @@ components:
           example: success
 
     # invite end
+
+    # group begin
+    TransferGroup:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        newUserId:
+          type: string
+          example: 55
+        group:
+          type: object
+          properties:
+            owner:
+              type: boolean
+              example: true
+            moderator:
+              type: boolean
+              example: false
+      required:
+        - oldUserId
+        - newUserId
+
+    CreateUpdateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: public
+          description: Available values - public, private, secret.
+        description:
+          type: string
+          example: description group
+        groupTheme:
+          type: string
+          example: group theme
+        ownerId:
+          type: string
+          example: 1
+          description: "1"
+        logo:
+          type: file
+          description: The file to upload.
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+            format: binary
+        usersIds:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - name
+        - groupType
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: private
+        ownerId:
+          type: string
+          example: 1
+        archival:
+          type: boolean
+        description:
+          type: string
+          example: private
+        groupTheme:
+          type: string
+          example: private
+        logo:
+          type: string
+          example: /8c/nsfkjnns486sd4f56.jpg
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        usersIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "1"
+            - "2"
+
+    SendInviteToGroup:
+      type: object
+      properties:
+        groupId:
+          type: string
+          example: 1
+        userIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+
+
+    # group end
 
