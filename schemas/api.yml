@@ -948,14 +948,18 @@ paths:
       security:
         - bearerAuth: []
     post:
-      description: Create post. Available only for authorized users.
+      description: >
+        Create post. Available only for authorized users.
+
+
+        Use one of `fileIds` or `uploadId` to bind earlier uploaded files to the post that is going to be created.
       tags:
         - newsFeedService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePostDto'
+              $ref: '#/components/schemas/CreatePostDto'
       responses:
         '200':
           description: OK
@@ -983,9 +987,9 @@ paths:
         - newsFeedService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePostDto'
+              $ref: '#/components/schemas/UpdatePostDto'
       responses:
         '200':
           description: OK
@@ -1703,6 +1707,7 @@ paths:
           content:
             application/json:
               schema:
+                type: object
                 properties:
                   data:
                     type: array
@@ -1738,32 +1743,68 @@ paths:
       security:
         - bearerAuth: []
 
-  /files/v1/files/{id}:
+  /files/v1/files?uploadId:
     get:
-      description: Shows the info about the file
+      description: Lists the file info
       tags:
         - filesService
       parameters:
-        - in: path
-          name: fileId
+        - in: query
+          name: uploadId
+          description: >
+            Use this parameter instead of `entityType` and `entityId` to list the upload bundle
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           required: true
-          description: Numeric ID of the file to show
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileInfoDto'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /files/v1/files?entityIds[]:
+    get:
+      description: Lists the file info
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityIds'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      entityId:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files/{id}:
     patch:
-      description: Update the `entity_id` for one file or a group of files
+      description: Update the `entity_id` for one file
       tags:
         - filesService
       parameters:
@@ -1777,6 +1818,16 @@ paths:
                 format: uuid
           required: true
           description: Numeric ID of the file to update or the UUID of the upload group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityId:
+                  type: integer
+                  format: int64
       responses:
         '200':
           description: Successful response
@@ -1804,6 +1855,65 @@ paths:
             format: int64
           required: true
           description: Numeric ID of the file to remove
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files?entityType&entityId:
+    patch:
+      description: >
+        Update the `entity_id` for a group of files determined by `entityType` and `entityId`
+
+
+        It's okay to specify the parameters in the request body instead of query.
+
+
+        At the moment this is used internally to bind earlier uploaded files to an entity
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: >
+        Removes the multiple files bound to the entity
+
+
+        At the moment this is used internally to sync of files removal with posts
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
       responses:
         '204':
           description: No content
@@ -1843,80 +1953,9 @@ paths:
             - example: 3
             - default: 3
             - required: false
-        - childList:
-          name: childList
-          in: query
-          description: >
-            Use this to define the number of child comments to retrieve.
-            Retrieve all if missing or retrieve the rest if `lastId` is present.
-          required: false
-          schema:
-            type: integer
-            format: int32
-          example: 2
-          default: 2
-        - nextId:
-          name: nextId
-          in: query
-          description: >
-            The top level comments are being paginated starting from the last page but in the ascending order.
-            This parameter used to point the topmost comment on the previous page. For example: to get the
-            previous page in the sample below `nextId` must be 22.
-
-            * comment-22
-
-            * comment-23
-
-            * comment-24
-
-
-            and the entire query should look like the following:
-
-
-            ```
-            ?entityType=post&entityId=123&list=3&childList=2&nextId=22
-            ```
-
-
-            This means: to get the previous 3 comments of the entity `post-123` along with the possible
-            child comments (no more then 2 child comments per parent) relating to the `comment-22`
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - lastId:
-          name: lastId
-          in: query
-          description: >
-            This parameter used to point the bottom child comment on the previous page. For example: to get the
-            next page if the child comments in the sample below, `lastId` must be 27, `entityType` must be "comment"
-            and `entityId` must be 25.
-
-              * comment-23
-
-              * comment-24
-
-              * comment-25
-
-              * child-comment-26-of-parent-25
-
-              * child-comment-27-of-parent-25
-
-
-              and the entire query should look like the following:
-
-
-
-              ```
-              ?entityType=post&entityId=123&childList=2&entityType=comment&entityId=25&lastId=27
-              ```
-
-
-              This means: to get the next 2 child comments of parent `comment-25` of the entity `post-123` relating to the `child-comment-27`
-          required: false
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/childList'
+        - $ref: '#/components/parameters/nextId'
+        - $ref: '#/components/parameters/lastId'
       responses:
         '200':
           description: Successful response
@@ -1956,30 +1995,60 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /comments/v1/comments/{id}:
+
+  /comments/v1/comments?entityIds[]:
     get:
-      description: Shows the comment info
+      description: >
+        Lists the comments related to the list of entities.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
       tags:
         - commentsService
       parameters:
-        - in: path
-          name: commentId
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: Numeric ID of the comment to show
+        - name: entity_type
+          in: query
+          allOf:
+            - $ref: '#/components/parameters/entityType'
+            - description: >
+                Entity type name.
+                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+                And only the child comments are being sent in this case.
+                Use along with `childList` and `lastId` to paginate the child comments.
+        - $ref: '#/components/parameters/entityIds'
+        - allOf:
+            - $ref: '#/components/parameters/list'
+            - description: >
+                Use this to define the number of top level comments to retrieve.
+                Retrieve all if missing or retrieve the rest if `nextId` is present.
+            - example: 3
+            - default: 3
+            - required: false
+        - $ref: '#/components/parameters/childList'
+        - $ref: '#/components/parameters/nextId'
+        - $ref: '#/components/parameters/lastId'
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommentServiceDto'
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      entityId:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/CommentServiceDto'
+                            - $ref: '#/components/schemas/CommentExtrasServiceDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /comments/v1/comments/{id}:
     patch:
       description: Updates the comment
       tags:
@@ -2021,6 +2090,26 @@ paths:
             format: int64
           required: true
           description: Numeric ID of the comment to delete
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments?entityType&entityId:
+    delete:
+      description: >
+        Removes the multiple comments bound to the entity
+
+
+        At the moment this is used internally to sync of comments removal with posts
+      tags:
+        - commentsService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
       responses:
         '204':
           description: No content
@@ -2754,6 +2843,80 @@ components:
         type: number
         default: 20
       example: 10
+    childList:
+      name: childList
+      in: query
+      description: >
+        Use this to define the number of child comments to retrieve.
+        Retrieve all if missing or retrieve the rest if `lastId` is present.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 2
+      example: 2
+    nextId:
+      name: nextId
+      in: query
+      description: >
+        The top level comments are being paginated starting from the last page but in the ascending order.
+        This parameter used to point the topmost comment on the previous page. For example: to get the
+        previous page in the sample below `nextId` must be 22.
+
+        * comment-22
+
+        * comment-23
+
+        * comment-24
+
+
+        and the entire query should look like the following:
+
+
+        ```
+        ?entityType=post&entityId=123&list=3&childList=2&nextId=22
+        ```
+
+
+        This means: to get the previous 3 comments of the entity `post-123` along with the possible
+        child comments (no more then 2 child comments per parent) relating to the `comment-22`
+      required: false
+      schema:
+        type: integer
+        format: int64
+    lastId:
+      name: lastId
+      in: query
+      description: >
+        This parameter used to point the bottom child comment on the previous page. For example: to get the
+        next page if the child comments in the sample below, `lastId` must be 27, `entityType` must be "comment"
+        and `entityId` must be 25.
+
+          * comment-23
+
+          * comment-24
+
+          * comment-25
+
+          * child-comment-26-of-parent-25
+
+          * child-comment-27-of-parent-25
+
+
+          and the entire query should look like the following:
+
+
+
+          ```
+          ?entityType=post&entityId=123&childList=2&entityType=comment&entityId=25&lastId=27
+          ```
+
+
+          This means: to get the next 2 child comments of parent `comment-25` of the entity `post-123` relating to the `child-comment-27`
+      required: false
+      schema:
+        type: integer
+        format: int64
     query:
       name: query
       in: query
@@ -2891,6 +3054,17 @@ components:
         format: int64
       required: true
       description: Entity ID
+    entityIds:
+      in: query
+      name: entityIds
+      description: >
+        Use this parameter instead of `entityId` to list files for multiple entities at once. The response differs in this case.
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: true
     groupId:
       name: groupId
       in: path
@@ -3412,7 +3586,7 @@ components:
                   - "1"
                   - "2"
                 empty: []
-    CreateUpdatePostDto:
+    CreatePostDto:
       type: object
       properties:
         title:
@@ -3421,11 +3595,27 @@ components:
         message:
           type: string
           example: Message post
-        files:
+        fileIds:
           type: array
+          description: Defines the array of fileIds uploaded earlier that need to be bound to the post
           items:
-            type: string
-            format: binary
+            type: integer
+            format: int64
+        uploadId:
+          description: Defines the earlier uploaded file bundle that need to be bound to the post
+          type: string
+          format: uuid
+        recipients:
+          $ref: '#/components/schemas/RecipientsPost'
+    UpdatePostDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Title post
+        message:
+          type: string
+          example: Message post
         recipients:
           $ref: '#/components/schemas/RecipientsPost'
     # news feed end
@@ -3726,6 +3916,25 @@ components:
         url:
           type: string
           example: 'https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg'
+
+    FileList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
+
+    IndexedFileList:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileInfoDto'
 
     # files end
 
