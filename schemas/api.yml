@@ -14,6 +14,8 @@ tags:
   - name: tasksService
   - name: filesService
   - name: commentsService
+  - name: groupService
+  - name: portalService
 
 paths:
   # users begin
@@ -377,6 +379,62 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /company/v1/users/checkEmail/:
+    get:
+      description: Email existence check.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: email already exist
+        '204':
+          $ref: '#/components/responses/NoContent'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/getUsersByField/:
+    post:
+      description: Getting a list of users by filter. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/getUsersByField'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # users end
 
   # auth begin
@@ -732,6 +790,46 @@ paths:
   # roles end
 
   # invite begin
+  /company/v1/users/checkInvite/:
+    get:
+      description: Checking if an invitation exists.
+      tags:
+        - inviteService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '422':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          example: 'Invitation canceled, contact your space partner'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: []
   /company/v1/invites/email:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -776,7 +874,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/invites/{userId}/repeatInvitation:
+  /company/v1/invites/email/{userId}/repeatInvitation:
     parameters:
       - $ref: '#/components/parameters/userId'
 
@@ -966,13 +1064,26 @@ paths:
                       type: boolean
                       default: false
                       example: true
+                    groupId:
+                      description: Group ID
+                      default: 'current group id'
+                      type: string
+                      example: 11
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                allOf:
+                  - $ref: '#/components/schemas/Task'
+                  - type: object
+                    properties:
+                      groupId:
+                        description: Group ID
+                        default: 'current group id'
+                        type: string
+                        example: 11
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -2009,6 +2120,653 @@ paths:
 
   # comments end
 
+  # group begin
+  /groups/v1/groups/:
+    get:
+      description: Get posts list. Available only for authorized users.
+      tags:
+        - groupService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/archived'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Group'
+                        - allOf:
+                            - $ref: '#/components/schemas/Group'
+                            - type: object
+                              properties:
+                                comments:
+                                  example: "[]"
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create group. Available only for authorized users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateGroupDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /groups/v1/groups/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    get:
+      description: Shows the group info. Available only for authorized users.
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update group. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateGroupDto'
+                - type: object
+                  properties:
+                    archival:
+                      example: true
+                      description: "true or false"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete group. Only available to group owner.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/delegation:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroup'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/attachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Adding a user to a group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/detachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Remove user from group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/joinGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Adding the current user to the group. Available to open groups or by invitation.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/leaveGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Remove the current user from the group..
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/:
+    get:
+      description: Getting a list of invitations to groups of the current user.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groupId:
+                    type: array
+                    items:
+                      type: string
+                    example: ["2", "5"]
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Sending invitations to groups. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendInviteToGroup'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    delete:
+      description: Refusal of an invitation. Only available to the current user.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # groups end
+
+  # portals begin
+  /portals/v1/portal/:
+    get:
+      description: Get portals list. Available only for backend.
+      tags:
+        - portalService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Portal'
+                        - allOf:
+                            - $ref: '#/components/schemas/Portal'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create portal. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+
+  /portals/v1/portal/{domain}:
+    parameters:
+      - $ref: '#/components/parameters/domain'
+    get:
+      description: The main method for getting access list for portal services. Available only for authorized users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+                  - type: object
+                    properties:
+                      services:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/ServiceAccess'
+                            - allOf:
+                                - $ref: '#/components/schemas/ServiceAccess'
+
+  /portals/v1/portal/{portalId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    get:
+      description: Shows the portal info. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+                  - type: object
+                    properties:
+                      services:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/ServiceAccess'
+                            - allOf:
+                                - $ref: '#/components/schemas/ServiceAccess'
+
+    patch:
+      description: Update portal. Only available to super users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portal'
+
+  /portals/v1/portal/{portalId}/addService/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceId'
+    patch:
+      description: Add service to portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/removeService/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceId'
+    patch:
+      description: Remove service to portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/activate:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    patch:
+      description: Activate portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    patch:
+      description: Deactivate portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/enableService/{serviceName}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceName'
+    patch:
+      description: Service activation. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/disableService/{serviceName}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceName'
+    patch:
+      description: Service activation. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/service/:
+    get:
+      description: Get service list. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Services'
+                        - allOf:
+                            - $ref: '#/components/schemas/Services'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateServices'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Services'
+
+  /portals/v1/service/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/serviceId'
+    get:
+      description: Show service. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Services'
+    patch:
+      description: Update service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateServices'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Services'
+
+  /portals/v1/tariff/:
+    get:
+      description: Get tariff list. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Tariff'
+                        - allOf:
+                            - $ref: '#/components/schemas/Tariff'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateTariff'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Tariff'
+
+  /portals/v1/tariff/{tariffId}:
+    parameters:
+      - $ref: '#/components/parameters/tariffId'
+    get:
+      description: Display tariff. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tariff'
+    patch:
+      description: Update tariff. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateTariff'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Tariff'
+
+
+  # portals end
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2021,6 +2779,8 @@ components:
       description: Access token is missing or invalid
     Forbidden:
       description: Forbidden
+    NoContent:
+      description: No Content
 
   parameters:
     userId:
@@ -2305,6 +3065,57 @@ components:
           type: integer
           format: int64
       required: true
+    groupId:
+      name: groupId
+      in: path
+      description: Group id
+      required: true
+      schema:
+        type: string
+    archived:
+      name: archived
+      in: query
+      description: filter archived or non-archived group
+      required: false
+      schema:
+        type: boolean
+        default: false
+      example: true, false, 1, 0, yes, no, ""
+    domain:
+      name: domain
+      in: path
+      description: Domain name
+      required: true
+      schema:
+        type: string
+    portalId:
+      name: portalId
+      in: path
+      description: Portal id
+      required: true
+      schema:
+        type: string
+    serviceId:
+      name: serviceId
+      in: path
+      description: Service id
+      required: true
+      schema:
+        type: string
+    serviceName:
+      name: serviceName
+      in: path
+      description: Service name
+      required: true
+      schema:
+        type: string
+    tariffId:
+      name: tariffId
+      in: path
+      description: Tariff id
+      required: true
+      schema:
+        type: string
 
   schemas:
     # common begin
@@ -2494,6 +3305,17 @@ components:
           type: string
       example:
         position: new position
+    getUsersByField:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example:
+            - '1'
+            - '2'
+
     # users begin
 
     # auth
@@ -2868,6 +3690,10 @@ components:
           description: Department ID
           type: string
           example: 1
+        groupId:
+          description: Group ID
+          type: string
+          example: 1
         files:
           $ref: '#/components/schemas/Files'
 
@@ -3066,8 +3892,8 @@ components:
           example: 1
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3364,8 +4190,8 @@ components:
           example: 1
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3415,8 +4241,8 @@ components:
       properties:
         entityType:
           allOf:
-          - $ref: '#/components/schemas/EntityTypes'
-          - example: 'post'
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
         entityId:
           type: integer
           format: int64
@@ -3483,4 +4309,294 @@ components:
           example: success
 
     # invite end
+
+    # group begin
+    TransferGroup:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        newUserId:
+          type: string
+          example: 55
+        group:
+          type: object
+          properties:
+            owner:
+              type: boolean
+              example: true
+            moderator:
+              type: boolean
+              example: false
+      required:
+        - oldUserId
+        - newUserId
+
+    CreateUpdateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: public
+          description: Available values - public, private, secret.
+        description:
+          type: string
+          example: description group
+        groupTheme:
+          type: string
+          example: group theme
+        ownerId:
+          type: string
+          example: 1
+          description: "1"
+        logo:
+          type: file
+          description: The file to upload.
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+            format: binary
+        usersIds:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - name
+        - groupType
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: private
+        ownerId:
+          type: string
+          example: 1
+        archival:
+          type: boolean
+        description:
+          type: string
+          example: private
+        groupTheme:
+          type: string
+          example: private
+        logo:
+          type: string
+          example: /8c/nsfkjnns486sd4f56.jpg
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        usersIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "1"
+            - "2"
+
+    SendInviteToGroup:
+      type: object
+      properties:
+        groupId:
+          type: string
+          example: 1
+        userIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+
+
+    # group end
+
+
+    # portal begin
+
+    Portal:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        portal_name:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        ending_date:
+          type: integer
+          example: 1680020176
+        active:
+          type: boolean
+        jwt_secret:
+          type: string
+          example: F8Ka2ovT3OyztOY4FiH7OvbU2nLprrQDllrWFMJ5DVk
+        s3_bucket:
+          type: string
+          example: alter_ego
+        s3_region:
+          type: string
+          example: us-east-1
+        s3_access_key_id:
+          type: string
+          example: example
+        s3_secret_access_key:
+          type: string
+          example: example
+
+    CreatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        tariffId:
+          type: string
+          example: 1
+
+    UpdatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        endingDate:
+          type: interger
+          example: 1680020176
+        tariffId:
+          type: string
+          example: 1
+
+    ServiceAccess:
+      type: object
+      properties:
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+        db_host:
+          type: string
+          example: company_test
+        db_name:
+          type: string
+          example: company_test
+        db_login:
+          type: string
+          example: company_test
+        db_password:
+          type: string
+          example: company_test
+
+    Services:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+
+    CreateUpdateServices:
+      type: object
+      properties:
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: base
+        description:
+          type: string
+          example: tariff example
+        expiration_date:
+          type: integer
+          example: 123456
+        start_date:
+          type: integer
+          example: 1668895926
+        end_date:
+          type: integer
+          example: 1668895926
+        promotional:
+          type: boolean
+        start_promo_date:
+          type: integer
+          example: 1668895926
+        end_promo_date:
+          type: integer
+          example: 1668895926
+
+    CreateUpdateTariff:
+      type: object
+      properties:
+        name:
+          type: string
+          example: base
+        description:
+          type: string
+          example: tariff example
+        expiration_date:
+          type: integer
+          example: 123456
+        start_date:
+          type: integer
+          example: 1668895926
+        end_date:
+          type: integer
+          example: 1668895926
+        promotional:
+          type: boolean
+        start_promo_date:
+          type: integer
+          example: 1668895926
+        end_promo_date:
+          type: integer
+          example: 1668895926
+
+
+
+
+
+
+
+
+
+    # portal end
+
 
