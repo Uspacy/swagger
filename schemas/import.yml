@@ -5,7 +5,7 @@ info:
     Import wizard. Returns information about the number of entities and their import time from the selected portal
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
+  - url: http://127.0.0.1:8000
 paths:
   /bitrix24:
     post:
