@@ -7,7 +7,7 @@ info:
 servers:
   - url: http://127.0.0.1:8000
 paths:
-  /bitrix24:
+  /calculate/bitrix24:
     post:
       tags:
         - bitrix24
