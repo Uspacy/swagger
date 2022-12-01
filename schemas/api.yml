@@ -2240,24 +2240,6 @@ paths:
       security:
         - bearerAuth: []
 
-  /groups/v1/delegation:
-    post:
-      description: Transfer groups to another user. Available only for admin users.
-      tags:
-        - groupService
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransferGroup'
-      responses:
-        '204':
-          description: No content
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-
   /groups/v1/groups/{groupId}/attachUser/{userId}:
     parameters:
       - $ref: '#/components/parameters/groupId'
@@ -2410,6 +2392,75 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToUser:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroup'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToDepartment:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroupToDepartment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToGroupMembers:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroupToMembers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupToMembersSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
   # groups end
@@ -4320,18 +4371,74 @@ components:
         newUserId:
           type: string
           example: 55
-        group:
-          type: object
-          properties:
-            owner:
-              type: boolean
-              example: true
-            moderator:
-              type: boolean
-              example: false
+        owner:
+          type: boolean
+          example: true
+          default: true
+        moderator:
+          type: boolean
+          example: false
+          default: true
       required:
         - oldUserId
         - newUserId
+
+    TransferGroupToDepartment:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        departmentUserIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        owner:
+          type: boolean
+          example: true
+          default: true
+        moderator:
+          type: boolean
+          example: false
+          default: true
+      required:
+        - oldUserId
+        - newUserId
+
+    TransferGroupToMembers:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+      required:
+        - oldUserId
+
+    TransferGroupSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countGroups:
+          type: integer
+          example: 2
+        countModerator:
+          type: integer
+          example: 4
+
+    TransferGroupToMembersSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countGroups:
+          type: integer
+          example: 2
 
     CreateUpdateGroupDto:
       type: object
