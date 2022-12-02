@@ -1671,7 +1671,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /tasks/v1/delegation:
+  /tasks/v1/transferToUser:
     post:
       description: Transfer tasks to another user. Available only for admin users.
       tags:
@@ -1682,8 +1682,36 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferTask'
       responses:
-        '204':
-          description: No content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferTasksSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/transferToDepartment:
+    post:
+      description: Transfer tasks to department. Available only for admin users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferTasksToDepartment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferTasksSuccess'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -3893,15 +3921,50 @@ components:
         newUserId:
           type: string
           example: 55
-        task:
-          type: object
-          properties:
-            owner:
-              type: boolean
-              example: true
-            responsible:
-              type: boolean
-              example: false
+        owner:
+          type: boolean
+          example: true
+        responsible:
+          type: boolean
+          example: false
+      required:
+        - oldUserId
+        - newUserId
+
+    TransferTasksSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countOwnerTasks:
+          type: integer
+          example: 2
+        countResponsibleTasks:
+          type: integer
+          example: 4
+
+    TransferTasksToDepartment:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        departmentUserIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        owner:
+          type: boolean
+          example: true
+          default: false
+        responsible:
+          type: boolean
+          example: false
+          default: false
       required:
         - oldUserId
         - newUserId
@@ -4374,11 +4437,11 @@ components:
         owner:
           type: boolean
           example: true
-          default: true
+          default: false
         moderator:
           type: boolean
           example: false
-          default: true
+          default: false
       required:
         - oldUserId
         - newUserId
@@ -4399,11 +4462,11 @@ components:
         owner:
           type: boolean
           example: true
-          default: true
+          default: false
         moderator:
           type: boolean
           example: false
-          default: true
+          default: false
       required:
         - oldUserId
         - newUserId
