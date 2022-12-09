@@ -3594,6 +3594,8 @@ components:
         authorId:
           type: string
           example: 1
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
         files:
           type: array
           items:
@@ -3674,6 +3676,8 @@ components:
         message:
           type: string
           example: Message post
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
         fileIds:
           type: array
           description: Defines the array of fileIds uploaded earlier that need to be bound to the post
@@ -3695,8 +3699,22 @@ components:
         message:
           type: string
           example: Message post
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
         recipients:
           $ref: '#/components/schemas/RecipientsPost'
+    AuthorMood:
+      type: string
+      enum:
+        - happy
+        - proud
+        - thankful
+        - inspired
+        - excited
+        - festive
+        - worried
+        - sad
+        - angry
     # news feed end
 
     # tasks begin
