@@ -533,6 +533,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      text:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - You need to provide a verification code
+                            - Incorrect verification code
+                            - Attempts count exceeded. Try again later
+                  status:
+                    type: boolean
+                    example: true
   /company/v1/auth/confirmEmail/:
     description: Confirm email user. Returns token, refreshToken
     post:
@@ -3599,6 +3619,10 @@ components:
         password:
           type: string
           example: 12345678
+        code:
+          type: string
+          example: 237419
+          description: filled on second auth step if 2FA is eneabled
     ConfirmEmailDto:
       type: object
       properties:
