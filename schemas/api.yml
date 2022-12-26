@@ -6,10 +6,10 @@ servers:
   - url: http://127.0.0.1:8000
 tags:
   - name: usersService
-  - name: authService
-  - name: departmentsService
-  - name: rolesService
-  - name: inviteService
+  - name: auth (usersService)
+  - name: departments (usersService)
+  - name: roles (usersService)
+  - name: invite (usersService)
   - name: newsFeedService
   - name: tasksService
   - name: filesService
@@ -315,11 +315,11 @@ paths:
               $ref: '#/components/schemas/TwoFactorEnable'
       responses:
         '201':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/TwoFactorGetQr'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorGetQr'
         '200':
           description: OK
           content:
@@ -434,6 +434,9 @@ paths:
                     avatar:
                       default: ''
                       format: binary
+                    userId:
+                      type: string
+                      example: 2
 
       responses:
         '200':
@@ -512,6 +515,44 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /company/v1/users/personalSettings/:
+    get:
+      tags:
+        - usersService
+      description: Get self profile. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personalSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # users end
 
   # auth begin
@@ -519,7 +560,7 @@ paths:
     description: Sign in user by email, password. Returns token, refreshToken
     post:
       tags:
-        - authService
+        - auth (usersService)
       requestBody:
         required: true
         content:
@@ -557,7 +598,7 @@ paths:
     description: Confirm email user. Returns token, refreshToken
     post:
       tags:
-        - authService
+        - auth (usersService)
       requestBody:
         required: true
         content:
@@ -575,7 +616,7 @@ paths:
     description: refreshToken exprired token. Returns new token
     post:
       tags:
-        - authService
+        - auth (usersService)
       responses:
         '200':
           description: OK
@@ -587,7 +628,7 @@ paths:
     post:
       description: New user registration by invitation. Returns token, refreshToken
       tags:
-        - authService
+        - auth (usersService)
       requestBody:
         required: true
         content:
@@ -608,7 +649,7 @@ paths:
     get:
       description: Get departments list. Available only for authorized users.
       tags:
-        - departmentsService
+        - departments (usersService)
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
@@ -635,7 +676,7 @@ paths:
     post:
       description: Create department. Available only for users with admin permissions
       tags:
-        - departmentsService
+        - departments (usersService)
       requestBody:
         required: true
         content:
@@ -669,7 +710,7 @@ paths:
     get:
       description: Get department by id. Available only for authorized users.
       tags:
-        - departmentsService
+        - departments (usersService)
       responses:
         '200':
           description: OK
@@ -686,7 +727,7 @@ paths:
         Update department data (set head department, move users, set parent department)
         Available only for head parent department or users with admin permissions. Returns updated department data
       tags:
-        - departmentsService
+        - departments (usersService)
       requestBody:
         required: true
         content:
@@ -708,7 +749,7 @@ paths:
       description:
         Delete department. Available only for users with admin permissions.
       tags:
-        - departmentsService
+        - departments (usersService)
       responses:
         '204':
           description: No content
@@ -720,7 +761,7 @@ paths:
     patch:
       description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
       tags:
-        - departmentsService
+        - departments (usersService)
       parameters:
         - $ref: '#/components/parameters/departmentId'
       requestBody:
@@ -749,7 +790,7 @@ paths:
     get:
       description: Get permissions list. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       responses:
         '200':
           description: OK
@@ -765,7 +806,7 @@ paths:
     get:
       description: Get role list. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       responses:
         '200':
           description: OK
@@ -787,7 +828,7 @@ paths:
     post:
       description: Create role. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       requestBody:
         required: true
         content:
@@ -814,7 +855,7 @@ paths:
     get:
       description: Get role by id. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       responses:
         '200':
           description: OK
@@ -835,7 +876,7 @@ paths:
       description:
         Update role data. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       requestBody:
         required: true
         content:
@@ -876,7 +917,7 @@ paths:
       description:
         Delete role. Only available to authorized users with the owner or administrator role.
       tags:
-        - rolesService
+        - roles (usersService)
       responses:
         '204':
           description: No content
@@ -891,7 +932,7 @@ paths:
     get:
       description: Checking if an invitation exists.
       tags:
-        - inviteService
+        - invite (usersService)
       parameters:
         - $ref: '#/components/parameters/searchEmail'
       responses:
@@ -931,7 +972,7 @@ paths:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
       tags:
-        - inviteService
+        - invite (usersService)
       requestBody:
         required: true
         content:
@@ -951,7 +992,7 @@ paths:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
       tags:
-        - inviteService
+        - invite (usersService)
       requestBody:
         required: true
         content:
@@ -979,7 +1020,7 @@ paths:
       description:
         Resending an invitation. Only available to authorized users with the owner or administrator role.
       tags:
-        - inviteService
+        - invite (usersService)
 
       responses:
         '200':
@@ -1000,7 +1041,7 @@ paths:
       description:
         Delete invitation. Only available to authorized users with the owner or administrator role.
       tags:
-        - inviteService
+        - invite (usersService)
       responses:
         '204':
           description: No content
@@ -3380,14 +3421,15 @@ components:
         id:
           type: string
           example: 1
-        email:
-          $ref: '#/components/schemas/multipleEmail'
         firstName:
           type: string
           example: Stas
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+          example: ""
         position:
           type: string
           example: CTO
@@ -3406,16 +3448,23 @@ components:
         aboutMyself:
           type: string
           example: about me
-        phone:
-          $ref: '#/components/schemas/Phone'
         active:
           type: boolean
+        registered:
+          type: boolean
+          example: true
         birthday:
+          $ref: '#/components/schemas/Date'
+        dateOfDismiss:
           $ref: '#/components/schemas/Date'
         showBirthYear:
           type: boolean
           default: false
           example: true
+        email:
+          $ref: '#/components/schemas/multipleEmail'
+        phone:
+          $ref: '#/components/schemas/Phone'
         roles:
           $ref: '#/components/schemas/Roles'
         departmentsIds:
@@ -3427,6 +3476,11 @@ components:
             - '2'
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
+        emailInvitation:
+          type: boolean
+          example: true
+        dateOfInvitation:
+          $ref: '#/components/schemas/Date'
     TwoFactorStatus:
       type: object
       properties:
@@ -3539,6 +3593,28 @@ components:
           example:
             - '1'
             - '2'
+
+    personalSettings:
+      type: object
+      properties:
+        nameFormat:
+          type: string
+          example: first-last
+        lang:
+          type: string
+          example: ua
+        timeFormat:
+          type: string
+          example: 24-hours
+        dateFormat:
+          type: string
+          example: hh:mm:ss
+        timezone:
+          type: string
+          example: Kiev +2
+        firstDay:
+          type: string
+          example: monday
 
     # users begin
 
