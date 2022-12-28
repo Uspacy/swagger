@@ -516,7 +516,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /company/v1/users/personalSettings/:
+  /company/v1/users/me/settings/:
     get:
       tags:
         - usersService
