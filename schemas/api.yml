@@ -313,7 +313,7 @@ paths:
       tags:
         - usersService
       parameters:
-      - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: OK
@@ -847,6 +847,59 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateRolesDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /company/v1/departments/{departmentId}/addUsers/:
+    patch:
+      description: Update department users by id. Available only for users with admin permissions.
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIds'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/departments/{departmentId}/deleteUsers/:
+    patch:
+      description: Update department users by id. Available only for users with admin permissions.
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIds'
       responses:
         '200':
           description: OK
@@ -3641,13 +3694,6 @@ components:
           type: boolean
           default: false
           example: true
-        departmentsIds:
-          type: array
-          items:
-            type: string
-          example:
-            - '1'
-            - '2'
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
@@ -3886,11 +3932,13 @@ components:
           type: string
           default: ""
           example: 1
-        usersIds:
-          type: string
-          example:
-            - '1'
-            - '2'
+    UserIds:
+      type: array
+      items:
+        type: string
+      example:
+        - '1'
+        - '2'
     # Departments end
 
     # news feed begin
