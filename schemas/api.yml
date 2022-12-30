@@ -248,6 +248,83 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+  /company/v1/users/{userId}/settings/:
+    get:
+      tags:
+        - usersService
+      description: Get persinal settings by id. Available only for users with admin permissions
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update personal settings by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personalSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/twoFactorStatus:
+    get:
+      description: Get two-factor authentication status by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/twoFactorDisable:
+    patch:
+      description: Disable two-factor authentication by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+      - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatusDisabled'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   /company/v1/users/me/:
     get:
       tags:
@@ -3615,7 +3692,20 @@ components:
         firstDay:
           type: string
           example: monday
-
+        themeAccentColor:
+          type: string
+          example: '#ff0000'
+        themeDecor:
+          type: string
+          enum:
+            - standard
+            - framed
+        themeName:
+          type: string
+          enum:
+            - dark
+            - light
+            - highlighted
     # users begin
 
     # auth
