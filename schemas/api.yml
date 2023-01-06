@@ -4726,10 +4726,14 @@ components:
           format: int64
           example: 128513
           description: Represents the UNICODE symbol such as 0x0001F601
-        count:
+        amount:
           type: integer
           format: int32
           example: 53
+        entityId:
+          type: integer
+          format: int64
+          example: 1
 
     CreateCommentServiceDto:
       type: object
