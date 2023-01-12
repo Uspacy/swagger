@@ -1201,14 +1201,7 @@ paths:
                   data:
                     type: array
                     items:
-                      oneOf:
-                        - $ref: '#/components/schemas/Post'
-                        - allOf:
-                            - $ref: '#/components/schemas/Post'
-                            - type: object
-                              properties:
-                                comments:
-                                  example: "[]"
+                      $ref: '#/components/schemas/Post'
                   meta:
                     $ref: '#/components/schemas/Meta'
         '401':
@@ -1239,7 +1232,9 @@ paths:
                   - type: object
                     properties:
                       comments:
-                        example: "[]"
+                        example: null
+                      reactions:
+                        example: null
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -1322,7 +1317,7 @@ paths:
         - tasksService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               allOf:
                 - $ref: '#/components/schemas/CreateEditTaskDto'
@@ -1337,6 +1332,17 @@ paths:
                       default: 'current group id'
                       type: string
                       example: 11
+                    fileIds:
+                      type: array
+                      description: Defines the array of fileIds uploaded earlier that need to be bound to the post
+                      items:
+                        type: integer
+                        format: int64
+                    uploadId:
+                      description: Defines the earlier uploaded file bundle that need to be bound to the post
+                      type: string
+                      format: uuid
+
       responses:
         '200':
           description: OK
@@ -1352,6 +1358,11 @@ paths:
                         default: 'current group id'
                         type: string
                         example: 11
+                      comments:
+                        example: null
+                      reactions:
+                        example: null
+
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -1435,128 +1446,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/comments/:
-    parameters:
-      - $ref: '#/components/parameters/taskId'
-    get:
-      parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/list'
-      description: Get comments task by id. Available only for authorized users and users who have access to task.
-      tags:
-        - tasksService
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  meta:
-                    type: object
-                    $ref: '#/components/schemas/Meta'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Comment'
-
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-    post:
-      description: Create comment for task. Available only for authorized users and users who have access to task.
-      tags:
-        - tasksService
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/CreateUpdateCommentDto'
-                - type: object
-                  properties:
-                    denial:
-                      type: boolean
-                      default: false
-                      example: true
-                      description: When the comment is a rejection and the task is not accepted.
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Comment'
-                  - type: object
-                    properties:
-                      responsibleId:
-                        type: string
-                        example: 2
-                      denial:
-                        type: boolean
-                        example: true
-
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-  /tasks/v1/tasks/{taskId}/comments/{commentId}/:
-    parameters:
-      - $ref: '#/components/parameters/taskId'
-      - $ref: '#/components/parameters/commentId'
-    delete:
-      description: Delete comment to task by id. Available only for authorized users and author comment.
-      tags:
-        - tasksService
-      responses:
-        '204':
-          description: No content
-
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-    patch:
-      description: Update comment for task. Available only for authorized users and author comment.
-      tags:
-        - tasksService
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/CreateUpdateCommentDto'
-                - type: object
-                  properties:
-                    denial:
-                      type: boolean
-                      default: false
-                      example: true
-                      description: When the comment is a rejection and the task is not accepted.
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Comment'
-                  - type: object
-                    properties:
-                      responsibleId:
-                        type: string
-                        example: 2
-                      denial:
-                        type: boolean
-                        example: true
-
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
 
   /tasks/v1/stages/:
     get:
@@ -3971,6 +3860,10 @@ components:
             allOf:
               - $ref: '#/components/schemas/CommentServiceDto'
               - $ref: '#/components/schemas/CommentExtrasServiceDto'
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionServiceDto'
     RecipientsPost:
       type: object
       properties:
@@ -4084,6 +3977,9 @@ components:
     Task:
       type: object
       properties:
+        id:
+          type: string
+          example: 5
         title:
           type: string
           example: Describe swagger api for tasksService
@@ -4155,7 +4051,41 @@ components:
           type: string
           example: 1
         files:
-          $ref: '#/components/schemas/Files'
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
+          example:
+            - id: 7
+              entityType: "task"
+              entityId: 5
+              uploadId: "369c4620-adee-4526-a0d8-a1db20bcf5b2"
+              originalFilename: "sample.jpg"
+              lastModified: 1664629542
+              size: 123456
+              url: "https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg"
+        comments:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CommentServiceDto'
+              - $ref: '#/components/schemas/CommentExtrasServiceDto'
+            example:
+              id: 2
+              entityType: "task"
+              entityId: 5
+              message: "Message comment"
+              authorId: "1"
+              date: 1654180120
+              reactions:
+                - reaction: 128513
+                  amount: 23
+                  entityId: 2
+              nextId: 12
+              prevId: 5
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionServiceDto'
 
     CreateEditTaskDto:
       type: object
@@ -4188,11 +4118,6 @@ components:
             - LOW
             - AVERAGE
             - HIGH
-        files:
-          type: array
-          items:
-            type: string
-            format: binary
         departmentId:
           description: Department ID
           default: 'current department id'
