@@ -16,6 +16,7 @@ tags:
   - name: commentsService
   - name: groupService
   - name: portalService
+  - name: crmService
 
 paths:
   # users begin
@@ -2999,9 +3000,329 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Tariff'
-
-
   # portals end
+
+  # crm begin
+  /crm/v1/entity/:
+    get:
+      description: Get available entities list. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Entity'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create entity. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Entity'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/field_types/:
+    get:
+      description: Get available field types list. Available only for all users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Field_Types_List'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/{entity}/fields/:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+    get:
+      description: Get available fields list. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Field'
+                        - type: object
+                          properties:
+                            code:
+                              type: string
+                              example: source
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create field. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Field'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/{entity}/fields/{field}/:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/field'
+    get:
+      description: Get field by code. Available only for authorized users and users who have access to crm.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit field by code. Available only for authorized users and crm maker.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Field'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete field by code. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/{entity}/:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+    get:
+      description: Get available  crm entity items list. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create  crm entity item. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CrmEntity'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmEntity'
+                  - $ref: '#/components/schemas/CrmEAdditionalFields'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/{entity}/{itemId}/:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/itemId'
+    get:
+      description: Get crm entity item. Available only for authorized users and users who have access to crm.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmEntity'
+                  - $ref: '#/components/schemas/CrmEAdditionalFields'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit crm entity item. Available only for authorized users and users who have access to crm.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CrmEntity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmEntity'
+                  - $ref: '#/components/schemas/CrmEAdditionalFields'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete crm entity item. Available only for admin users and users who have access to crm.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # crm end
 
 components:
   securitySchemes:
@@ -3349,6 +3670,27 @@ components:
       name: tariffId
       in: path
       description: Tariff id
+      required: true
+      schema:
+        type: string
+    entity:
+      name: entity
+      in: path
+      description: entity code
+      required: true
+      schema:
+        type: string
+    itemId:
+      name: itemId
+      in: path
+      description: Item id
+      required: true
+      schema:
+        type: string
+    field:
+      name: field
+      in: path
+      description: field code
       required: true
       schema:
         type: string
@@ -5069,14 +5411,179 @@ components:
           type: integer
           example: 1668895926
 
-
-
-
-
-
-
-
-
     # portal end
+
+    # crm begin
+    Entity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Leads
+        tableName:
+          type: string
+          example: leads
+        type:
+          type: string
+          example: leads
+        sort:
+          type: integer
+          example: 1
+
+    Field_Type:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: String
+        type:
+          type: string
+          example: string
+        multiple:
+          type: boolean
+          example: true
+
+    Field_Types_List:
+      type: array
+      items:
+        $ref: '#/components/schemas/Field_Type'
+      example:
+        - id: 1
+          name: String
+          type: string
+          multiple: false
+        - id: 2
+          name: Textarea
+          type: textarea
+          multiple: false
+        - id: 3
+          name: Integer
+          type: integer
+          multiple: false
+        - id: 4
+          name: Date and time
+          type: datetime
+          multiple: false
+        - id: 5
+          name: Money
+          type: money
+          multiple: false
+        - id: 6
+          name: Label
+          type: label
+          multiple: true
+        - id: 7
+          name: Phone
+          type: phone
+          multiple: true
+        - id: 8
+          name: Email
+          type: email
+          multiple: true
+        - id: 9
+          name: Social
+          type: social
+          multiple: true
+        - id: 10
+          name: Link
+          type: link
+          multiple: false
+        - id: 11
+          name: Boolean
+          type: boolean
+          multiple: false
+        - id: 12
+          name: User
+          type: user_id
+          multiple: false
+        - id: 13
+          name: Photo
+          type: photo
+          multiple: false
+        - id: 14
+          name: File
+          type: file
+          multiple: false
+        - id: 15
+          name: Address
+          type: address
+          multiple: false
+        - id: 16
+          name: Legal details
+          type: legal_details
+          multiple: false
+        - id: 17
+          name: Binding to the entity
+          type: binding_to_the_entity
+          multiple: false
+        - id: 18
+          name: UTM
+          type: utm
+          multiple: false
+
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Source
+        required:
+          type: boolean
+          example: false
+        editable:
+          type: boolean
+          example: true
+        show:
+          type: boolean
+          example: true
+        hidden:
+          type: boolean
+          example: false
+        fieldSectionId:
+          type: integer
+          example: 11
+        sort:
+          type: integer
+          example: 90
+
+    CrmEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        source:
+          type: string
+          example: shop
+
+    CrmEAdditionalFields:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        created_by:
+          type: integer
+          example: 1
+        changed_by:
+          type: integer
+          example: 1
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+
+
+    # crm end
+
+
 
 
