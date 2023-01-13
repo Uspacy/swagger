@@ -1,0 +1,18 @@
+openapi: '3.0.1'
+info:
+  title: Uspacy api
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000
+tags:
+  - name: usersService
+  - name: auth (usersService)
+  - name: departments (usersService)
+  - name: roles (usersService)
+  - name: invite (usersService)
+  - name: newsFeedService
+  - name: tasksService
+  - name: filesService
+  - name: commentsService
+  - name: groupService
+  - name: portalService
