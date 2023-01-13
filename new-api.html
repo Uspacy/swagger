@@ -14,9 +14,9 @@
 	window.onload = () => {
 		window.ui = SwaggerUIBundle({
 			urls: [
-				{url: `new/init.yml?v=${Date.now() / 180000 | 0}`, name: "api-yml"},
-				{url: `new/users-service.yml?v=${Date.now() / 180000 | 0}`, name: "api-yml"},
-				{url: `new/components.yml?v=${Date.now() / 180000 | 0}`, name: "api-yml"},
+				{url: `new/init.yml?v=${Date.now() / 180000 | 0}`, name: "init-yml"},
+				{url: `new/users-service.yml?v=${Date.now() / 180000 | 0}`, name: "users-service-yml"},
+				{url: `new/components.yml?v=${Date.now() / 180000 | 0}`, name: "components-yml"},
 			],
 			dom_id: '#root',
 			plugins: [
