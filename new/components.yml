@@ -1,0 +1,2075 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    Forbidden:
+      description: Forbidden
+    NoContent:
+      description: No Content
+
+  parameters:
+    userId:
+      name: userId
+      in: path
+      description: User id
+      required: true
+      schema:
+        type: string
+    departmentId:
+      name: departmentId
+      in: path
+      description: Department id
+      required: true
+      schema:
+        type: string
+    roleId:
+      name: roleId
+      in: path
+      description: Role id
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: current page
+      required: false
+      schema:
+        type: integer
+        default: 1
+      example: 1
+    searchEmail:
+      name: email
+      in: query
+      required: false
+      schema:
+        type: string
+      example: rar.stas@gmail.com
+    searchFirstName:
+      name: firstName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Stas
+    searchLastName:
+      name: LastName
+      in: query
+      required: false
+      schema:
+        type: string
+      example: Raranetskyi
+    list:
+      name: list
+      in: query
+      description: how many items should be per page
+      required: false
+      schema:
+        type: number
+        default: 20
+      example: 10
+    childList:
+      name: childList
+      in: query
+      description: >
+        Use this to define the number of child comments to retrieve.
+        Retrieve all if missing or retrieve the rest if `lastId` is present.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 2
+      example: 2
+    nextId:
+      name: nextId
+      in: query
+      description: >
+        The top level comments are being paginated starting from the last page but in the ascending order.
+        This parameter used to point the topmost comment on the previous page. For example: to get the
+        previous page in the sample below `nextId` must be 22.
+
+        * comment-22
+
+        * comment-23
+
+        * comment-24
+
+
+        and the entire query should look like the following:
+
+
+        ```
+        ?entityType=post&entityId=123&list=3&childList=2&nextId=22
+        ```
+
+
+        This means: to get the previous 3 comments of the entity `post-123` along with the possible
+        child comments (no more then 2 child comments per parent) relating to the `comment-22`
+      required: false
+      schema:
+        type: integer
+        format: int64
+    lastId:
+      name: lastId
+      in: query
+      description: >
+        This parameter used to point the bottom child comment on the previous page. For example: to get the
+        next page if the child comments in the sample below, `lastId` must be 27, `entityType` must be "comment"
+        and `entityId` must be 25.
+
+          * comment-23
+
+          * comment-24
+
+          * comment-25
+
+          * child-comment-26-of-parent-25
+
+          * child-comment-27-of-parent-25
+
+
+          and the entire query should look like the following:
+
+
+
+          ```
+          ?entityType=post&entityId=123&childList=2&entityType=comment&entityId=25&lastId=27
+          ```
+
+
+          This means: to get the next 2 child comments of parent `comment-25` of the entity `post-123` relating to the `child-comment-27`
+      required: false
+      schema:
+        type: integer
+        format: int64
+    query:
+      name: query
+      in: query
+      description: search query
+      required: false
+      schema:
+        type: string
+        default: ""
+      example: "some query string"
+    filter:
+      name: filter
+      in: query
+      description: Fields, corresponding to the available list of entity.
+      required: false
+      style: deepObject
+      schema:
+        type: object
+    filterUsers:
+      allOf:
+        - $ref: '#/components/parameters/filter'
+        - type: object
+          description: Fields, corresponding to the available list of fields user.
+          example:
+            email: rar.stas@gmail.com
+            firstName: Stas
+            lastName: Raranetskyi
+            phone: "+3801234567"
+            position: CTO
+            active: true
+            departmentsIds: ["1111", "2222"]
+            roles:
+              - OWNER
+              - ADMIN
+    queryUsers:
+      allOf:
+        - $ref: '#/components/parameters/query'
+        - type: string
+          description: Search by email, firstName, lastName
+          example: rar.stas@gmail.com
+    filterDepartments:
+      allOf:
+        - $ref: '#/components/parameters/filter'
+        - type: object
+          description: Fields, corresponding to the available list of fields department.
+          example:
+            name: "Frontend department"
+            headId: "1111"
+            parentDepartmentId: "1111"
+            usersIds: ["1111", "2222", "3333"]
+    queryDepartments:
+      allOf:
+        - $ref: '#/components/parameters/query'
+        - type: string
+          description: Search by name department
+          example: Frontend department
+    postId:
+      name: postId
+      in: path
+      description: Post id
+      required: true
+      schema:
+        type: string
+    commentId:
+      name: commentId
+      in: path
+      description: Comment id
+      required: true
+      schema:
+        type: string
+    taskId:
+      name: taskId
+      in: path
+      description: Task id
+      required: true
+      schema:
+        type: string
+    stageId:
+      name: stageId
+      in: path
+      description: Stage id
+      required: true
+      schema:
+        type: string
+    order_by:
+      name: order_by
+      in: query
+      description: sorting direction
+      required: false
+      schema:
+        type: string
+        default: desc
+      example: order_by=asc
+    field_name:
+      name: field_name
+      in: query
+      description: the field we are looking for
+      required: false
+      schema:
+        type: string
+      example: priority=Low
+    sort_by:
+      name: sort_by
+      in: query
+      description: the field by which to sort
+      required: false
+      schema:
+        type: string
+      example: sort_by=deadline
+    checkListId:
+      name: checkListId
+      in: path
+      description: Check List id
+      required: true
+      schema:
+        type: string
+    checkListItemId:
+      name: checkListItemId
+      in: path
+      description: Check List item id
+      required: true
+      schema:
+        type: string
+    entityType:
+      in: query
+      name: entityType
+      schema:
+        $ref: '#/components/schemas/EntityTypes'
+      required: true
+      description: Entity type name
+    entityId:
+      in: query
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+    entityIds:
+      in: query
+      name: entityIds
+      description: >
+        Use this parameter instead of `entityId` to list files for multiple entities at once. The response differs in this case.
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: true
+    groupId:
+      name: groupId
+      in: path
+      description: Group id
+      required: true
+      schema:
+        type: string
+    archived:
+      name: archived
+      in: query
+      description: filter archived or non-archived group
+      required: false
+      schema:
+        type: boolean
+        default: false
+      example: true, false, 1, 0, yes, no, ""
+    domain:
+      name: domain
+      in: path
+      description: Domain name
+      required: true
+      schema:
+        type: string
+    portalId:
+      name: portalId
+      in: path
+      description: Portal id
+      required: true
+      schema:
+        type: string
+    serviceId:
+      name: serviceId
+      in: path
+      description: Service id
+      required: true
+      schema:
+        type: string
+    serviceName:
+      name: serviceName
+      in: path
+      description: Service name
+      required: true
+      schema:
+        type: string
+    tariffId:
+      name: tariffId
+      in: path
+      description: Tariff id
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    # common begin
+    Meta:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 100
+        page:
+          type: number
+          example: 1
+        list:
+          type: number
+          example: 10
+
+    Roles:
+      type: array
+      items:
+        type: string
+      example:
+        - OWNER
+        - Employee
+        - ADMIN
+    Email:
+      type: string
+      example: 'rar.stas@gmail.com'
+    multipleEmail:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83mc2s'
+          type:
+            type: string
+            example: main
+          value:
+            type: string
+            example: 'stark@gmail.com'
+          main:
+            type: boolean
+            example: true
+      example:
+        - id: ''
+          type: main
+          value: stark@gmail.com
+          main: true
+        - id: '01gdnpddf5xgzxqvcn4x83mc2s'
+          type: work
+          value: benner@gmail.com
+          main: false
+    Phone:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83mc2s'
+          type:
+            type: string
+            enum: [WORK, MOBILE, HOME]
+            example: WORK
+          value:
+            type: string
+            example: '+380123456789'
+
+    Date:
+      type: number
+      description: timestamp in seconds
+      default: 0
+      example: 1654180120
+    Files:
+      type: array
+      items:
+        type: string
+      example:
+        - path/to/image.jpg
+        - path/to/image.png
+    # common end
+
+    # users begin
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Stas
+        lastName:
+          type: string
+          example: Raranetskyi
+        patronymic:
+          type: string
+          example: ""
+        position:
+          type: string
+          example: CTO
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
+        active:
+          type: boolean
+        registered:
+          type: boolean
+          example: true
+        birthday:
+          $ref: '#/components/schemas/Date'
+        dateOfDismiss:
+          $ref: '#/components/schemas/Date'
+        showBirthYear:
+          type: boolean
+          default: false
+          example: true
+        email:
+          $ref: '#/components/schemas/multipleEmail'
+        phone:
+          $ref: '#/components/schemas/Phone'
+        roles:
+          $ref: '#/components/schemas/Roles'
+        departmentsIds:
+          type: array
+          items:
+            type: string
+          example:
+            - '1'
+            - '2'
+        socialMedia:
+          $ref: '#/components/schemas/SocialMedia'
+        emailInvitation:
+          type: boolean
+          example: true
+        dateOfInvitation:
+          $ref: '#/components/schemas/Date'
+    TwoFactorStatus:
+      type: object
+      properties:
+        enabled:
+          type: integer
+          enum:
+            - 0
+            - 1
+    TwoFactorEnable:
+      type: object
+      properties:
+        step:
+          type: string
+          enum:
+            - get-qr-code
+            - verify-secret
+        code:
+          type: integer
+          example: 555406
+          description: Available on a second step (check-code)
+    TwoFactorGetQr:
+      type: object
+      properties:
+        secretKey:
+          type: string
+          example: RWPIRBJCIUJITLPC
+        qrCodeUri:
+          type: text
+          example: "data:image/png;base64,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"
+    TwoFactorStatusEnabled:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Two-factor authentication was successfully enabled
+    TwoFactorStatusDisabled:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Two-factor authentication was successfully disabled
+
+
+    UpdateUserDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        firstName:
+          type: string
+          example: Stas
+        lastName:
+          type: string
+          example: Raranetskyi
+        specialization:
+          type: string
+          example: Specialist
+        country:
+          type: string
+          example: Ukraine
+        city:
+          type: string
+          example: Kiyv
+        avatar:
+          type: string
+          example: /storage/avatars/c4ca423/avatar.jpeg
+        aboutMyself:
+          type: string
+          example: about me
+        phone:
+          $ref: '#/components/schemas/Phone'
+        birthday:
+          $ref: '#/components/schemas/Date'
+        showBirthYear:
+          type: boolean
+          default: false
+          example: true
+        socialMedia:
+          $ref: '#/components/schemas/SocialMedia'
+    UpdateRolesDto:
+      allOf:
+        - $ref: '#/components/schemas/Roles'
+    UpdateUserPosition:
+      type: object
+      properties:
+        position:
+          type: string
+      example:
+        position: new position
+    getUsersByField:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example:
+            - '1'
+            - '2'
+
+    personalSettings:
+      type: object
+      properties:
+        nameFormat:
+          type: string
+          example: first-last
+        lang:
+          type: string
+          example: ua
+        timeFormat:
+          type: string
+          example: 24-hours
+        dateFormat:
+          type: string
+          example: hh:mm:ss
+        timezone:
+          type: string
+          example: Kiev +2
+        firstDay:
+          type: string
+          example: monday
+        themeAccentColor:
+          type: string
+          example: '#ff0000'
+        themeDecor:
+          type: string
+          enum:
+            - standard
+            - framed
+        themeName:
+          type: string
+          enum:
+            - dark
+            - light
+            - highlighted
+    # users begin
+
+    # auth
+    SocialMedia:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: '01gdnpddf5xgzxqvcn4x83bn2s'
+          name:
+            type: string
+            example: facebook
+          link:
+            type: string
+            example: https://www.facebook.com
+    Token:
+      type: object
+      properties:
+        expireInSeconds:
+          type: number
+          example: 720
+        jwt:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
+    SignUpDto:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        password:
+          type: string
+      example:
+        email: "example@gmail.com"
+        password: "12345678"
+        firstName: Stas
+        lastName: Raranetskyi
+    JWT:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        email:
+          $ref: '#/components/schemas/Email'
+        firstName:
+          type: string
+          example: Stas
+        lastName:
+          type: string
+          example: Raranetskyi
+        workspaceId:
+          type: string
+          example: 123123
+        roles:
+          $ref: '#/components/schemas/Roles'
+        departmentsIds:
+          type: array
+          items:
+            type: string
+          example:
+            - 1
+            - 2
+          description: All departments from the parent
+    SignInDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          example: 12345678
+        code:
+          type: string
+          example: 237419
+          description: filled on second auth step if 2FA is eneabled
+    ConfirmEmailDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        token:
+          type: string
+          example: r6pvb5pllte
+    ChangePasswordDto:
+      type: object
+      properties:
+        password:
+          type: string
+          example: 12345678
+    ChangeSelfPasswordDto:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          example: 12345678
+        newPassword:
+          type: string
+          example: 12345678
+    EmailPasswordDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: example@gmail.com
+    EmailPasswordTokenDto:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          example: 12345678
+        token:
+          type: string
+          example: r6pvb5pllte
+
+    RegistrationByInvitation:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          example: 12345678
+        firstName:
+          type: string
+          example: Tony
+        lastName:
+          type: string
+          example: Stark
+    # auth end
+
+    # Departments begin
+    Department:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Frontend department
+        headId:
+          type: string
+          example: 1
+        parentDepartmentId:
+          type: string
+          default: null
+          example: 1
+        usersIds:
+          type: string
+          example:
+            - '1'
+            - '2'
+        roles:
+          $ref: '#/components/schemas/Roles'
+    DepartmentPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Frontend department
+        headId:
+          type: string
+          example: 1
+        description:
+          type: string
+          example: example
+        parentDepartmentId:
+          type: string
+          default: ""
+          example: 1
+    UserIds:
+      type: array
+      items:
+        type: string
+      example:
+        - '1'
+        - '2'
+    # Departments end
+
+    # news feed begin
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: Title post
+        message:
+          type: string
+          example: Message post
+        authorId:
+          type: string
+          example: 1
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
+        date:
+          $ref: '#/components/schemas/Date'
+        comments:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CommentServiceDto'
+              - $ref: '#/components/schemas/CommentExtrasServiceDto'
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionServiceDto'
+    RecipientsPost:
+      type: object
+      properties:
+        exclude:
+          type: object
+          description: A field by which you can exclude the viewing of a post for users and / or departments
+          properties:
+            departmentsIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "1"
+                - "2"
+              examples:
+                arrayDepartmentsIds:
+                  - "1"
+                  - "2"
+                empty: []
+            usersIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "1"
+                - "2"
+              examples:
+                arrayUsersIds:
+                  - "1"
+                  - "2"
+                empty: []
+        include:
+          type: object
+          description: A field by which you can include the viewing of a post for users and / or departments
+          properties:
+            departmentsIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "3"
+                - "4"
+              examples:
+                arrayDepartmentsIds:
+                  - "1"
+                  - "2"
+                empty: []
+            usersIds:
+              type: array
+              items:
+                type: string
+              example:
+                - "3"
+                - "4"
+              examples:
+                arrayUsersIds:
+                  - "1"
+                  - "2"
+                empty: []
+    CreatePostDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Title post
+        message:
+          type: string
+          example: Message post
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
+        fileIds:
+          type: array
+          description: Defines the array of fileIds uploaded earlier that need to be bound to the post
+          items:
+            type: integer
+            format: int64
+        uploadId:
+          description: Defines the earlier uploaded file bundle that need to be bound to the post
+          type: string
+          format: uuid
+        recipients:
+          $ref: '#/components/schemas/RecipientsPost'
+    UpdatePostDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Title post
+        message:
+          type: string
+          example: Message post
+        author_mood:
+          $ref: '#/components/schemas/AuthorMood'
+        recipients:
+          $ref: '#/components/schemas/RecipientsPost'
+    AuthorMood:
+      type: string
+      enum:
+        - happy
+        - proud
+        - thankful
+        - inspired
+        - excited
+        - festive
+        - worried
+        - sad
+        - angry
+    # news feed end
+
+    # tasks begin
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 5
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        closedDate:
+          $ref: '#/components/schemas/Date'
+        createdBy:
+          type: string
+          example: 1
+        closedBy:
+          type: string
+          example: 1
+        createdDate:
+          $ref: '#/components/schemas/Date'
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        accomplicesIds:
+          type: array
+          items:
+            type: string
+          example: ["2", "3"]
+        auditorsIds:
+          type: array
+          items:
+            type: string
+          example: ["4", "5"]
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        kanbanStageId:
+          type: string
+          example: 2
+        priority:
+          type: string
+          enum:
+            - Low
+            - Average
+            - High
+        acceptResult:
+          type: boolean
+          default: false
+          example: true
+        requiredResult:
+          type: boolean
+          default: false
+          example: true
+        resultCommentId:
+          type: string
+          example: 1
+        fixed:
+          type: boolean
+          default: false
+          example: true
+        archive:
+          type: boolean
+          default: false
+          example: false
+        departmentId:
+          description: Department ID
+          type: string
+          example: 1
+        groupId:
+          description: Group ID
+          type: string
+          example: 1
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
+          example:
+            - id: 7
+              entityType: "task"
+              entityId: 5
+              uploadId: "369c4620-adee-4526-a0d8-a1db20bcf5b2"
+              originalFilename: "sample.jpg"
+              lastModified: 1664629542
+              size: 123456
+              url: "https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg"
+        comments:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CommentServiceDto'
+              - $ref: '#/components/schemas/CommentExtrasServiceDto'
+            example:
+              id: 2
+              entityType: "task"
+              entityId: 5
+              message: "Message comment"
+              authorId: "1"
+              date: 1654180120
+              reactions:
+                - reaction: 128513
+                  amount: 23
+                  entityId: 2
+              nextId: 12
+              prevId: 5
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionServiceDto'
+
+    CreateEditTaskDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Describe swagger api for tasksService
+        deadline:
+          $ref: '#/components/schemas/Date'
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        accomplicesIds:
+          type: array
+          items:
+            type: string
+          example: ["2", "3"]
+        auditorsIds:
+          type: array
+          items:
+            type: string
+          example: ["4", "5"]
+        body:
+          type: string
+          example: <b>need use swagger-ui@4.x</b>
+        priority:
+          type: string
+          enum:
+            - LOW
+            - AVERAGE
+            - HIGH
+        departmentId:
+          description: Department ID
+          default: 'current department id'
+          type: string
+          example: 1
+
+    TaskStatus:
+      type: string
+      enum:
+        - TO_DO
+        - IN_PROGRESS
+        - READY_FOR_REVIEW
+        - DONE
+        - BLOCKED
+
+    CanbanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        title:
+          type: string
+          example: To do
+        color:
+          type: string
+          example: "#ff0000"
+        afterId:
+          type: string
+          description: The ID of the stage to add after.
+          example: 0
+
+    CreateEditCanbanStageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: In progress
+        color:
+          type: string
+          example: "#ff0000"
+        afterId:
+          type: string
+          description: The ID of the stage to add after.
+          example: 1
+    MoveTaskCanbanStageDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Task id
+          example: 1
+
+    CreateDenial:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: No time
+
+    CreateUpdateCheckList:
+      type: object
+      properties:
+        title:
+          type: string
+          example: New check list
+
+    CheckList:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Check list id
+          example: 1
+        title:
+          type: string
+          example: New check list
+
+    CheckListItem:
+      type: object
+      properties:
+        title:
+          type: string
+          example: First item
+        responsibleId:
+          description: ID of responsible person
+          type: string
+          example: 1
+        deadline:
+          $ref: '#/components/schemas/Date'
+
+    MassEditIds:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          example: ["1", "2"]
+
+    TransferTask:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        newUserId:
+          type: string
+          example: 55
+        owner:
+          type: boolean
+          example: true
+        responsible:
+          type: boolean
+          example: false
+      required:
+        - oldUserId
+        - newUserId
+
+    TransferTasksSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countOwnerTasks:
+          type: integer
+          example: 2
+        countResponsibleTasks:
+          type: integer
+          example: 4
+
+    TransferTasksToDepartment:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        departmentUserIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        owner:
+          type: boolean
+          example: true
+          default: false
+        responsible:
+          type: boolean
+          example: false
+          default: false
+      required:
+        - oldUserId
+        - newUserId
+
+    # tasks end
+
+    # files begin
+
+    EntityTypes:
+      type: string
+      enum:
+        - comment
+        - post
+        - task
+
+    UploadContainer:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        entityType:
+          $ref: '#/components/schemas/EntityTypes'
+        entityId:
+          type: integer
+          format: int64
+      required:
+        - files
+        - entityType
+
+    FileInfoDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        entityType:
+          allOf:
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+        uploadId:
+          type: string
+          format: uuid
+          example: '369c4620-adee-4526-a0d8-a1db20bcf5b2'
+        originalFilename:
+          type: string
+          example: sample.jpg
+        lastModified:
+          type: integer
+          format: int64
+          example: 1664629542
+        size:
+          type: integer
+          format: int64
+          example: 123456
+        url:
+          type: string
+          example: 'https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg'
+
+    FileList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
+
+    IndexedFileList:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileInfoDto'
+
+    # files end
+
+    # roles begin
+    NewRoleList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: ADMIN
+        permissions:
+          $ref: '#/components/schemas/PermissionsAction'
+
+    PermissionsAction:
+      type: object
+      properties:
+        create:
+          type: string
+          example:
+            - crm.lead.create.mine
+            - crm.lead.create.allowed
+            - crm.lead.create.department
+        view:
+          type: string
+          example:
+            - crm.lead.view.mine
+            - crm.lead.view.allowed
+            - crm.lead.view.department
+        edit:
+          type: string
+          example:
+            - crm.lead.edit.mine
+            - crm.lead.edit.allowed
+            - crm.lead.edit.department
+        delete:
+          type: string
+          example:
+            - crm.lead.delete.mine
+            - crm.lead.delete.allowed
+            - crm.lead.delete.department
+        export:
+          type: string
+          example:
+            - crm.lead.export.mine
+            - crm.lead.export.allowed
+            - crm.lead.export.department
+
+    RoleList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: ADMIN
+        userlist:
+          $ref: '#/components/schemas/Userlist'
+        departmentlist:
+          $ref: '#/components/schemas/Departmentlist'
+
+    Departmentlist:
+      type: array
+      items:
+        $ref: '#/components/schemas/DepartmentForRole'
+
+    DepartmentForRole:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Employee
+        dateUpdate:
+          $ref: '#/components/schemas/Date'
+
+    Userlist:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserForRole'
+
+    UserForRole:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Stas
+        lastName:
+          type: string
+          example: Raranetskyi
+        avatar:
+          type: string
+          example: path to avatar
+        dateUpdate:
+          $ref: '#/components/schemas/Date'
+
+    RoleStore:
+      type: object
+      properties:
+        name:
+          type: string
+          example: ADMIN
+        permissions:
+          $ref: '#/components/schemas/PermissionsStore'
+
+    PermissionsStore:
+      type: array
+      items:
+        type: string
+      example:
+        - crm.lead.edit.mine
+        - crm.lead.delete.allowed
+        - crm.lead.edit.department
+
+    PermissionsList:
+      type: object
+      properties:
+        create:
+          type: string
+          example:
+            - crm.lead.create.allowed
+            - crm.contact.create.allowed
+            - crm.company.create.allowed
+            - crm.deal.create.allowed
+            - crm.invoice.create.allowed
+            - crm.product.create.allowed
+            - crm.activity.create.allowed
+            - hrm.hiring.create.allowed
+            - hrm.candidate.create.allowed
+            - hrm.department.create.allowed
+            - hrm.employee.create.allowed
+            - tasks.task.create.allowed
+            - tasks.board.create.allowed
+            - tasks.template.create.allowed
+        view:
+          type: string
+          example:
+            - crm.lead.view.allowed
+            - crm.lead.view.department
+            - crm.lead.view.mine
+            - crm.contact.view.allowed
+            - crm.contact.view.department
+            - crm.contact.view.mine
+            - crm.company.view.allowed
+            - crm.company.view.mine
+            - crm.deal.view.allowed
+            - crm.deal.view.mine
+            - crm.invoice.view.allowed
+            - crm.invoice.view.mine
+            - crm.product.view.allowed
+            - crm.activity.view.allowed
+            - crm.activity.view.mine
+            - hrm.hiring.view.allowed
+            - hrm.candidate.view.allowed
+            - hrm.department.view.allowed
+            - hrm.employee.view.allowed
+            - hrm.employee.view.mine
+            - tasks.task.view.allowed
+            - tasks.task.view.department
+            - tasks.task.view.mine
+            - tasks.board.view.allowed
+            - tasks.board.view.department
+            - tasks.template.view.allowed
+            - tasks.template.view.department
+        edit:
+          type: string
+          example:
+            - crm.lead.edit.allowed
+            - crm.lead.edit.department
+            - crm.lead.edit.mine
+            - crm.contact.edit.allowed
+            - crm.contact.edit.department
+            - crm.contact.edit.mine
+            - crm.company.edit.allowed
+            - crm.company.edit.mine
+            - crm.deal.edit.allowed
+            - crm.deal.edit.mine
+            - crm.invoice.edit.allowed
+            - crm.invoice.edit.mine
+            - crm.product.edit.allowed
+            - crm.activity.edit.allowed
+            - crm.activity.edit.mine
+            - hrm.hiring.edit.allowed
+            - hrm.candidate.edit.allowed
+            - hrm.department.edit.allowed
+            - hrm.employee.edit.allowed
+            - hrm.employee.edit.mine
+            - tasks.task.edit.allowed
+            - tasks.task.edit.department
+            - tasks.task.edit.mine
+            - tasks.board.edit.allowed
+            - tasks.board.edit.mine
+            - tasks.template.edit.allowed
+            - tasks.template.edit.mine
+            - news_feed.news.edit.allowed
+        delete:
+          type: string
+          example:
+            - crm.lead.delete.allowed
+            - crm.contact.delete.allowed
+            - crm.company.delete.allowed
+            - crm.deal.delete.allowed
+            - crm.invoice.delete.allowed
+            - crm.product.delete.allowed
+            - crm.activity.delete.allowed
+            - crm.activity.delete.mine
+            - hrm.hiring.delete.allowed
+            - hrm.candidate.delete.allowed
+            - hrm.department.delete.allowed
+            - hrm.employee.delete.allowed
+            - tasks.task.delete.allowed
+            - tasks.task.delete.mine
+            - tasks.board.delete.allowed
+            - tasks.board.delete.mine
+            - tasks.template.delete.allowed
+            - tasks.template.delete.mine
+            - news_feed.news.delete.allowed
+        export:
+          type: string
+          example:
+            - crm.lead.export.allowed
+            - crm.contact.export.allowed
+            - crm.company.export.allowed
+            - crm.deal.export.allowed
+            - crm.invoice.export.allowed
+            - crm.product.export.allowed
+            - crm.activity.export.allowed
+            - hrm.hiring.export.allowed
+            - hrm.candidate.export.allowed
+            - hrm.department.export.allowed
+            - hrm.employee.export.allowed
+            - tasks.task.export.allowed
+            - tasks.template.export.allowed
+
+    # roles end
+
+    # comments begin
+
+    CommentServiceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        entityType:
+          allOf:
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+        message:
+          type: string
+          example: Message comment
+        authorId:
+          type: string
+          example: 1
+        date:
+          $ref: '#/components/schemas/Date'
+
+    CommentExtrasServiceDto:
+      type: object
+      properties:
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionServiceDto'
+        nextId:
+          type: integer
+          format: int64
+          example: 3
+          description: If NULL, this is the last comment if the (sub)thread
+        prevId:
+          type: integer
+          format: int64
+          example: 1
+          description: If NULL, this is the first comment if the (sub)thread
+
+    ReactionServiceDto:
+      type: object
+      properties:
+        reaction:
+          type: integer
+          format: int64
+          example: 128513
+          description: Represents the UNICODE symbol such as 0x0001F601
+        amount:
+          type: integer
+          format: int32
+          example: 53
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+
+    CreateCommentServiceDto:
+      type: object
+      properties:
+        entityType:
+          allOf:
+            - $ref: '#/components/schemas/EntityTypes'
+            - example: 'post'
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+        message:
+          type: string
+          example: Message post
+      required:
+        - entityType
+        - entityId
+
+    UpdateCommentServiceDto:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Message post
+
+    # comments end
+
+    # invite begin
+    InvitesStore:
+      type: array
+      items:
+        $ref: '#/components/schemas/InviteExample'
+      example:
+        - email: stark@gmail.com
+          firstName: Tony
+          lastName: Stark
+        - email: benner@gmail.com
+          firstName: Bruce
+          lastName: Benner
+
+
+    InviteExample:
+      type: object
+      properties:
+        email:
+          type: string
+          example: stark@gmail.com
+        firstName:
+          type: string
+          example: Tony
+        lastName:
+          type: string
+          example: Stark
+
+    InvitesBatchStore:
+      type: array
+      items:
+        type: string
+      example:
+        - stark@gmail.com
+        - benner@gmail.com
+
+    Success:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: success
+
+    # invite end
+
+    # group begin
+    TransferGroup:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        newUserId:
+          type: string
+          example: 55
+        owner:
+          type: boolean
+          example: true
+          default: false
+        moderator:
+          type: boolean
+          example: false
+          default: false
+      required:
+        - oldUserId
+        - newUserId
+
+    TransferGroupToDepartment:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+        departmentUserIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        owner:
+          type: boolean
+          example: true
+          default: false
+        moderator:
+          type: boolean
+          example: false
+          default: false
+      required:
+        - oldUserId
+        - newUserId
+
+    TransferGroupToMembers:
+      type: object
+      properties:
+        oldUserId:
+          type: string
+          example: 2
+      required:
+        - oldUserId
+
+    TransferGroupSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countGroups:
+          type: integer
+          example: 2
+        countModerator:
+          type: integer
+          example: 4
+
+    TransferGroupToMembersSuccess:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        countGroups:
+          type: integer
+          example: 2
+
+    CreateUpdateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: public
+          description: Available values - public, private, secret.
+        description:
+          type: string
+          example: description group
+        groupTheme:
+          type: string
+          example: group theme
+        ownerId:
+          type: string
+          example: 1
+          description: "1"
+        logo:
+          type: file
+          description: The file to upload.
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+            format: binary
+        usersIds:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - name
+        - groupType
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Title group
+        groupType:
+          type: string
+          example: private
+        ownerId:
+          type: string
+          example: 1
+        archival:
+          type: boolean
+        description:
+          type: string
+          example: private
+        groupTheme:
+          type: string
+          example: private
+        logo:
+          type: string
+          example: /8c/nsfkjnns486sd4f56.jpg
+        moderatorsIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+        usersIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "1"
+            - "2"
+
+    SendInviteToGroup:
+      type: object
+      properties:
+        groupId:
+          type: string
+          example: 1
+        userIds:
+          type: array
+          items:
+            type: string
+          example:
+            - "11"
+            - "22"
+
+
+    # group end
+
+
+    # portal begin
+
+    Portal:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        portal_name:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        ending_date:
+          type: integer
+          example: 1680020176
+        active:
+          type: boolean
+        jwt_secret:
+          type: string
+          example: F8Ka2ovT3OyztOY4FiH7OvbU2nLprrQDllrWFMJ5DVk
+        s3_bucket:
+          type: string
+          example: alter_ego
+        s3_region:
+          type: string
+          example: us-east-1
+        s3_access_key_id:
+          type: string
+          example: example
+        s3_secret_access_key:
+          type: string
+          example: example
+
+    CreatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        tariffId:
+          type: string
+          example: 1
+
+    UpdatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        endingDate:
+          type: interger
+          example: 1680020176
+        tariffId:
+          type: string
+          example: 1
+
+    ServiceAccess:
+      type: object
+      properties:
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+        db_host:
+          type: string
+          example: company_test
+        db_name:
+          type: string
+          example: company_test
+        db_login:
+          type: string
+          example: company_test
+        db_password:
+          type: string
+          example: company_test
+
+    Services:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+
+    CreateUpdateServices:
+      type: object
+      properties:
+        name:
+          type: string
+          example: company
+        enabled:
+          type: boolean
+
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: base
+        description:
+          type: string
+          example: tariff example
+        expiration_date:
+          type: integer
+          example: 123456
+        start_date:
+          type: integer
+          example: 1668895926
+        end_date:
+          type: integer
+          example: 1668895926
+        promotional:
+          type: boolean
+        start_promo_date:
+          type: integer
+          example: 1668895926
+        end_promo_date:
+          type: integer
+          example: 1668895926
+
+    CreateUpdateTariff:
+      type: object
+      properties:
+        name:
+          type: string
+          example: base
+        description:
+          type: string
+          example: tariff example
+        expiration_date:
+          type: integer
+          example: 123456
+        start_date:
+          type: integer
+          example: 1668895926
+        end_date:
+          type: integer
+          example: 1668895926
+        promotional:
+          type: boolean
+        start_promo_date:
+          type: integer
+          example: 1668895926
+        end_promo_date:
+          type: integer
+          example: 1668895926
+
+
+
+
+
+
+
+
+
+    # portal end

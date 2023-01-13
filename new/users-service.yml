@@ -1,0 +1,2985 @@
+paths:
+  # users begin
+  /company/v1/users/:
+    get:
+      description: Get users list. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        # - $ref: '#/components/parameters/queryUsers'
+        - $ref: '#/components/parameters/filterUsers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpDto'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      position:
+                        example: ''
+                      phone:
+                        example: "[]"
+                      birthday:
+                        example: 0
+                      roles:
+                        example: '["Employee"]'
+                      departmentsIds:
+                        example: "[]"
+                      socialMedia:
+                        example: "[]"
+
+          description: Created
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - usersService
+      description: Get user by id. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update user data by id. Available only for authorized users
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/deactivate/:
+    post:
+      description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      active:
+                        example: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/activate/:
+    post:
+      description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/updateRoles/:
+    patch:
+      description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRolesDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/updatePosition/:
+    patch:
+      description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserPosition'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/changePassword/:
+    patch:
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      description: Update user password by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/settings/:
+    get:
+      tags:
+        - usersService
+      description: Get persinal settings by id. Available only for users with admin permissions
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update personal settings by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personalSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/twoFactorStatus:
+    get:
+      description: Get two-factor authentication status by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/{userId}/twoFactorDisable:
+    patch:
+      description: Disable two-factor authentication by id. Available only for users with admin permissions.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatusDisabled'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/:
+    get:
+      tags:
+        - usersService
+      description: Get self profile. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/changePassword/:
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSelfPasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/twoFactorStatus:
+    get:
+      description: Get two-factor authentication status. Available only for authorized users.
+      tags:
+        - usersService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/twoFactorEnable:
+    patch:
+      description: Enable two-factor authentication in a two steps
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorEnable'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorGetQr'
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatusEnabled'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      text:
+                        type: array
+                        items:
+                          example: 'The code has expired'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: []
+  /company/v1/users/me/twoFactorDisable:
+    patch:
+      description: Disable two-factor authentication
+      tags:
+        - usersService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorStatusDisabled'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/forgotPassword/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordDto'
+      responses:
+        '200':
+          description: OK
+  /company/v1/users/resetPassword/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordTokenDto'
+      responses:
+        '200':
+          description: OK
+  /company/v1/users/search/:
+    get:
+      description: Search. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+        - $ref: '#/components/parameters/searchFirstName'
+        - $ref: '#/components/parameters/searchLastName'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/uploadAvatar:
+    post:
+      description: Avatar upload. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - avatar
+                  properties:
+                    avatar:
+                      default: ''
+                      format: binary
+                    userId:
+                      type: string
+                      example: 2
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      responsibleId:
+                        type: string
+                        example: 2
+                      denial:
+                        type: boolean
+                        example: true
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/checkEmail/:
+    get:
+      description: Email existence check.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: email already exist
+        '204':
+          $ref: '#/components/responses/NoContent'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/getUsersByField/:
+    post:
+      description: Getting a list of users by filter. Available to unauthorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/getUsersByField'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /company/v1/users/me/settings/:
+    get:
+      tags:
+        - usersService
+      description: Get self profile. Available only for authorized users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - usersService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personalSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/personalSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # users end
+
+  # auth begin
+  /company/v1/auth/signIn/:
+    description: Sign in user by email, password. Returns token, refreshToken
+    post:
+      tags:
+        - auth (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      text:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - You need to provide a verification code
+                            - Incorrect verification code
+                            - Attempts count exceeded. Try again later
+                  status:
+                    type: boolean
+                    example: true
+  /company/v1/auth/confirmEmail/:
+    description: Confirm email user. Returns token, refreshToken
+    post:
+      tags:
+        - auth (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /company/v1/auth/refreshToken/:
+    description: refreshToken exprired token. Returns new token
+    post:
+      tags:
+        - auth (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /company/v1/auth/register/:
+    post:
+      description: New user registration by invitation. Returns token, refreshToken
+      tags:
+        - auth (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationByInvitation'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  # auth end
+
+  # departments begin
+  /company/v1/departments/:
+    get:
+      description: Get departments list. Available only for authorized users.
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        # - $ref: '#/components/parameters/queryDepartments'
+        - $ref: '#/components/parameters/filterDepartments'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Department'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create department. Available only for users with admin permissions
+      tags:
+        - departments (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Department'
+                  - type: object
+                    properties:
+                      roles:
+                        type: array
+                        items:
+                          type: string
+                        example: "[]"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/departments/{departmentId}/:
+    parameters:
+      - $ref: '#/components/parameters/departmentId'
+    get:
+      description: Get department by id. Available only for authorized users.
+      tags:
+        - departments (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description:
+        Update department data (set head department, move users, set parent department)
+        Available only for head parent department or users with admin permissions. Returns updated department data
+      tags:
+        - departments (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description:
+        Delete department. Available only for users with admin permissions.
+      tags:
+        - departments (usersService)
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/departments/{departmentId}/updateRoles/:
+    patch:
+      description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRolesDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /company/v1/departments/{departmentId}/addUsers/:
+    patch:
+      description: Update department users by id. Available only for users with admin permissions.
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIds'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/departments/{departmentId}/deleteUsers/:
+    patch:
+      description: Update department users by id. Available only for users with admin permissions.
+      tags:
+        - departments (usersService)
+      parameters:
+        - $ref: '#/components/parameters/departmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIds'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # departments end
+
+  # roles begin
+  /company/v1/permissions/:
+    get:
+      description: Get permissions list. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/roles/:
+    get:
+      description: Get role list. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleList'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create role. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleStore'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/NewRoleList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/roles/{roleId}/:
+    parameters:
+      - $ref: '#/components/parameters/roleId'
+    get:
+      description: Get role by id. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RoleList'
+                  - type: object
+                    properties:
+                      permissions:
+                        $ref: '#/components/schemas/PermissionsAction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description:
+        Update role data. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RoleStore'
+                - type: object
+                  properties:
+                    usersIds:
+                      type: string
+                      example:
+                        - "1"
+                        - "2"
+                    departmentsIds:
+                      type: string
+                      example:
+                        - "1"
+                        - "2"
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RoleList'
+                  - type: object
+                    properties:
+                      permissions:
+                        $ref: '#/components/schemas/PermissionsAction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description:
+        Delete role. Only available to authorized users with the owner or administrator role.
+      tags:
+        - roles (usersService)
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # roles end
+
+  # invite begin
+  /company/v1/users/checkInvite/:
+    get:
+      description: Checking if an invitation exists.
+      tags:
+        - invite (usersService)
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '422':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          example: 'Invitation canceled, contact your space partner'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email:
+    post:
+      description: Create invites. Only available to authorized users with the owner or administrator role.
+      tags:
+        - invite (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitesStore'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email/batch:
+    post:
+      description: Create invites. Only available to authorized users with the owner or administrator role.
+      tags:
+        - invite (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitesBatchStore'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email/{userId}/repeatInvitation:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Resending an invitation. Only available to authorized users with the owner or administrator role.
+      tags:
+        - invite (usersService)
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /company/v1/invites/email/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+
+    delete:
+      description:
+        Delete invitation. Only available to authorized users with the owner or administrator role.
+      tags:
+        - invite (usersService)
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # invite begin
+
+  # newsfeed begin
+  /newsfeed/v1/posts/:
+    get:
+      description: Get posts list. Available only for authorized users.
+      tags:
+        - newsFeedService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: >
+        Create post. Available only for authorized users.
+
+
+        Use one of `fileIds` or `uploadId` to bind earlier uploaded files to the post that is going to be created.
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Post'
+                  - type: object
+                    properties:
+                      comments:
+                        example: null
+                      reactions:
+                        example: null
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /newsfeed/v1/posts/{postId}/:
+    parameters:
+      - $ref: '#/components/parameters/postId'
+    patch:
+      description: Update post. Available only for author.
+      tags:
+        - newsFeedService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete post. Available only for author or users with admin permissions.
+      tags:
+        - newsFeedService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # newsfeed end
+
+  # tasks begin
+  /tasks/v1/tasks/:
+    get:
+      description: Get available tasks list. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/field_name'
+        - $ref: '#/components/parameters/sort_by'
+        - $ref: '#/components/parameters/order_by'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateEditTaskDto'
+                - type: object
+                  properties:
+                    fixed:
+                      type: boolean
+                      default: false
+                      example: true
+                    groupId:
+                      description: Group ID
+                      default: 'current group id'
+                      type: string
+                      example: 11
+                    fileIds:
+                      type: array
+                      description: Defines the array of fileIds uploaded earlier that need to be bound to the post
+                      items:
+                        type: integer
+                        format: int64
+                    uploadId:
+                      description: Defines the earlier uploaded file bundle that need to be bound to the post
+                      type: string
+                      format: uuid
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Task'
+                  - type: object
+                    properties:
+                      groupId:
+                        description: Group ID
+                        default: 'current group id'
+                        type: string
+                        example: 11
+                      comments:
+                        example: null
+                      reactions:
+                        example: null
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      description: Get task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit task by id. Available only for authorized users and task maker.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateEditTaskDto'
+                - type: object
+                  properties:
+                    archive:
+                      type: boolean
+                      default: false
+                      example: true
+                    fixed:
+                      type: boolean
+                      default: false
+                      example: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete task by id. Available only for authorized users and task maker.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/denial/:
+    post:
+      description: Abandoning a task. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDenial'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /tasks/v1/stages/:
+    get:
+      description: Get canban stages. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CanbanStage'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create canban stage. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CanbanStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 2
+                      afterId:
+                        type: string
+                        example: 1
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/stages/{stageId}/:
+    get:
+      description: Get canban stage by id. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanbanStage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update canban stage by id. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CanbanStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 2
+                      afterId:
+                        type: string
+                        example: 1
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Create comment for task. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/stages/{stageId}/moveTask/:
+    post:
+      description: Moving a task to stage
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveTaskCanbanStageDto'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/{taskId}/checkList/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+    get:
+      description: Get comments task by id. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/CheckList'
+                    - type: object
+                      properties:
+                        checkListItemIds:
+                          type: array
+                          items:
+                            type: string
+                          example: ["2", "3"]
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create check list for task. Available only for authorized users and users who have access to task.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCheckList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CheckList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
+    parameters:
+      - $ref: '#/components/parameters/taskId'
+      - $ref: '#/components/parameters/checkListId'
+    patch:
+      description: Update check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateCheckList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateUpdateCheckList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete check list to task by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/checkList/{checkListId}/:
+    parameters:
+      - $ref: '#/components/parameters/checkListId'
+    get:
+      description: Get items check list by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Check list item id
+                          example: 1
+                    - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create item check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CheckListItem'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Check list item id
+                        example: 1
+                  - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/checkList/{checkListId}/{checkListItemId}:
+    parameters:
+      - $ref: '#/components/parameters/checkListId'
+      - $ref: '#/components/parameters/checkListItemId'
+    delete:
+      description: Delete item to check list by id. Available only for authorized users.
+      tags:
+        - tasksService
+      responses:
+        '204':
+          description: No content
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update check list for task. Available only for authorized users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CheckListItem'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Check list item id
+                        example: 1
+                  - $ref: '#/components/schemas/CheckListItem'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/tasks/massEdit/complete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/massEdit/archive/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/tasks/massEdit/delete/:
+    post:
+      description: Bulk editing tasks
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassEditIds'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /tasks/v1/transferToUser:
+    post:
+      description: Transfer tasks to another user. Available only for admin users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferTask'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferTasksSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /tasks/v1/transferToDepartment:
+    post:
+      description: Transfer tasks to department. Available only for admin users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferTasksToDepartment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferTasksSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # tasks end
+
+  # files begin
+
+  /files/v1/files:
+    get:
+      description: Lists the file info
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Upload one or more files
+      tags:
+        - filesService
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadContainer'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files?uploadId:
+    get:
+      description: Lists the file info
+      tags:
+        - filesService
+      parameters:
+        - in: query
+          name: uploadId
+          description: >
+            Use this parameter instead of `entityType` and `entityId` to list the upload bundle
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files?entityIds[]:
+    get:
+      description: Lists the file info
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityIds'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      entityId:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files/{id}:
+    patch:
+      description: Update the `entity_id` for one file
+      tags:
+        - filesService
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            oneOf:
+              - type: integer
+                format: int64
+              - type: string
+                format: uuid
+          required: true
+          description: Numeric ID of the file to update or the UUID of the upload group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Removes the uploaded file and info about it
+      tags:
+        - filesService
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Numeric ID of the file to remove
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /files/v1/files?entityType&entityId:
+    patch:
+      description: >
+        Update the `entity_id` for a group of files determined by `entityType` and `entityId`
+
+
+        It's okay to specify the parameters in the request body instead of query.
+
+
+        At the moment this is used internally to bind earlier uploaded files to an entity
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileInfoDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: >
+        Removes the multiple files bound to the entity
+
+
+        At the moment this is used internally to sync of files removal with posts
+      tags:
+        - filesService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # files end
+
+  # comments begin
+
+  /comments/v1/comments/:
+    get:
+      description: >
+        Lists the comments related to some entity.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
+      tags:
+        - commentsService
+      parameters:
+        - name: entity_type
+          in: query
+          allOf:
+            - $ref: '#/components/parameters/entityType'
+            - description: >
+                Entity type name.
+                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+                And only the child comments are being sent in this case.
+                Use along with `childList` and `lastId` to paginate the child comments.
+        - $ref: '#/components/parameters/entityId'
+        - allOf:
+            - $ref: '#/components/parameters/list'
+            - description: >
+                Use this to define the number of top level comments to retrieve.
+                Retrieve all if missing or retrieve the rest if `nextId` is present.
+            - example: 3
+            - default: 3
+            - required: false
+        - $ref: '#/components/parameters/childList'
+        - $ref: '#/components/parameters/nextId'
+        - $ref: '#/components/parameters/lastId'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CommentServiceDto'
+                        - $ref: '#/components/schemas/CommentExtrasServiceDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Creates new comment
+      tags:
+        - commentsService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentServiceDto'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentServiceDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments?entityIds[]:
+    get:
+      description: >
+        Lists the comments related to the list of entities.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
+      tags:
+        - commentsService
+      parameters:
+        - name: entity_type
+          in: query
+          allOf:
+            - $ref: '#/components/parameters/entityType'
+            - description: >
+                Entity type name.
+                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+                And only the child comments are being sent in this case.
+                Use along with `childList` and `lastId` to paginate the child comments.
+        - $ref: '#/components/parameters/entityIds'
+        - allOf:
+            - $ref: '#/components/parameters/list'
+            - description: >
+                Use this to define the number of top level comments to retrieve.
+                Retrieve all if missing or retrieve the rest if `nextId` is present.
+            - example: 3
+            - default: 3
+            - required: false
+        - $ref: '#/components/parameters/childList'
+        - $ref: '#/components/parameters/nextId'
+        - $ref: '#/components/parameters/lastId'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      entityId:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/CommentServiceDto'
+                            - $ref: '#/components/schemas/CommentExtrasServiceDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments/{id}:
+    patch:
+      description: Updates the comment
+      tags:
+        - commentsService
+      parameters:
+        - in: path
+          name: commentId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Numeric ID of the comment to show
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommentServiceDto'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentServiceDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Removes the comment
+      tags:
+        - commentsService
+      parameters:
+        - in: path
+          name: commentId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Numeric ID of the comment to delete
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments?entityType&entityId:
+    delete:
+      description: >
+        Removes the multiple comments bound to the entity
+
+
+        At the moment this is used internally to sync of comments removal with posts
+      tags:
+        - commentsService
+      parameters:
+        - $ref: '#/components/parameters/entityType'
+        - $ref: '#/components/parameters/entityId'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # comments end
+
+  # group begin
+  /groups/v1/groups/:
+    get:
+      description: Get posts list. Available only for authorized users.
+      tags:
+        - groupService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/archived'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Group'
+                        - allOf:
+                            - $ref: '#/components/schemas/Group'
+                            - type: object
+                              properties:
+                                comments:
+                                  example: "[]"
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create group. Available only for authorized users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateGroupDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /groups/v1/groups/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    get:
+      description: Shows the group info. Available only for authorized users.
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Update group. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateGroupDto'
+                - type: object
+                  properties:
+                    archival:
+                      example: true
+                      description: "true or false"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete group. Only available to group owner.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/attachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Adding a user to a group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/detachUser/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+
+    patch:
+      description:
+        Remove user from group. Only available to group owner or moderator.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/joinGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Adding the current user to the group. Available to open groups or by invitation.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/leaveGroup:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+
+    patch:
+      description:
+        Remove the current user from the group..
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/:
+    get:
+      description: Getting a list of invitations to groups of the current user.
+      tags:
+        - groupService
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groupId:
+                    type: array
+                    items:
+                      type: string
+                    example: ["2", "5"]
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Sending invitations to groups. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendInviteToGroup'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/invites/{groupId}/:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    delete:
+      description: Refusal of an invitation. Only available to the current user.
+      tags:
+        - groupService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToUser:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroup'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToDepartment:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroupToDepartment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/transferToGroupMembers:
+    post:
+      description: Transfer groups to another user. Available only for admin users.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferGroupToMembers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransferGroupToMembersSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  # groups end
+
+  # portals begin
+  /portals/v1/portal/:
+    get:
+      description: Get portals list. Available only for backend.
+      tags:
+        - portalService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Portal'
+                        - allOf:
+                            - $ref: '#/components/schemas/Portal'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create portal. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+
+  /portals/v1/portal/{domain}:
+    parameters:
+      - $ref: '#/components/parameters/domain'
+    get:
+      description: The main method for getting access list for portal services. Available only for authorized users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+                  - type: object
+                    properties:
+                      services:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/ServiceAccess'
+                            - allOf:
+                                - $ref: '#/components/schemas/ServiceAccess'
+
+  /portals/v1/portal/{portalId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    get:
+      description: Shows the portal info. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+                  - type: object
+                    properties:
+                      services:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/ServiceAccess'
+                            - allOf:
+                                - $ref: '#/components/schemas/ServiceAccess'
+
+    patch:
+      description: Update portal. Only available to super users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portal'
+
+  /portals/v1/portal/{portalId}/addService/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceId'
+    patch:
+      description: Add service to portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/removeService/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceId'
+    patch:
+      description: Remove service to portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/activate:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    patch:
+      description: Activate portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/deactivate:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+    patch:
+      description: Deactivate portal. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/enableService/{serviceName}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceName'
+    patch:
+      description: Service activation. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/portal/{portalId}/disableService/{serviceName}:
+    parameters:
+      - $ref: '#/components/parameters/portalId'
+      - $ref: '#/components/parameters/serviceName'
+    patch:
+      description: Service activation. Available only for super users.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /portals/v1/service/:
+    get:
+      description: Get service list. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Services'
+                        - allOf:
+                            - $ref: '#/components/schemas/Services'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateServices'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Services'
+
+  /portals/v1/service/{serviceId}:
+    parameters:
+      - $ref: '#/components/parameters/serviceId'
+    get:
+      description: Show service. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Services'
+    patch:
+      description: Update service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateServices'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Services'
+
+  /portals/v1/tariff/:
+    get:
+      description: Get tariff list. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Tariff'
+                        - allOf:
+                            - $ref: '#/components/schemas/Tariff'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+    post:
+      description: Create service. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateTariff'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Tariff'
+
+  /portals/v1/tariff/{tariffId}:
+    parameters:
+      - $ref: '#/components/parameters/tariffId'
+    get:
+      description: Display tariff. Available only for super user.
+      tags:
+        - portalService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tariff'
+    patch:
+      description: Update tariff. Available only for superadmin users.
+      tags:
+        - portalService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateTariff'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Tariff'
+
+
+  # portals end
