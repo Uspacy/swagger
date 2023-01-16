@@ -4121,6 +4121,7 @@ components:
         lastName:
           type: string
           example: Stark
+          required: false
     # auth end
 
     # Departments begin
