@@ -5,8 +5,8 @@ info:
 servers:
   - url: http://127.0.0.1:8000
 tags:
+  - name: authService
   - name: usersService
-  - name: auth (usersService)
   - name: departments (usersService)
   - name: roles (usersService)
   - name: invite (usersService)
@@ -18,39 +18,99 @@ tags:
   - name: crmService
 
 paths:
-  # users begin
-  /company/v1/users/:
-    get:
-      description: Get users list. Available only for authorized users.
+
+  # auth begin
+  /auth/v1/auth/sign_in/:
+    description: Sign in user by email, password. Returns token, refreshToken
+    post:
       tags:
-        - usersService
-      parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryUsers'
-        - $ref: '#/components/parameters/filterUsers'
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Token'
+        '403':
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/User'
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
+                  errors:
+                    type: object
+                    properties:
+                      text:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - You need to provide a verification code
+                            - Incorrect verification code
+                            - Attempts count exceeded. Try again later
+                  status:
+                    type: boolean
+                    example: true
+  /auth/v1/auth/confirm_email/:
+    description: Confirm email user. Returns token, refreshToken
+    post:
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/auth/refresh_token/:
+    description: refreshToken exprired token. Returns new token
+    post:
+      tags:
+        - authService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/auth/register/:
+    post:
+      description: New user registration by invitation. Returns token, refreshToken
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationByInvitation'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/users/:
     post:
       description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
       tags:
-        - usersService
+        - authService
       requestBody:
         required: true
         content:
@@ -86,6 +146,92 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
+  /auth/v1/users/forgot_password/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordDto'
+      responses:
+        '200':
+          description: OK
+  /auth/v1/users/reset_password/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordTokenDto'
+      responses:
+        '200':
+          description: OK
+  /auth/v1/users/{userId}/change_password/:
+    patch:
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      description: Update user password by id. Available only for users with admin permissions.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  # auth end
+
+
+  # users begin
+  /company/v1/users/:
+    get:
+      description: Get users list. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        # - $ref: '#/components/parameters/queryUsers'
+        - $ref: '#/components/parameters/filterUsers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   /company/v1/users/{userId}/:
     parameters:
       - $ref: '#/components/parameters/userId'
@@ -224,30 +370,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/users/{userId}/changePassword/:
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/userId'
-      description: Update user password by id. Available only for users with admin permissions.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangePasswordDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
+
   /company/v1/users/{userId}/settings/:
     get:
       tags:
@@ -440,34 +563,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /company/v1/users/forgotPassword/:
-    post:
-      description: Reset password. Available to unauthorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailPasswordDto'
-      responses:
-        '200':
-          description: OK
-  /company/v1/users/resetPassword/:
-    post:
-      description: Reset password. Available to unauthorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailPasswordTokenDto'
-      responses:
-        '200':
-          description: OK
+
   /company/v1/users/search/:
     get:
       description: Search. Available only for authorized users.
@@ -631,95 +727,6 @@ paths:
       security:
         - bearerAuth: []
   # users end
-
-  # auth begin
-  /company/v1/auth/signIn/:
-    description: Sign in user by email, password. Returns token, refreshToken
-    post:
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignInDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-        '403':
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: object
-                    properties:
-                      text:
-                        type: array
-                        items:
-                          type: string
-                          enum:
-                            - You need to provide a verification code
-                            - Incorrect verification code
-                            - Attempts count exceeded. Try again later
-                  status:
-                    type: boolean
-                    example: true
-  /company/v1/auth/confirmEmail/:
-    description: Confirm email user. Returns token, refreshToken
-    post:
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmEmailDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  /company/v1/auth/refreshToken/:
-    description: refreshToken exprired token. Returns new token
-    post:
-      tags:
-        - auth (usersService)
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  /company/v1/auth/register/:
-    post:
-      description: New user registration by invitation. Returns token, refreshToken
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegistrationByInvitation'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  # auth end
 
   # departments begin
   /company/v1/departments/:
@@ -3736,6 +3743,9 @@ components:
           type: string
           example: Stark
           required: false
+        domain:
+          type: string
+          example: stark
     # auth end
 
     # Departments begin
