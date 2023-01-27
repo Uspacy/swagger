@@ -2971,6 +2971,102 @@ paths:
       security:
         - bearerAuth: []
 
+  /crm/v1/tasks/:
+    get:
+      description: Get available crm-task entity items list. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CrmTaskEntity'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create crm-task entity item. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCrmTaskDto'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrmTaskEntity'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/task/{itemId}/:
+    parameters:
+      - $ref: '#/components/parameters/itemId'
+    get:
+      description: Get crm-task entity item. Available only for authorized users and users who have access to crm.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrmTaskEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Edit crm-task entity item. Available only for authorized users and users who have access to crm.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateCrmTaskDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrmTaskEntity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Delete crm-task entity item. Available only for admin users and users who have access to crm.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   # crm end
 
 components:
@@ -5032,6 +5128,138 @@ components:
         updated_at:
           type: integer
           example: 12156465
+
+    CrmTaskTypes:
+      type: string
+      enum:
+        - task
+        - call
+        - meeting
+        - chat
+        - email
+
+    CrmTaskStatuses:
+      type: string
+      enum:
+        - planned
+        - done
+        - cancelled
+
+    CrmTaskEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdBy:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: Title example
+        type:
+          $ref: '#/components/schemas/CrmTaskTypes'
+        status:
+          $ref: '#/components/schemas/CrmTaskStatuses'
+        description:
+          type: string
+        startTime:
+          type: integer
+          format: int64
+          example: 1674950100
+        endTime:
+          type: integer
+          format: int64
+          example: 1674951000
+        responsibleId:
+          type: integer
+          format: int64
+          example: 5
+        companyId:
+          type: integer
+          format: int64
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [123,234,345]
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrmEntity'
+        deals:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrmEntity'
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrmEntity'
+        company:
+          $ref: '#/components/schemas/CrmEntity'
+
+    CreateUpdateCrmTaskDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Sed non massa
+        createdBy:
+          type: integer
+          format: int64
+          example: 5
+        type:
+          allOf:
+            - $ref: '#/components/schemas/CrmTaskTypes'
+            - example: meeting
+        status:
+          allOf:
+            - $ref: '#/components/schemas/CrmTaskStatuses'
+            - example: planned
+        description:
+          type: string
+          example: Duis id rutrum risus. Sed in urna.
+        startTime:
+          type: integer
+          format: int64
+          example: 1674950100
+        endTime:
+          type: integer
+          format: int64
+          example: 1674951000
+        responsibleId:
+          type: integer
+          format: int64
+          example: 5
+        companyId:
+          type: integer
+          format: int64
+          example: 67
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [123,234,345]
+        deals:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [56]
+        leads:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [34]
+        contacts:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [12,32]
 
 
     # crm end
