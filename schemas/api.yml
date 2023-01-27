@@ -198,7 +198,53 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
+  /auth/v1/users/me/change_password/:
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSelfPasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /auth/v1/users/check_email/:
+    get:
+      description: Email existence check.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: email already exist
+        '204':
+          $ref: '#/components/responses/NoContent'
+      security:
+        - bearerAuth: []
   # auth end
 
 
@@ -316,7 +362,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/users/{userId}/updateRoles/:
+  /company/v1/users/{userId}/update_roles/:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
       tags:
@@ -343,7 +389,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/users/{userId}/updatePosition/:
+  /company/v1/users/{userId}/update_position/:
     patch:
       description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
       tags:
@@ -412,7 +458,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /company/v1/users/{userId}/twoFactorStatus:
+  /company/v1/users/{userId}/twofa_status:
     get:
       description: Get two-factor authentication status by id. Available only for users with admin permissions.
       tags:
@@ -430,7 +476,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /company/v1/users/{userId}/twoFactorDisable:
+  /company/v1/users/{userId}/twofa_disable:
     patch:
       description: Disable two-factor authentication by id. Available only for users with admin permissions.
       tags:
@@ -464,29 +510,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /company/v1/users/me/changePassword/:
-    patch:
-      description: Update self password. Available only for authorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangeSelfPasswordDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-  /company/v1/users/me/twoFactorStatus:
+
+  /company/v1/users/me/twofa_status:
     get:
       description: Get two-factor authentication status. Available only for authorized users.
       tags:
@@ -502,7 +527,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /company/v1/users/me/twoFactorEnable:
+  /company/v1/users/me/twofa_enable:
     patch:
       description: Enable two-factor authentication in a two steps
       tags:
@@ -546,7 +571,7 @@ paths:
                     example: true
       security:
         - bearerAuth: []
-  /company/v1/users/me/twoFactorDisable:
+  /company/v1/users/me/twofa_disable:
     patch:
       description: Disable two-factor authentication
       tags:
@@ -590,7 +615,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /company/v1/users/uploadAvatar:
+  /company/v1/users/upload_avatar:
     post:
       description: Avatar upload. Available only for authorized users.
       tags:
@@ -633,33 +658,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /company/v1/users/checkEmail/:
-    get:
-      description: Email existence check.
-      tags:
-        - usersService
-      parameters:
-        - $ref: '#/components/parameters/searchEmail'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: email already exist
-        '204':
-          $ref: '#/components/responses/NoContent'
-      security:
-        - bearerAuth: []
-
-  /company/v1/users/getUsersByField/:
+  /company/v1/users/get_users_by_field/:
     post:
       description: Getting a list of users by filter. Available to unauthorized users.
       tags:
@@ -1065,7 +1064,7 @@ paths:
   # roles end
 
   # invite begin
-  /company/v1/users/checkInvite/:
+  /company/v1/users/check_invite/:
     get:
       description: Checking if an invitation exists.
       tags:
@@ -1149,7 +1148,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: []
-  /company/v1/invites/email/{userId}/repeatInvitation:
+  /company/v1/invites/email/{userId}/repeat_invitation:
     parameters:
       - $ref: '#/components/parameters/userId'
 
