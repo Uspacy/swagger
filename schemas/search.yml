@@ -1,0 +1,121 @@
+basePath: /
+definitions:
+  app.errorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  client.Department:
+    properties:
+      headId:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  client.Task:
+    properties:
+      deadline:
+        type: integer
+      id:
+        type: string
+      responsibleId:
+        type: string
+      title:
+        type: string
+    type: object
+  client.User:
+    properties:
+      id:
+        type: integer
+    type: object
+  entity.Response:
+    properties:
+      data:
+        properties:
+          departments:
+            items:
+              $ref: '#/definitions/client.Department'
+            type: array
+          groups:
+            items:
+              properties:
+                description:
+                  type: string
+                id:
+                  type: integer
+                logo:
+                  type: string
+                name:
+                  type: string
+              type: object
+            type: array
+          newsfeed:
+            items:
+              properties:
+                id:
+                  type: integer
+                message:
+                  type: string
+                title:
+                  type: string
+              type: object
+            type: array
+          tasks:
+            items:
+              $ref: '#/definitions/client.Task'
+            type: array
+          users:
+            items:
+              $ref: '#/definitions/client.User'
+            type: array
+        type: object
+    type: object
+host: localhost:8000
+info:
+  contact: { }
+  description: API Server to get data from few services
+  title: Search-Backend API
+  version: "1.0"
+paths:
+  /search:
+    get:
+      consumes:
+        - application/json
+      description: search data from few services
+      parameters:
+        - description: name search by q
+          in: query
+          name: q
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+      security:
+        - ApiKeyAuth: [ ]
+      summary: SearchHandler
+      tags:
+        - search
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
