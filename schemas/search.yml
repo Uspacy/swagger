@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   app.errorMessage:
     properties:
@@ -8,26 +7,64 @@ definitions:
   client.Department:
     properties:
       headId:
+        example: "41"
         type: string
       id:
+        example: 1
         type: integer
       name:
+        example: Відділ продукту
+        type: string
+    type: object
+  client.Group:
+    properties:
+      description:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
+      id:
+        example: 1231
+        type: integer
+      logo:
+        example: https://uspacy-stage-s3-bucket.s3.eu-west-1.amazonaws.com/02/c4/02c46a2bdffc39bd2cdb8582e4afe3bc.jpg
+        type: string
+      name:
+        example: Describe swagger api for
+        type: string
+    type: object
+  client.Newsfeed:
+    properties:
+      id:
+        example: 1231
+        type: integer
+      message:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
+      title:
+        example: Describe swagger api for
         type: string
     type: object
   client.Task:
     properties:
+      body:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
       deadline:
+        example: 1654180120
         type: integer
       id:
-        type: string
+        example: 1231
+        type: integer
       responsibleId:
-        type: string
+        example: 223
+        type: integer
       title:
+        example: Describe swagger api for
         type: string
     type: object
   client.User:
     properties:
       id:
+        example: 1
         type: integer
     type: object
   entity.Response:
@@ -40,27 +77,11 @@ definitions:
             type: array
           groups:
             items:
-              properties:
-                description:
-                  type: string
-                id:
-                  type: integer
-                logo:
-                  type: string
-                name:
-                  type: string
-              type: object
+              $ref: '#/definitions/client.Group'
             type: array
           newsfeed:
             items:
-              properties:
-                id:
-                  type: integer
-                message:
-                  type: string
-                title:
-                  type: string
-              type: object
+              $ref: '#/definitions/client.Newsfeed'
             type: array
           tasks:
             items:
@@ -72,12 +93,8 @@ definitions:
             type: array
         type: object
     type: object
-host: localhost:8000
 info:
-  contact: { }
-  description: API Server to get data from few services
-  title: Search-Backend API
-  version: "1.0"
+  contact: {}
 paths:
   /search:
     get:
@@ -109,13 +126,8 @@ paths:
           schema:
             $ref: '#/definitions/app.errorMessage'
       security:
-        - ApiKeyAuth: [ ]
+        - ApiKeyAuth: []
       summary: SearchHandler
       tags:
         - search
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"
