@@ -1,0 +1,133 @@
+definitions:
+  app.errorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  client.Department:
+    properties:
+      headId:
+        example: "41"
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Відділ продукту
+        type: string
+    type: object
+  client.Group:
+    properties:
+      description:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
+      id:
+        example: 1231
+        type: integer
+      logo:
+        example: https://uspacy-stage-s3-bucket.s3.eu-west-1.amazonaws.com/02/c4/02c46a2bdffc39bd2cdb8582e4afe3bc.jpg
+        type: string
+      name:
+        example: Describe swagger api for
+        type: string
+    type: object
+  client.Newsfeed:
+    properties:
+      id:
+        example: 1231
+        type: integer
+      message:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
+      title:
+        example: Describe swagger api for
+        type: string
+    type: object
+  client.Task:
+    properties:
+      body:
+        example: <b>need use swagger-ui@4.x</b>
+        type: string
+      deadline:
+        example: 1654180120
+        type: integer
+      id:
+        example: 1231
+        type: integer
+      responsibleId:
+        example: 223
+        type: integer
+      title:
+        example: Describe swagger api for
+        type: string
+    type: object
+  client.User:
+    properties:
+      id:
+        example: 1
+        type: integer
+    type: object
+  entity.Response:
+    properties:
+      data:
+        properties:
+          departments:
+            items:
+              $ref: '#/definitions/client.Department'
+            type: array
+          groups:
+            items:
+              $ref: '#/definitions/client.Group'
+            type: array
+          newsfeed:
+            items:
+              $ref: '#/definitions/client.Newsfeed'
+            type: array
+          tasks:
+            items:
+              $ref: '#/definitions/client.Task'
+            type: array
+          users:
+            items:
+              $ref: '#/definitions/client.User'
+            type: array
+        type: object
+    type: object
+info:
+  contact: {}
+paths:
+  /search:
+    get:
+      consumes:
+        - application/json
+      description: search data from few services
+      parameters:
+        - description: name search by q
+          in: query
+          name: q
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.errorMessage'
+      security:
+        - ApiKeyAuth: []
+      summary: SearchHandler
+      tags:
+        - search
+swagger: "2.0"
