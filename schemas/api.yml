@@ -224,7 +224,7 @@ paths:
     get:
       description: Email existence check.
       tags:
-        - usersService
+        - authService
       parameters:
         - $ref: '#/components/parameters/searchEmail'
       responses:
@@ -245,6 +245,64 @@ paths:
           $ref: '#/components/responses/NoContent'
       security:
         - bearerAuth: []
+  /auth/v1/portals/:
+    get:
+      description: Portal domain availability check.
+      tags:
+        - authService
+      parameters:
+        - $ref: '#/components/parameters/searchPortalDomain'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '422':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      domain:
+                        type: array
+                        items:
+                          example: 'The domain has already been taken.'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: []
+    post:
+      description: Create portal
+      tags:
+        - authService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+
   # auth end
 
 
@@ -3142,6 +3200,13 @@ components:
       schema:
         type: string
       example: Raranetskyi
+    searchPortalDomain:
+      name: domain
+      in: query
+      required: false
+      schema:
+        type: string
+      example: alter_ego
     list:
       name: list
       in: query
@@ -3605,8 +3670,6 @@ components:
         message:
           type: string
           example: Two-factor authentication was successfully disabled
-
-
     UpdateUserDto:
       type: object
       properties:
@@ -3663,7 +3726,6 @@ components:
           example:
             - '1'
             - '2'
-
     personalSettings:
       type: object
       properties:
@@ -3701,7 +3763,7 @@ components:
             - highlighted
     # users begin
 
-    # auth
+    # auth begin
     SocialMedia:
       type: array
       items:
@@ -3822,7 +3884,6 @@ components:
         token:
           type: string
           example: r6pvb5pllte
-
     RegistrationByInvitation:
       type: object
       properties:
@@ -3841,6 +3902,56 @@ components:
         domain:
           type: string
           example: stark
+    CreatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        tariffId:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Root
+          description: Portal owner name
+        email:
+          type: string
+          example: root@gmail.com
+          description: Portal owner email
+        password:
+          type: string
+          example: 12345678
+          description: Portal owner password (of existing user or new one)
+    Portal:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        portal_name:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        ending_date:
+          type: integer
+          example: 1680020176
+        active:
+          type: boolean
+        jwt_secret:
+          type: string
+          example: F8Ka2ovT3OyztOY4FiH7OvbU2nLprrQDllrWFMJ5DVk
+        s3_bucket:
+          type: string
+          example: alter_ego
+        creator_ip:
+          type: string
+          example: 172.70.174.228
     # auth end
 
     # Departments begin
