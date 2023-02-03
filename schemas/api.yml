@@ -3035,7 +3035,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /crm/v1/tasks/:
+  /crm/v1/static/tasks/:
     get:
       description: Get available crm-task entity items list. Available only for admin users.
       tags:
@@ -3081,7 +3081,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /crm/v1/task/{itemId}/:
+  /crm/v1/static/task/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/itemId'
     get:
