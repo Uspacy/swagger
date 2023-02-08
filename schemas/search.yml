@@ -1,10 +1,10 @@
 definitions:
-  app.errorMessage:
+  errorMessage:
     properties:
       message:
         type: string
     type: object
-  client.Department:
+  Department:
     properties:
       headId:
         example: "41"
@@ -16,7 +16,7 @@ definitions:
         example: Відділ продукту
         type: string
     type: object
-  client.Group:
+  Group:
     properties:
       description:
         example: <b>need use swagger-ui@4.x</b>
@@ -31,7 +31,7 @@ definitions:
         example: Describe swagger api for
         type: string
     type: object
-  client.Newsfeed:
+  Newsfeed:
     properties:
       id:
         example: 1231
@@ -43,7 +43,7 @@ definitions:
         example: Describe swagger api for
         type: string
     type: object
-  client.Task:
+  Task:
     properties:
       body:
         example: <b>need use swagger-ui@4.x</b>
@@ -61,35 +61,35 @@ definitions:
         example: Describe swagger api for
         type: string
     type: object
-  client.User:
+  User:
     properties:
       id:
         example: 1
         type: integer
     type: object
-  entity.Response:
+  Response:
     properties:
       data:
         properties:
           departments:
             items:
-              $ref: '#/definitions/client.Department'
+              $ref: '#/definitions/Department'
             type: array
           groups:
             items:
-              $ref: '#/definitions/client.Group'
+              $ref: '#/definitions/Group'
             type: array
           newsfeed:
             items:
-              $ref: '#/definitions/client.Newsfeed'
+              $ref: '#/definitions/Newsfeed'
             type: array
           tasks:
             items:
-              $ref: '#/definitions/client.Task'
+              $ref: '#/definitions/Task'
             type: array
           users:
             items:
-              $ref: '#/definitions/client.User'
+              $ref: '#/definitions/User'
             type: array
         type: object
     type: object
@@ -112,19 +112,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Response'
+            $ref: '#/definitions/Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/app.errorMessage'
+            $ref: '#/definitions/errorMessage'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/app.errorMessage'
+            $ref: '#/definitions/errorMessage'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/app.errorMessage'
+            $ref: '#/definitions/errorMessage'
       security:
         - ApiKeyAuth: []
       summary: SearchHandler

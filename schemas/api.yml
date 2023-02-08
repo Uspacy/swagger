@@ -16,6 +16,7 @@ tags:
   - name: commentsService
   - name: groupService
   - name: crmService
+  - name: searchService
 
 paths:
 
@@ -3133,6 +3134,37 @@ paths:
 
   # crm end
 
+
+  # search begin
+  /search/v1/search:
+    parameters:
+      - description: Name search by q
+        in: query
+        name: q
+    get:
+      description: Search data from all services
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          description: Internal Server Error
+          $ref: '#/components/responses/NoContent'
+      tags:
+        - searchService
+      security:
+        - bearerAuth: [ ]
+
+  # search end
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3147,6 +3179,16 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+
+    # search serivce
+    SearchErrorMessage:
+      description: Custom error
+      properties:
+        message:
+          type: string
+      type: object
+
+
 
   parameters:
     userId:
@@ -5385,5 +5427,101 @@ components:
     # crm end
 
 
+    # search begin
+    SearchDepartment:
+      properties:
+        headId:
+          example: "41"
+          type: string
+        id:
+          example: 1
+          type: integer
+        name:
+          example: Відділ продукту
+          type: string
+      type: object
 
+    SearchGroup:
+      properties:
+        description:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        id:
+          example: 1231
+          type: integer
+        logo:
+          example: https://uspacy-stage-s3-bucket.s3.eu-west-1.amazonaws.com/02/c4/02c46a2bdffc39bd2cdb8582e4afe3bc.jpg
+          type: string
+        name:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchNewsfeed:
+      properties:
+        id:
+          example: 1231
+          type: integer
+        message:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        title:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchTask:
+      properties:
+        body:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        deadline:
+          example: 1654180120
+          type: integer
+        id:
+          example: 1231
+          type: integer
+        responsibleId:
+          example: 223
+          type: integer
+        title:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchUser:
+      properties:
+        id:
+          example: 1
+          type: integer
+      type: object
+
+    SearchResponse:
+      properties:
+        data:
+          properties:
+            departments:
+              items:
+                $ref: '#/components/schemas/SearchDepartment'
+              type: array
+            groups:
+              items:
+                $ref: '#/components/schemas/SearchGroup'
+              type: array
+            newsfeed:
+              items:
+                $ref: '#/components/schemas/SearchNewsfeed'
+              type: array
+            tasks:
+              items:
+                $ref: '#/components/schemas/SearchTask'
+              type: array
+            users:
+              items:
+                $ref: '#/components/schemas/SearchUser'
+              type: array
+          type: object
+      type: object
+
+  # search end
 
