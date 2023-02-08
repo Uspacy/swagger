@@ -5,8 +5,8 @@ info:
 servers:
   - url: http://127.0.0.1:8000
 tags:
+  - name: authService
   - name: usersService
-  - name: auth (usersService)
   - name: departments (usersService)
   - name: roles (usersService)
   - name: invite (usersService)
@@ -16,41 +16,102 @@ tags:
   - name: commentsService
   - name: groupService
   - name: crmService
+  - name: searchService
 
 paths:
-  # users begin
-  /company/v1/users/:
-    get:
-      description: Get users list. Available only for authorized users.
+
+  # auth begin
+  /auth/v1/auth/sign_in/:
+    description: Sign in user by email, password. Returns token, refreshToken
+    post:
       tags:
-        - usersService
-      parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryUsers'
-        - $ref: '#/components/parameters/filterUsers'
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Token'
+        '403':
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/User'
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
+                  errors:
+                    type: object
+                    properties:
+                      text:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - You need to provide a verification code
+                            - Incorrect verification code
+                            - Attempts count exceeded. Try again later
+                  status:
+                    type: boolean
+                    example: true
+  /auth/v1/auth/confirm_email/:
+    description: Confirm email user. Returns token, refreshToken
+    post:
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/auth/refresh_token/:
+    description: refreshToken exprired token. Returns new token
+    post:
+      tags:
+        - authService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/auth/register/:
+    post:
+      description: New user registration by invitation. Returns token, refreshToken
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationByInvitation'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+  /auth/v1/users/:
     post:
       description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
       tags:
-        - usersService
+        - authService
       requestBody:
         required: true
         content:
@@ -85,7 +146,197 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
+  /auth/v1/users/forgot_password/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordDto'
+      responses:
+        '200':
+          description: OK
+  /auth/v1/users/reset_password/:
+    post:
+      description: Reset password. Available to unauthorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPasswordTokenDto'
+      responses:
+        '200':
+          description: OK
+  /auth/v1/users/{userId}/change_password/:
+    patch:
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      description: Update user password by id. Available only for users with admin permissions.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /auth/v1/users/me/change_password/:
+    patch:
+      description: Update self password. Available only for authorized users.
+      tags:
+        - authService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSelfPasswordDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /auth/v1/users/check_email/:
+    get:
+      description: Email existence check.
+      tags:
+        - authService
+      parameters:
+        - $ref: '#/components/parameters/searchEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: email already exist
+        '204':
+          $ref: '#/components/responses/NoContent'
+      security:
+        - bearerAuth: [ ]
+  /auth/v1/portals/:
+    get:
+      description: Portal domain availability check.
+      tags:
+        - authService
+      parameters:
+        - $ref: '#/components/parameters/searchPortalDomain'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '422':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      domain:
+                        type: array
+                        items:
+                          example: 'The domain has already been taken.'
+                  status:
+                    type: boolean
+                    example: true
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create portal
+      tags:
+        - authService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Portal'
+
+  # auth end
+
+
+  # users begin
+  /company/v1/users/:
+    get:
+      description: Get users list. Available only for authorized users.
+      tags:
+        - usersService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        # - $ref: '#/components/parameters/queryUsers'
+        - $ref: '#/components/parameters/filterUsers'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
   /company/v1/users/{userId}/:
     parameters:
       - $ref: '#/components/parameters/userId'
@@ -103,7 +354,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update user data by id. Available only for authorized users
       tags:
@@ -124,7 +375,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate/:
     post:
       description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
@@ -149,7 +400,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/activate/:
     post:
       description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
@@ -169,8 +420,8 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
-  /company/v1/users/{userId}/updateRoles/:
+        - bearerAuth: [ ]
+  /company/v1/users/{userId}/update_roles/:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
       tags:
@@ -196,8 +447,8 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
-  /company/v1/users/{userId}/updatePosition/:
+        - bearerAuth: [ ]
+  /company/v1/users/{userId}/update_position/:
     patch:
       description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
       tags:
@@ -223,31 +474,8 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
-  /company/v1/users/{userId}/changePassword/:
-    patch:
-      parameters:
-        - $ref: '#/components/parameters/userId'
-      description: Update user password by id. Available only for users with admin permissions.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangePasswordDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
+
   /company/v1/users/{userId}/settings/:
     get:
       tags:
@@ -265,7 +493,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update personal settings by id. Available only for users with admin permissions.
       tags:
@@ -288,8 +516,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
-  /company/v1/users/{userId}/twoFactorStatus:
+        - bearerAuth: [ ]
+  /company/v1/users/{userId}/twofa_status:
     get:
       description: Get two-factor authentication status by id. Available only for users with admin permissions.
       tags:
@@ -306,8 +534,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
-  /company/v1/users/{userId}/twoFactorDisable:
+        - bearerAuth: [ ]
+  /company/v1/users/{userId}/twofa_disable:
     patch:
       description: Disable two-factor authentication by id. Available only for users with admin permissions.
       tags:
@@ -324,7 +552,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/me/:
     get:
       tags:
@@ -340,30 +568,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
-  /company/v1/users/me/changePassword/:
-    patch:
-      description: Update self password. Available only for authorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangeSelfPasswordDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: []
-  /company/v1/users/me/twoFactorStatus:
+        - bearerAuth: [ ]
+
+  /company/v1/users/me/twofa_status:
     get:
       description: Get two-factor authentication status. Available only for authorized users.
       tags:
@@ -378,8 +585,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
-  /company/v1/users/me/twoFactorEnable:
+        - bearerAuth: [ ]
+  /company/v1/users/me/twofa_enable:
     patch:
       description: Enable two-factor authentication in a two steps
       tags:
@@ -422,8 +629,8 @@ paths:
                     type: boolean
                     example: true
       security:
-        - bearerAuth: []
-  /company/v1/users/me/twoFactorDisable:
+        - bearerAuth: [ ]
+  /company/v1/users/me/twofa_disable:
     patch:
       description: Disable two-factor authentication
       tags:
@@ -438,36 +645,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
-  /company/v1/users/forgotPassword/:
-    post:
-      description: Reset password. Available to unauthorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailPasswordDto'
-      responses:
-        '200':
-          description: OK
-  /company/v1/users/resetPassword/:
-    post:
-      description: Reset password. Available to unauthorized users.
-      tags:
-        - usersService
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailPasswordTokenDto'
-      responses:
-        '200':
-          description: OK
+
   /company/v1/users/search/:
     get:
       description: Search. Available only for authorized users.
@@ -492,9 +672,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
-  /company/v1/users/uploadAvatar:
+  /company/v1/users/upload_avatar:
     post:
       description: Avatar upload. Available only for authorized users.
       tags:
@@ -535,35 +715,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
-  /company/v1/users/checkEmail/:
-    get:
-      description: Email existence check.
-      tags:
-        - usersService
-      parameters:
-        - $ref: '#/components/parameters/searchEmail'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: email already exist
-        '204':
-          $ref: '#/components/responses/NoContent'
-      security:
-        - bearerAuth: []
-
-  /company/v1/users/getUsersByField/:
+  /company/v1/users/get_users_by_field/:
     post:
       description: Getting a list of users by filter. Available to unauthorized users.
       tags:
@@ -591,7 +745,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/me/settings/:
     get:
@@ -608,7 +762,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update self password. Available only for authorized users.
       tags:
@@ -629,97 +783,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # users end
-
-  # auth begin
-  /company/v1/auth/signIn/:
-    description: Sign in user by email, password. Returns token, refreshToken
-    post:
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignInDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-        '403':
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: object
-                    properties:
-                      text:
-                        type: array
-                        items:
-                          type: string
-                          enum:
-                            - You need to provide a verification code
-                            - Incorrect verification code
-                            - Attempts count exceeded. Try again later
-                  status:
-                    type: boolean
-                    example: true
-  /company/v1/auth/confirmEmail/:
-    description: Confirm email user. Returns token, refreshToken
-    post:
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmEmailDto'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  /company/v1/auth/refreshToken/:
-    description: refreshToken exprired token. Returns new token
-    post:
-      tags:
-        - auth (usersService)
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  /company/v1/auth/register/:
-    post:
-      description: New user registration by invitation. Returns token, refreshToken
-      tags:
-        - auth (usersService)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegistrationByInvitation'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-  # auth end
 
   # departments begin
   /company/v1/departments/:
@@ -749,7 +814,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create department. Available only for users with admin permissions
       tags:
@@ -780,7 +845,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/:
     parameters:
       - $ref: '#/components/parameters/departmentId'
@@ -798,7 +863,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description:
         Update department data (set head department, move users, set parent department)
@@ -821,7 +886,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description:
         Delete department. Available only for users with admin permissions.
@@ -833,7 +898,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/updateRoles/:
     patch:
       description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
@@ -859,7 +924,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/departments/{departmentId}/addUsers/:
     patch:
@@ -886,7 +951,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/deleteUsers/:
     patch:
       description: Update department users by id. Available only for users with admin permissions.
@@ -912,7 +977,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # departments end
 
   # roles begin
@@ -931,7 +996,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/roles/:
     get:
       description: Get role list. Only available to authorized users with the owner or administrator role.
@@ -954,7 +1019,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create role. Only available to authorized users with the owner or administrator role.
       tags:
@@ -978,7 +1043,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/roles/{roleId}/:
     parameters:
       - $ref: '#/components/parameters/roleId'
@@ -1001,7 +1066,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description:
         Update role data. Only available to authorized users with the owner or administrator role.
@@ -1042,7 +1107,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description:
         Delete role. Only available to authorized users with the owner or administrator role.
@@ -1054,11 +1119,11 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # roles end
 
   # invite begin
-  /company/v1/users/checkInvite/:
+  /company/v1/users/check_invite/:
     get:
       description: Checking if an invitation exists.
       tags:
@@ -1097,7 +1162,7 @@ paths:
                     type: boolean
                     example: true
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -1117,7 +1182,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email/batch:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -1141,8 +1206,8 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
-  /company/v1/invites/email/{userId}/repeatInvitation:
+        - bearerAuth: [ ]
+  /company/v1/invites/email/{userId}/repeat_invitation:
     parameters:
       - $ref: '#/components/parameters/userId'
 
@@ -1162,7 +1227,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email/{userId}/:
     parameters:
       - $ref: '#/components/parameters/userId'
@@ -1178,7 +1243,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # invite begin
 
   # newsfeed begin
@@ -1207,7 +1272,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: >
         Create post. Available only for authorized users.
@@ -1240,7 +1305,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /newsfeed/v1/posts/{postId}/:
     parameters:
       - $ref: '#/components/parameters/postId'
@@ -1265,7 +1330,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete post. Available only for author or users with admin permissions.
       tags:
@@ -1278,7 +1343,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # newsfeed end
 
   # tasks begin
@@ -1310,7 +1375,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create task. Available only for authorized users.
       tags:
@@ -1366,7 +1431,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1384,7 +1449,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit task by id. Available only for authorized users and task maker.
       tags:
@@ -1415,7 +1480,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete task by id. Available only for authorized users and task maker.
       tags:
@@ -1426,7 +1491,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/denial/:
     post:
       description: Abandoning a task. Available only for authorized users.
@@ -1468,7 +1533,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create canban stage. Available only for authorized users.
       tags:
@@ -1498,7 +1563,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/:
     get:
       description: Get canban stage by id. Available only for authorized users.
@@ -1516,7 +1581,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update canban stage by id. Available only for authorized users.
       tags:
@@ -1548,7 +1613,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Create comment for task. Available only for authorized users.
       tags:
@@ -1562,7 +1627,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/moveTask/:
     post:
       description: Moving a task to stage
@@ -1581,7 +1646,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/tasks/{taskId}/checkList/:
     parameters:
@@ -1606,12 +1671,12 @@ paths:
                           type: array
                           items:
                             type: string
-                          example: ["2", "3"]
+                          example: [ "2", "3" ]
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create check list for task. Available only for authorized users and users who have access to task.
       tags:
@@ -1634,7 +1699,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1661,7 +1726,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete check list to task by id. Available only for authorized users.
       tags:
@@ -1673,7 +1738,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1701,7 +1766,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create item check list for task. Available only for authorized users.
       tags:
@@ -1730,7 +1795,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/checkList/{checkListId}/{checkListItemId}:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1746,7 +1811,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update check list for task. Available only for authorized users.
       tags:
@@ -1775,7 +1840,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/tasks/massEdit/complete/:
     post:
@@ -1793,7 +1858,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/massEdit/archive/:
     post:
       description: Bulk editing tasks
@@ -1810,7 +1875,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/massEdit/delete/:
     post:
       description: Bulk editing tasks
@@ -1827,7 +1892,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/transferToUser:
     post:
       description: Transfer tasks to another user. Available only for admin users.
@@ -1849,7 +1914,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/transferToDepartment:
     post:
@@ -1872,7 +1937,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # tasks end
 
@@ -1901,7 +1966,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Upload one or more files
       tags:
@@ -1926,7 +1991,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?uploadId:
     get:
@@ -1957,7 +2022,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?entityIds[]:
     get:
@@ -1985,7 +2050,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files/{id}:
     patch:
@@ -2027,7 +2092,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Removes the uploaded file and info about it
       tags:
@@ -2046,7 +2111,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?entityType&entityId:
     patch:
@@ -2087,7 +2152,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: >
         Removes the multiple files bound to the entity
@@ -2105,7 +2170,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # files end
 
@@ -2158,7 +2223,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Creates new comment
       tags:
@@ -2179,7 +2244,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments?entityIds[]:
     get:
@@ -2231,7 +2296,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments/{id}:
     patch:
@@ -2262,7 +2327,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Removes the comment
       tags:
@@ -2281,7 +2346,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments?entityType&entityId:
     delete:
@@ -2301,7 +2366,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # comments end
 
@@ -2339,7 +2404,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create group. Available only for authorized users.
       tags:
@@ -2362,7 +2427,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /groups/v1/groups/{groupId}/:
     parameters:
       - $ref: '#/components/parameters/groupId'
@@ -2382,7 +2447,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update group. Only available to group owner.
       tags:
@@ -2410,7 +2475,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete group. Only available to group owner.
       tags:
@@ -2423,7 +2488,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/attachUser/{userId}:
     parameters:
@@ -2446,7 +2511,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/detachUser/{userId}:
     parameters:
@@ -2469,7 +2534,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/joinGroup:
     parameters:
@@ -2491,7 +2556,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/leaveGroup:
     parameters:
@@ -2513,7 +2578,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/invites/:
     get:
@@ -2533,12 +2598,12 @@ paths:
                     type: array
                     items:
                       type: string
-                    example: ["2", "5"]
+                    example: [ "2", "5" ]
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Sending invitations to groups. Only available to group owner.
       tags:
@@ -2561,7 +2626,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/invites/{groupId}/:
     parameters:
@@ -2578,7 +2643,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToUser:
     post:
@@ -2601,7 +2666,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToDepartment:
     post:
@@ -2624,7 +2689,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToGroupMembers:
     post:
@@ -2647,7 +2712,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # groups end
 
 
@@ -2674,7 +2739,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create entity. Available only for admin users.
       tags:
@@ -2704,7 +2769,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/field_types/:
     get:
@@ -2726,7 +2791,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/{entity}/fields/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -2757,7 +2822,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create field. Available only for admin users.
       tags:
@@ -2790,7 +2855,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/{entity}/fields/{field}/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -2819,7 +2884,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit field by code. Available only for authorized users and crm maker.
       tags:
@@ -2850,7 +2915,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete field by code. Available only for admin users.
       tags:
@@ -2861,7 +2926,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/{entity}/:
     parameters:
@@ -2889,7 +2954,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create  crm entity item. Available only for admin users.
       tags:
@@ -2914,7 +2979,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/{entity}/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -2935,7 +3000,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit crm entity item. Available only for authorized users and users who have access to crm.
       tags:
@@ -2958,7 +3023,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete crm entity item. Available only for admin users and users who have access to crm.
       tags:
@@ -2969,9 +3034,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
-  /crm/v1/tasks/:
+  /crm/v1/static/tasks/:
     get:
       description: Get available crm-task entity items list. Available only for admin users.
       tags:
@@ -2993,7 +3058,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create crm-task entity item. Available only for admin users.
       tags:
@@ -3015,9 +3080,9 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
-  /crm/v1/task/{itemId}/:
+  /crm/v1/static/task/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/itemId'
     get:
@@ -3034,7 +3099,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit crm-task entity item. Available only for authorized users and users who have access to crm.
       tags:
@@ -3054,7 +3119,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete crm-task entity item. Available only for admin users and users who have access to crm.
       tags:
@@ -3065,9 +3130,46 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # crm end
+
+
+  # search begin
+  /search/v1/search:
+    parameters:
+      - description: name search by q
+        in: query
+        name: q
+        type: string
+    get:
+      consumes:
+        - application/json
+
+      description: Search data from all services
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          description: Internal Server Error
+          $ref: '#/components/responses/NoContent'
+      tags:
+        - searchService
+      security:
+        - bearerAuth: [ ]
+
+  # search end
 
 components:
   securitySchemes:
@@ -3083,6 +3185,16 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+
+    # search serivce
+    SearchErrorMessage:
+      description: Custom error
+      properties:
+        message:
+          type: string
+      type: object
+
+
 
   parameters:
     userId:
@@ -3136,6 +3248,13 @@ components:
       schema:
         type: string
       example: Raranetskyi
+    searchPortalDomain:
+      name: domain
+      in: query
+      required: false
+      schema:
+        type: string
+      example: alter_ego
     list:
       name: list
       in: query
@@ -3248,7 +3367,7 @@ components:
             phone: "+3801234567"
             position: CTO
             active: true
-            departmentsIds: ["1111", "2222"]
+            departmentsIds: [ "1111", "2222" ]
             roles:
               - OWNER
               - ADMIN
@@ -3267,7 +3386,7 @@ components:
             name: "Frontend department"
             headId: "1111"
             parentDepartmentId: "1111"
-            usersIds: ["1111", "2222", "3333"]
+            usersIds: [ "1111", "2222", "3333" ]
     queryDepartments:
       allOf:
         - $ref: '#/components/parameters/query'
@@ -3465,7 +3584,7 @@ components:
             example: '01gdnpddf5xgzxqvcn4x83mc2s'
           type:
             type: string
-            enum: [WORK, MOBILE, HOME]
+            enum: [ WORK, MOBILE, HOME ]
             example: WORK
           value:
             type: string
@@ -3599,8 +3718,6 @@ components:
         message:
           type: string
           example: Two-factor authentication was successfully disabled
-
-
     UpdateUserDto:
       type: object
       properties:
@@ -3657,7 +3774,6 @@ components:
           example:
             - '1'
             - '2'
-
     personalSettings:
       type: object
       properties:
@@ -3695,7 +3811,7 @@ components:
             - highlighted
     # users begin
 
-    # auth
+    # auth begin
     SocialMedia:
       type: array
       items:
@@ -3816,7 +3932,6 @@ components:
         token:
           type: string
           example: r6pvb5pllte
-
     RegistrationByInvitation:
       type: object
       properties:
@@ -3832,6 +3947,59 @@ components:
           type: string
           example: Stark
           required: false
+        domain:
+          type: string
+          example: stark
+    CreatePortal:
+      type: object
+      properties:
+        portalName:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        tariffId:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Root
+          description: Portal owner name
+        email:
+          type: string
+          example: root@gmail.com
+          description: Portal owner email
+        password:
+          type: string
+          example: 12345678
+          description: Portal owner password (of existing user or new one)
+    Portal:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        portal_name:
+          type: string
+          example: alter_ego
+        domain:
+          type: string
+          example: alter_ego
+        ending_date:
+          type: integer
+          example: 1680020176
+        active:
+          type: boolean
+        jwt_secret:
+          type: string
+          example: F8Ka2ovT3OyztOY4FiH7OvbU2nLprrQDllrWFMJ5DVk
+        s3_bucket:
+          type: string
+          example: alter_ego
+        creator_ip:
+          type: string
+          example: 172.70.174.228
     # auth end
 
     # Departments begin
@@ -3935,7 +4103,7 @@ components:
                 arrayDepartmentsIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
             usersIds:
               type: array
               items:
@@ -3947,7 +4115,7 @@ components:
                 arrayUsersIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
         include:
           type: object
           description: A field by which you can include the viewing of a post for users and / or departments
@@ -3963,7 +4131,7 @@ components:
                 arrayDepartmentsIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
             usersIds:
               type: array
               items:
@@ -3975,7 +4143,7 @@ components:
                 arrayUsersIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
     CreatePostDto:
       type: object
       properties:
@@ -4056,12 +4224,12 @@ components:
           type: array
           items:
             type: string
-          example: ["2", "3"]
+          example: [ "2", "3" ]
         auditorsIds:
           type: array
           items:
             type: string
-          example: ["4", "5"]
+          example: [ "4", "5" ]
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -4156,12 +4324,12 @@ components:
           type: array
           items:
             type: string
-          example: ["2", "3"]
+          example: [ "2", "3" ]
         auditorsIds:
           type: array
           items:
             type: string
-          example: ["4", "5"]
+          example: [ "4", "5" ]
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -4269,7 +4437,7 @@ components:
           type: array
           items:
             type: string
-          example: ["1", "2"]
+          example: [ "1", "2" ]
 
     TransferTask:
       type: object
@@ -5183,7 +5351,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [123,234,345]
+          example: [ 123,234,345 ]
         contacts:
           type: array
           items:
@@ -5241,29 +5409,125 @@ components:
           items:
             type: integer
             format: int64
-          example: [123,234,345]
+          example: [ 123,234,345 ]
         deals:
           type: array
           items:
             type: integer
             format: int64
-          example: [56]
+          example: [ 56 ]
         leads:
           type: array
           items:
             type: integer
             format: int64
-          example: [34]
+          example: [ 34 ]
         contacts:
           type: array
           items:
             type: integer
             format: int64
-          example: [12,32]
+          example: [ 12,32 ]
 
 
     # crm end
 
 
+    # search begin
+    SearchDepartment:
+      properties:
+        headId:
+          example: "41"
+          type: string
+        id:
+          example: 1
+          type: integer
+        name:
+          example: Відділ продукту
+          type: string
+      type: object
 
+    SearchGroup:
+      properties:
+        description:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        id:
+          example: 1231
+          type: integer
+        logo:
+          example: https://uspacy-stage-s3-bucket.s3.eu-west-1.amazonaws.com/02/c4/02c46a2bdffc39bd2cdb8582e4afe3bc.jpg
+          type: string
+        name:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchNewsfeed:
+      properties:
+        id:
+          example: 1231
+          type: integer
+        message:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        title:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchTask:
+      properties:
+        body:
+          example: <b>need use swagger-ui@4.x</b>
+          type: string
+        deadline:
+          example: 1654180120
+          type: integer
+        id:
+          example: 1231
+          type: integer
+        responsibleId:
+          example: 223
+          type: integer
+        title:
+          example: Describe swagger api for
+          type: string
+      type: object
+
+    SearchUser:
+      properties:
+        id:
+          example: 1
+          type: integer
+      type: object
+
+    SearchResponse:
+      properties:
+        data:
+          properties:
+            departments:
+              items:
+                $ref: '#/components/schemas/SearchDepartment'
+              type: array
+            groups:
+              items:
+                $ref: '#/components/schemas/SearchGroup'
+              type: array
+            newsfeed:
+              items:
+                $ref: '#/components/schemas/SearchNewsfeed'
+              type: array
+            tasks:
+              items:
+                $ref: '#/components/schemas/SearchTask'
+              type: array
+            users:
+              items:
+                $ref: '#/components/schemas/SearchUser'
+              type: array
+          type: object
+      type: object
+
+  # search end
 
