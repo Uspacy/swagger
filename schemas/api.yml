@@ -1078,7 +1078,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/RoleStore'
+                - $ref: '#/components/schemas/RoleUpdate'
                 - type: object
                   properties:
                     usersIds:
@@ -4580,7 +4580,10 @@ components:
         id:
           type: string
           example: 1
-        name:
+        title:
+          type: string
+          example: Admin
+        code:
           type: string
           example: ADMIN
         permissions:
@@ -4626,7 +4629,10 @@ components:
         id:
           type: string
           example: 1
-        name:
+        title:
+          type: string
+          example: Admin
+        code:
           type: string
           example: ADMIN
         userlist:
@@ -4677,9 +4683,21 @@ components:
     RoleStore:
       type: object
       properties:
-        name:
+        title:
+          type: string
+          example: Admin
+        code:
           type: string
           example: ADMIN
+        permissions:
+          $ref: '#/components/schemas/PermissionsStore'
+
+    RoleUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Admin
         permissions:
           $ref: '#/components/schemas/PermissionsStore'
 
