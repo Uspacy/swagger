@@ -2413,7 +2413,14 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateGroupDto'
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateGroupDto'
+                - type: object
+                  properties:
+                    logo:
+                      type: string
+                      format: binary
+                      description: The file to upload.
       responses:
         '200':
           description: OK
@@ -2454,7 +2461,7 @@ paths:
         - groupService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               allOf:
                 - $ref: '#/components/schemas/CreateUpdateGroupDto'
@@ -2483,6 +2490,37 @@ paths:
       responses:
         '204':
           description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/groups/{groupId}/upload_logo:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    post:
+      description: Update group. Only available to group owner.
+      tags:
+        - groupService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  format: binary
+                  description: The file to upload. If empty, deletes the logo.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -5066,9 +5104,6 @@ components:
           type: string
           example: 1
           description: "1"
-        logo:
-          type: file
-          description: The file to upload.
         moderatorsIds:
           type: array
           items:
