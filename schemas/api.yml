@@ -1358,6 +1358,41 @@ paths:
         - $ref: '#/components/parameters/field_name'
         - $ref: '#/components/parameters/sort_by'
         - $ref: '#/components/parameters/order_by'
+        - allOf:
+          - $ref: '#/components/parameters/filter_number_enum'
+          - name: parent_id
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+          - $ref: '#/components/parameters/filter_string_enum'
+          - name: status
+            example: ["suspended", "not_planned"]
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: setter_id
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: responsible_id
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: accomplices
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: group_id
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: stages
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: priority
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: deadline
+
       responses:
         '200':
           description: OK
@@ -3221,10 +3256,6 @@ components:
     # search serivce
     SearchErrorMessage:
       description: Custom error
-      properties:
-        message:
-          type: string
-      type: object
 
 
 
@@ -3555,6 +3586,33 @@ components:
       required: true
       schema:
         type: string
+
+    filter_number_enum:
+      name: filterNumberEnum
+      in: query
+      description: Array of numeric values
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+    filter_string_enum:
+      name: filterStringEnum
+      in: query
+      description: Array of string values
+      schema:
+        type: array
+        items:
+          type: string
+    filter_array_of_time_ranges:
+      name: filterArrayOfTimeRanges
+      in: query
+      description: Array of strings formatted in the following way - <start_time>,<end_time>
+      schema:
+        type: array
+        items:
+          type: string
+      example: ["1674432000,1679529600"]
 
   schemas:
     # common begin
@@ -4343,6 +4401,9 @@ components:
     CreateEditTaskDto:
       type: object
       properties:
+        parentId:
+          type: integer
+          format: int64
         title:
           type: string
           example: Describe swagger api for tasksService
