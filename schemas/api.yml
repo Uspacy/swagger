@@ -2791,6 +2791,63 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /groups/v1/join/{groupId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+    get:
+      description: Getting a list of invited users for particular private group
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                example: [2, 5]
+                description: The list of user ids
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /groups/v1/join/{groupId}/request:
+    parameters:
+        - $ref: '#/components/parameters/groupId'
+    post:
+      description: Add join request for private group
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Decline private group join request
+      tags:
+        - groupService
+      responses:
+        '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # groups end
 
 
