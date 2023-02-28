@@ -1359,8 +1359,8 @@ paths:
         - $ref: '#/components/parameters/sort_by'
         - $ref: '#/components/parameters/order_by'
         - allOf:
-          - $ref: '#/components/parameters/filter_number_enum'
-          - name: parent_id
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: parent_id
         - in: query
           name: q
           description: Text search pattern
@@ -1368,9 +1368,9 @@ paths:
             type: string
           example: expecting
         - allOf:
-          - $ref: '#/components/parameters/filter_string_enum'
-          - name: status
-            example: ["suspended", "not_planned"]
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: status
+              example: ["suspended", "not_planned"]
         - allOf:
             - $ref: '#/components/parameters/filter_number_enum'
             - name: setter_id
@@ -2817,7 +2817,7 @@ paths:
 
   /groups/v1/join/{groupId}/request:
     parameters:
-        - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/groupId'
     post:
       description: Add join request for private group
       tags:
@@ -2839,11 +2839,11 @@ paths:
         - groupService
       responses:
         '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Success'
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -2927,7 +2927,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /crm/v1/{entity}/fields/:
+  /crm/v1/entities/{entity}/fields/:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
@@ -2991,7 +2991,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /crm/v1/{entity}/fields/{field}/:
+  /crm/v1/entities/{entity}/fields/{field}/:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/field'
@@ -3063,7 +3063,69 @@ paths:
       security:
         - bearerAuth: []
 
-  /crm/v1/{entity}/:
+
+  /crm/v1/entities/{entity}/lists/{field}/:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/field'
+    get:
+      description: Get list elements. Available  for all users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SourceList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Creating or editing list items. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SourceList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SourceList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/lists/{field}/{value}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/field'
+      - $ref: '#/components/parameters/value'
+    delete:
+      description: Deleting a list item. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+
+  /crm/v1/entities/{entity}/:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
@@ -3108,14 +3170,14 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/CrmEntity'
+                  - $ref: '#/components/schemas/CrmEntityResponce'
                   - $ref: '#/components/schemas/CrmEAdditionalFields'
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /crm/v1/{entity}/{itemId}/:
+  /crm/v1/entities/{entity}/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/itemId'
@@ -3171,6 +3233,45 @@ paths:
       security:
         - bearerAuth: []
 
+  /crm/v1/entities/{entity}/converting/{itemId}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/itemId'
+    post:
+      description: Converting crm entity item. Available for all users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+              example:
+                - 'contacts'
+                - 'deals'
+                - 'companies'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   /crm/v1/static/tasks/:
     get:
       description: Get available crm-task entity items list. Available only for admin users.
@@ -3216,7 +3317,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-
   /crm/v1/static/task/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/itemId'
@@ -3267,6 +3367,245 @@ paths:
       security:
         - bearerAuth: []
 
+  /crm/v1/entities/{entity}/kanban/funnel:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+    get:
+      description: Get funnels. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/Funnel'
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 11
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Funnel creating. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Funnel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Funnel'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/kanban/funnel/{funnelId}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/funnelId'
+    get:
+      description: Get funnels. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Funnel'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Funnel editing. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Funnel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Funnel'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Funnel deleting. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+
+  /crm/v1/entities/{entity}/kanban/stage:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+    get:
+      description: Get kanban stages. Available  for all users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/CrmStage'
+                    - allOf:
+                        - $ref: '#/components/schemas/CrmStageWithReason'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Create a kanban stage. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateCrmStage'
+                - type: object
+                  properties:
+                    stage_code:
+                      type: string
+                      example: 'new_deal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/entities/{entity}/kanban/stage/{stageId}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/stageId'
+    get:
+      description: Get kanban stage. Available for all users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    patch:
+      description: Editing a Kanban Stage. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateCrmStage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Deleting a Kanban Stage. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
   # crm end
 
 
@@ -3648,6 +3987,20 @@ components:
       required: true
       schema:
         type: string
+    value:
+      name: value
+      in: path
+      description: list value code
+      required: true
+      schema:
+        type: string
+    funnelId:
+      name: funnelId
+      in: path
+      description: funnel id
+      required: true
+      schema:
+        type: string
 
     filter_number_enum:
       name: filterNumberEnum
@@ -3675,6 +4028,7 @@ components:
         items:
           type: string
       example: ["1674432000,1679529600"]
+
 
   schemas:
     # common begin
@@ -5349,6 +5703,10 @@ components:
           name: Integer
           type: integer
           multiple: false
+        - id: 3
+          name: List
+          type: list
+          multiple: false
         - id: 4
           name: Date and time
           type: datetime
@@ -5402,8 +5760,8 @@ components:
           type: legal_details
           multiple: false
         - id: 17
-          name: Binding to the entity
-          type: binding_to_the_entity
+          name: Entity_reference
+          type: entity_reference
           multiple: false
         - id: 18
           name: UTM
@@ -5416,6 +5774,9 @@ components:
         name:
           type: string
           example: Source
+        code:
+          type: string
+          example: source
         required:
           type: boolean
           example: false
@@ -5428,9 +5789,24 @@ components:
         hidden:
           type: boolean
           example: false
+        multiple:
+          type: boolean
+          example: false
         fieldSectionId:
           type: integer
           example: 11
+        default_value:
+          type: string
+          example: value
+        tooltip:
+          type: string
+          example: example
+        type:
+          type: string
+          example: entity_reference
+        entity_reference_id:
+          type: integer
+          example: 123
         sort:
           type: integer
           example: 90
@@ -5447,6 +5823,200 @@ components:
         source:
           type: string
           example: shop
+        email:
+          $ref: '#/components/schemas/multipleEmail'
+        phone:
+          $ref: '#/components/schemas/Phone'
+        messengers:
+          $ref: '#/components/schemas/SocialMedia'
+
+    CrmEntityResponce:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        created_by:
+          type: integer
+          example: 1
+        changed_by:
+          type: integer
+          example: 1
+        converted:
+          type: boolean
+          example: false
+        first_name:
+          type: string
+          example: Johnny
+        last_name:
+          type: string
+          example: Stark
+        patronymic:
+          type: string
+          example: ""
+        company_name:
+          type: string
+          example: ""
+        position:
+          type: string
+          example: Owner
+        utm_source:
+          type: string
+          example: ""
+        utm_medium:
+          type: string
+          example: ""
+        utm_campaign:
+          type: string
+          example: ""
+        utm_content:
+          type: string
+          example: ""
+        utm_term:
+          type: string
+          example: ""
+        source:
+          $ref: '#/components/schemas/SourceList'
+        email:
+          $ref: '#/components/schemas/multipleEmail'
+        phone:
+          $ref: '#/components/schemas/Phone'
+        messengers:
+          $ref: '#/components/schemas/SocialMedia'
+        kanban_status:
+          type: string
+          example: IN_WORK
+        kanban_reason_id:
+          type: integer
+          example: 11
+        kanban_stage_id:
+          type: integer
+          example: 22
+
+
+    SourceList:
+      properties:
+        title:
+          type: string
+          example: 'Shop'
+        value:
+          type: string
+          example: shop
+        color:
+          type: string
+          example: '#6AD01F'
+        sort:
+          type: integer
+          example: 20
+        selected:
+          type: boolean
+          example: true
+      example:
+        - title: 'Shop'
+          value: shop
+          color: ''
+          sort: 10
+          selected: true
+        - title: 'Site'
+          value: site
+          color: ''
+          sort: 20
+          selected: false
+
+    Funnel:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'Sales funnel'
+        funnel_code:
+          type: string
+          example: 'sales_funnel'
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: false
+
+    CreateCrmStage:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'New Deal'
+        color:
+          type: string
+          example: '#6AD01F'
+        sort:
+          type: integer
+          example: 10
+
+
+    CrmStage:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'New Deal'
+        color:
+          type: string
+          example: '#6AD01F'
+        stage_code:
+          type: string
+          example: 'new_deal'
+        system_stage:
+          type: boolean
+          example: false
+        sort:
+          type: integer
+          example: 10
+        reasons:
+          type: string
+          example: []
+
+    CrmStageWithReason:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'New Deal'
+        color:
+          type: string
+          example: '#6AD01F'
+        stage_code:
+          type: string
+          example: 'new_deal'
+        system_stage:
+          type: boolean
+          example: true
+        sort:
+          type: integer
+          example: 10
+        reasons:
+          $ref: '#/components/schemas/CrmReason'
+
+    CrmReason:
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 'New'
+        sort:
+          type: integer
+          example: 20
+      example:
+        - id: 1
+          title: 'Shop'
+          sort: 10
+        - id: 2
+          title: 'Site'
+          sort: 20
 
     CrmEAdditionalFields:
       type: object
