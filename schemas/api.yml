@@ -2420,6 +2420,12 @@ paths:
           schema:
             type: boolean
           description: If true, shows only groups of my ownership or my membership
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: said
       responses:
         '200':
           description: OK
