@@ -1255,6 +1255,21 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: said
+        - in: query
+          name: group_id
+          description: ID of the group to get posts for
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          example: 1
       responses:
         '200':
           description: OK
@@ -1355,9 +1370,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        - $ref: '#/components/parameters/field_name'
-        - $ref: '#/components/parameters/sort_by'
-        - $ref: '#/components/parameters/order_by'
         - allOf:
             - $ref: '#/components/parameters/filter_number_enum'
             - name: parent_id
@@ -2891,7 +2903,6 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/Entity'
-
       responses:
         '200':
           description: OK
@@ -2906,7 +2917,6 @@ paths:
                         description: Entity ID
                         type: integer
                         example: 11
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -3130,7 +3140,6 @@ paths:
       security:
         - bearerAuth: []
 
-
   /crm/v1/entities/{entity}/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3168,7 +3177,6 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/CrmEntity'
-
       responses:
         '200':
           description: OK
@@ -3178,11 +3186,217 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/CrmEntityResponce'
                   - $ref: '#/components/schemas/CrmEAdditionalFields'
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /crm/v1/entities/companies/:
+    get:
+      description: Get available companies list.
+      tags:
+        - crmService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+          - $ref: '#/components/parameters/filter_string_enum'
+          - name: company_label
+            example: [ "partner", "competitor" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: source
+              example: [ "recommendation", "advertising" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: created_at
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: owner
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: deals
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/contacts/:
+    get:
+      description: Get available contacts list.
+      tags:
+        - crmService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: contact_label
+              example: [ "partner", "competitor" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: source
+              example: [ "recommendation", "advertising" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: created_at
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: owner
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: deals
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/deals/:
+    get:
+      description: Get available deals list.
+      tags:
+        - crmService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: kanban_status
+              example: [ "FAIL", "SUCCESS" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: stages
+              example: [ "NEW", "SUCCESS" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: created_at
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: owner
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: tasks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/leads/:
+    get:
+      description: Get available leads list.
+      tags:
+        - crmService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: kanban_status
+              example: [ "FAIL", "SUCCESS" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: stages
+              example: [ "NEW", "SUCCESS" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: source
+              example: [ "recommendation", "advertising" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: created_at
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: owner
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   /crm/v1/entities/{entity}/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3283,6 +3497,44 @@ paths:
       description: Get available crm-task entity items list. Available only for admin users.
       tags:
         - crmService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - in: query
+          name: q
+          description: Text search pattern
+          schema:
+            type: string
+          example: expecting
+        - allOf:
+          - $ref: '#/components/parameters/filter_string_enum'
+          - name: status
+            example: [ "planned", "done" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: type
+              example: [ "call", "meeting" ]
+        - allOf:
+            - $ref: '#/components/parameters/filter_array_of_time_ranges'
+            - name: start_time
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: responsible_id
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: participants
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: company_id
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: contacts
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: deals
+        - allOf:
+            - $ref: '#/components/parameters/filter_number_enum'
+            - name: leads
       responses:
         '200':
           description: OK
