@@ -3176,7 +3176,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/CrmEntity'
+                - $ref: '#/components/schemas/CreateCrmEntity'
       responses:
         '200':
           description: OK
@@ -3206,9 +3206,9 @@ paths:
             type: string
           example: expecting
         - allOf:
-          - $ref: '#/components/parameters/filter_string_enum'
-          - name: company_label
-            example: [ "partner", "competitor" ]
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: company_label
+              example: [ "partner", "competitor" ]
         - allOf:
             - $ref: '#/components/parameters/filter_string_enum'
             - name: source
@@ -3465,14 +3465,9 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-              example:
-                - 'contacts'
-                - 'deals'
-                - 'companies'
-
+              allOf:
+                - $ref: '#/components/schemas/conversionBodyWithFunnelId'
+                - $ref: '#/components/schemas/conversionBody'
       responses:
         '200':
           description: OK
@@ -3507,9 +3502,9 @@ paths:
             type: string
           example: expecting
         - allOf:
-          - $ref: '#/components/parameters/filter_string_enum'
-          - name: status
-            example: [ "planned", "done" ]
+            - $ref: '#/components/parameters/filter_string_enum'
+            - name: status
+              example: [ "planned", "done" ]
         - allOf:
             - $ref: '#/components/parameters/filter_string_enum'
             - name: type
@@ -3662,6 +3657,11 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/Funnel'
+                - type: object
+                  properties:
+                    funnel_code:
+                      type: string
+                      example: 'new_deal'
       responses:
         '200':
           description: OK
@@ -3700,6 +3700,10 @@ paths:
                       id:
                         type: integer
                         example: 11
+                      stages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CrmStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -3713,7 +3717,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/Funnel'
+                - $ref: '#/components/schemas/UpdateFunnel'
       responses:
         '200':
           description: OK
@@ -3747,6 +3751,7 @@ paths:
   /crm/v1/entities/{entity}/kanban/stage:
     parameters:
       - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/filterFunnel'
     get:
       description: Get kanban stages. Available  for all users.
       tags:
@@ -3783,6 +3788,9 @@ paths:
                     stage_code:
                       type: string
                       example: 'new_deal'
+                    funnel_id:
+                      type: integer
+                      example: 5
       responses:
         '200':
           description: OK
@@ -3855,6 +3863,141 @@ paths:
         - bearerAuth: []
     delete:
       description: Deleting a Kanban Stage. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/entities/{entity}/{entity_id}/move/stage/{stageId}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/entity_id'
+      - $ref: '#/components/parameters/stageId'
+    post:
+      description: Move a kanban stage. Available only for all users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    reason_id:
+                      type: integer
+                      example: 3
+                    reason_comment:
+                      type: string
+                      example: 'example'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CrmStage'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
+  /crm/v1/reasons/{funnelId}:
+    parameters:
+      - $ref: '#/components/parameters/funnelId'
+    get:
+      description: Get funnels. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ReasonList'
+
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    post:
+      description: Funnel creating. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateReason'
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      example: 'SUCCESS'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Reason'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+  /crm/v1/reasons/{reasonId}:
+    parameters:
+      - $ref: '#/components/parameters/reasonId'
+    patch:
+      description: Funnel editing. Available only for admin users.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateReason'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Reason'
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 11
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    delete:
+      description: Funnel deleting. Available only for admin users.
       tags:
         - crmService
       responses:
@@ -4197,6 +4340,14 @@ components:
         format: int64
       required: true
       description: Entity ID
+    entity_id:
+      in: path
+      name: entity_id
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
     entityIds:
       in: query
       name: entityIds
@@ -4259,6 +4410,13 @@ components:
       required: true
       schema:
         type: string
+    reasonId:
+      name: reasonId
+      in: path
+      description: reason id
+      required: true
+      schema:
+        type: string
 
     filter_number_enum:
       name: filterNumberEnum
@@ -4286,6 +4444,13 @@ components:
         items:
           type: string
       example: ["1674432000,1679529600"]
+    filterFunnel:
+      name: funnel_id
+      in: query
+      description: funnel id
+      required: false
+      schema:
+        type: string
 
 
   schemas:
@@ -6069,6 +6234,28 @@ components:
           type: integer
           example: 90
 
+    CreateCrmEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        source:
+          type: string
+          example: shop
+        funnel_id:
+          type: integer
+          example: 5
+        email:
+          $ref: '#/components/schemas/multipleEmail'
+        phone:
+          $ref: '#/components/schemas/Phone'
+        messengers:
+          $ref: '#/components/schemas/SocialMedia'
+
     CrmEntity:
       type: object
       properties:
@@ -6193,6 +6380,19 @@ components:
         funnel_code:
           type: string
           example: 'sales_funnel'
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: false
+
+    UpdateFunnel:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'Sales funnel'
         active:
           type: boolean
           example: true
@@ -6426,6 +6626,77 @@ components:
             type: integer
             format: int64
           example: [12,32]
+
+    conversionBody:
+      type: array
+      items:
+        properties:
+          table_name:
+            type: string
+            example: 'companies'
+      example:
+        - table_name: 'contacts'
+        - table_name: 'companies'
+
+
+    conversionBodyWithFunnelId:
+      type: array
+      items:
+        properties:
+          table_name:
+            type: string
+            example: 'deals'
+          funnel_id:
+            type: integer
+            example: 11
+      example:
+        - table_name: 'deals'
+          funnel_id: 11
+
+
+    ReasonList:
+      type: object
+      properties:
+        SUCCESS:
+          type: array
+          items:
+            properties:
+              id:
+                type: integer
+                example: 11
+              title:
+                type: string
+                example: 'Won'
+              sort:
+                type: integer
+                example: 10
+        FAIL:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reason'
+
+    Reason:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 11
+        title:
+          type: string
+          example: 'Other'
+        sort:
+          type: integer
+          example: 10
+
+    CreateReason:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'Won'
+        sort:
+          type: integer
+          example: 10
 
 
     # crm end
