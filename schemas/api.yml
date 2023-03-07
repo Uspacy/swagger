@@ -2851,6 +2851,26 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
+
+  /groups/v1/join/{groupId}/request/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
+    get:
+      description: Check if user sent join request to the private group
+      tags:
+        - groupService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/schemas/JoinRequestNotFound'
     delete:
       description: Decline private group join request
       tags:
@@ -2864,8 +2884,11 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/schemas/JoinRequestNotFound'
       security:
         - bearerAuth: []
+
   # groups end
 
 
@@ -5908,6 +5931,23 @@ components:
             - "11"
             - "22"
 
+    JoinRequestNotFound:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  text:
+                    type: array
+                    items:
+                      type: string
+                      example: join request not found
+              status:
+                type: boolean
+                example: true
 
     # group end
 
