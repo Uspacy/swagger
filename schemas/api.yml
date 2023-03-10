@@ -1986,6 +1986,189 @@ paths:
       security:
         - bearerAuth: []
 
+  /tasks/v1/tasks/{taskId}/start/:
+    patch:
+      description: Take on a task. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: IN_WORK
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /tasks/v1/tasks/{taskId}/pause/:
+    patch:
+      description: Pause the task. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: PAUSE
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /tasks/v1/tasks/{taskId}/complete/:
+    patch:
+      description: Complete the task. Sets different statuses depending on who initiated the action. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: COMPLETE
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /tasks/v1/tasks/{taskId}/restart/:
+    patch:
+      description: Restart the task. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: PLANNED
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /tasks/v1/tasks/{taskId}/watch/:
+    patch:
+      description: Watch the task. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /tasks/v1/tasks/{taskId}/unwatch/:
+    patch:
+      description: Unwatch the task. Available to users related to the task.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CreateEditTaskDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /tasks/v1/settings/:
+    get:
+      description: Get available settings list. Available only for authorized users.
+      tags:
+        - tasksService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+    put:
+      description: Update settings. Available only for admin users.
+      tags:
+        - tasksService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/TaskSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TaskSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: []
+
   # tasks end
 
   # files begin
@@ -5449,6 +5632,35 @@ components:
       required:
         - oldUserId
         - newUserId
+
+    CompleteComment:
+      type: object
+      properties:
+        resultCommentId:
+          type: integer
+          example: 11
+
+    TaskSettings:
+      type: object
+      properties:
+        fixingResult:
+          type: boolean
+          example: true
+          default: false
+        fixingResultRequiredFor:
+          type: array
+          items:
+            type: string
+          example: ["2", "3"]
+        acceptResult:
+          type: boolean
+          example: true
+          default: false
+        acceptResultRequiredFor:
+          type: array
+          items:
+            type: string
+          example: ["4", "5"]
 
     # tasks end
 
