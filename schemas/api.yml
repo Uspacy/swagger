@@ -2005,14 +2005,14 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: IN_WORK
+                        example: inWork
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/pause/:
+  /tasks/v1/tasks/{taskId}/stop/:
     patch:
-      description: Pause the task. Available to users related to the task.
+      description: Stopped the task. Available to users related to the task.
       tags:
         - tasksService
       parameters:
@@ -2029,12 +2029,12 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: PAUSE
+                        example: stopped
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/complete/:
+  /tasks/v1/tasks/{taskId}/ready/:
     patch:
       description: Complete the task. Sets different statuses depending on who initiated the action. Available to users related to the task.
       tags:
@@ -2058,7 +2058,7 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: COMPLETE
+                        example: ready
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -2082,7 +2082,7 @@ paths:
                     properties:
                       status:
                         type: string
-                        example: PLANNED
+                        example: scheduled
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -3825,7 +3825,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /crm/v1/entities/{entity}/kanban/funnel:
+  /crm/v1/entities/{entity}/funnel:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
@@ -3884,7 +3884,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: []
-  /crm/v1/entities/{entity}/kanban/funnel/{funnelId}:
+  /crm/v1/entities/{entity}/funnel/{funnelId}:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/funnelId'
