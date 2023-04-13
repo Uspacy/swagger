@@ -1,0 +1,75 @@
+swagger: '2.0'
+definitions:
+  errorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  Data:
+    type: object
+    properties:
+      encoding:
+        type: string
+      delimiter:
+        type: string
+      entityType:
+        type: integer
+      columns:
+        type: object
+        additionalProperties:
+          type: string
+      headers:
+        type: object
+        additionalProperties:
+          type: string
+info:
+  title: Fileimport Backend
+  version: 1.0.0
+schemes:
+  - https
+paths:
+  /fileimport/v1/csv_import:
+    post:
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: file
+          in: formData
+          type: file
+        - name: data
+          in: formData
+          type: string
+        - name: token
+          in: formData
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/errorMessage'
+          examples:
+            application/json:
+              message: Import finished successfully
+        '413':
+          description: StatusRequestEntityTooLarge
+          schema:
+            $ref: '#/definitions/errorMessage'
+          examples:
+            application/json:
+              message: The file is too large, it should not exceed 50 MB
+        '400':
+          description: StatusBadRequest
+          schema:
+            $ref: '#/definitions/errorMessage'
+          examples:
+            application/json:
+              message: error while trying to upload file
+        '500':
+          description: StatusInternalError
+          schema:
+            $ref: '#/definitions/errorMessage'
+          examples:
+            application/json:
+              message: error while trying to create a new field
+      tags:
+        - fileimport

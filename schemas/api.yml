@@ -17,6 +17,7 @@ tags:
   - name: groupService
   - name: crmService
   - name: searchService
+  - name: fileImport
 
 paths:
 
@@ -4243,7 +4244,43 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  # search end
+    # search end
+
+
+  # fileimport begin
+  /fileimport/v1/csv_import:
+    post:
+      parameters:
+        - name: file
+          in: formData
+          type: file
+        - name: data
+          in: formData
+          type: string
+        - name: token
+          in: formData
+          type: string
+      responses:
+        '200':
+          description: OK
+
+        '413':
+          description: StatusRequestEntityTooLarge
+
+        '400':
+          description: StatusBadRequest
+
+        '500':
+          description: StatusInternalError
+
+      tags:
+        - fileImport
+
+
+          # fileimport end
+
+
+
 
 components:
   securitySchemes:
@@ -4263,6 +4300,8 @@ components:
     # search serivce
     SearchErrorMessage:
       description: Custom error
+
+
 
 
 
