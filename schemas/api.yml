@@ -3521,6 +3521,12 @@ paths:
             - $ref: '#/components/parameters/filter_number_enum'
             - name: stages
               example: [ "NEW", "SUCCESS" ]
+        - in: query
+          name: funnel_id
+          description: filter by funnel id
+          schema:
+            type: integer
+          example: 12
         - allOf:
             - $ref: '#/components/parameters/filter_array_of_time_ranges'
             - name: created_at
@@ -4257,6 +4263,7 @@ paths:
         - name: data
           in: formData
           type: string
+
       responses:
         '200':
           description: OK
@@ -4273,6 +4280,7 @@ paths:
         - fileImport
       security:
         - bearerAuth: [ ]
+
 
 
           # fileimport end
