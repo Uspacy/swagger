@@ -4254,7 +4254,7 @@ paths:
 
 
   # fileimport begin
-  /fileimport/v1/csv_import:
+  /fileimport/v1/csv-import:
     post:
       parameters:
         - name: file
