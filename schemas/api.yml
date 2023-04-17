@@ -147,7 +147,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /auth/v1/users/forgot_password/:
     post:
       description: Reset password. Available to unauthorized users.
@@ -199,7 +199,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /auth/v1/users/me/change_password/:
     patch:
       description: Update self password. Available only for authorized users.
@@ -221,7 +221,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /auth/v1/users/check_email/:
     get:
       description: Email existence check.
@@ -246,7 +246,7 @@ paths:
         '204':
           $ref: '#/components/responses/NoContent'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /auth/v1/portals/:
     get:
       description: Portal domain availability check.
@@ -286,7 +286,7 @@ paths:
                     type: boolean
                     example: true
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create portal
       tags:
@@ -336,7 +336,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/{userId}/:
     parameters:
@@ -355,7 +355,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update user data by id. Available only for authorized users
       tags:
@@ -376,7 +376,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate/:
     post:
       description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
@@ -401,7 +401,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/activate/:
     post:
       description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
@@ -421,7 +421,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/update_roles/:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
@@ -448,7 +448,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/update_position/:
     patch:
       description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
@@ -475,7 +475,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/{userId}/settings/:
     get:
@@ -494,7 +494,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update personal settings by id. Available only for users with admin permissions.
       tags:
@@ -517,7 +517,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_status:
     get:
       description: Get two-factor authentication status by id. Available only for users with admin permissions.
@@ -535,7 +535,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_disable:
     patch:
       description: Disable two-factor authentication by id. Available only for users with admin permissions.
@@ -553,7 +553,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/me/:
     get:
       tags:
@@ -569,7 +569,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/me/twofa_status:
     get:
@@ -586,7 +586,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/me/twofa_enable:
     patch:
       description: Enable two-factor authentication in a two steps
@@ -630,7 +630,7 @@ paths:
                     type: boolean
                     example: true
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/users/me/twofa_disable:
     patch:
       description: Disable two-factor authentication
@@ -646,7 +646,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /company/v1/users/search/:
@@ -673,7 +673,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/upload_avatar:
     post:
@@ -716,7 +716,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/get_users_by_field/:
     post:
@@ -746,7 +746,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/users/me/settings/:
     get:
@@ -763,7 +763,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update self password. Available only for authorized users.
       tags:
@@ -784,7 +784,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # users end
 
   # departments begin
@@ -815,7 +815,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create department. Available only for users with admin permissions
       tags:
@@ -846,7 +846,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/:
     parameters:
       - $ref: '#/components/parameters/departmentId'
@@ -864,7 +864,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description:
         Update department data (set head department, move users, set parent department)
@@ -887,7 +887,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description:
         Delete department. Available only for users with admin permissions.
@@ -899,7 +899,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/updateRoles/:
     patch:
       description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
@@ -925,7 +925,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /company/v1/departments/{departmentId}/addUsers/:
     patch:
@@ -952,7 +952,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/deleteUsers/:
     patch:
       description: Update department users by id. Available only for users with admin permissions.
@@ -978,7 +978,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # departments end
 
   # roles begin
@@ -997,7 +997,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/roles/:
     get:
       description: Get role list. Only available to authorized users with the owner or administrator role.
@@ -1020,7 +1020,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create role. Only available to authorized users with the owner or administrator role.
       tags:
@@ -1044,7 +1044,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/roles/{roleId}/:
     parameters:
       - $ref: '#/components/parameters/roleId'
@@ -1067,7 +1067,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description:
         Update role data. Only available to authorized users with the owner or administrator role.
@@ -1108,7 +1108,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description:
         Delete role. Only available to authorized users with the owner or administrator role.
@@ -1120,7 +1120,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # roles end
 
   # invite begin
@@ -1163,7 +1163,7 @@ paths:
                     type: boolean
                     example: true
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -1183,7 +1183,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email/batch:
     post:
       description: Create invites. Only available to authorized users with the owner or administrator role.
@@ -1207,7 +1207,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email/{userId}/repeat_invitation:
     parameters:
       - $ref: '#/components/parameters/userId'
@@ -1228,7 +1228,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /company/v1/invites/email/{userId}/:
     parameters:
       - $ref: '#/components/parameters/userId'
@@ -1244,7 +1244,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # invite begin
 
   # newsfeed begin
@@ -1288,7 +1288,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: >
         Create post. Available only for authorized users.
@@ -1321,7 +1321,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /newsfeed/v1/posts/{postId}/:
     parameters:
       - $ref: '#/components/parameters/postId'
@@ -1346,7 +1346,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete post. Available only for author or users with admin permissions.
       tags:
@@ -1359,7 +1359,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # newsfeed end
 
   # tasks begin
@@ -1383,7 +1383,7 @@ paths:
         - allOf:
             - $ref: '#/components/parameters/filter_string_enum'
             - name: status
-              example: ["suspended", "not_planned"]
+              example: [ "suspended", "not_planned" ]
         - allOf:
             - $ref: '#/components/parameters/filter_number_enum'
             - name: setter_id
@@ -1423,7 +1423,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create task. Available only for authorized users.
       tags:
@@ -1479,7 +1479,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1497,7 +1497,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit task by id. Available only for authorized users and task maker.
       tags:
@@ -1528,7 +1528,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete task by id. Available only for authorized users and task maker.
       tags:
@@ -1539,7 +1539,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/denial/:
     post:
       description: Abandoning a task. Available only for authorized users.
@@ -1581,7 +1581,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create canban stage. Available only for authorized users.
       tags:
@@ -1611,7 +1611,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/:
     get:
       description: Get canban stage by id. Available only for authorized users.
@@ -1629,7 +1629,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update canban stage by id. Available only for authorized users.
       tags:
@@ -1661,7 +1661,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Create comment for task. Available only for authorized users.
       tags:
@@ -1675,7 +1675,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/moveTask/:
     post:
       description: Moving a task to stage
@@ -1694,7 +1694,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/tasks/{taskId}/checkList/:
     parameters:
@@ -1719,12 +1719,12 @@ paths:
                           type: array
                           items:
                             type: string
-                          example: ["2", "3"]
+                          example: [ "2", "3" ]
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create check list for task. Available only for authorized users and users who have access to task.
       tags:
@@ -1747,7 +1747,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/taskId'
@@ -1774,7 +1774,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete check list to task by id. Available only for authorized users.
       tags:
@@ -1786,7 +1786,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/checkList/{checkListId}/:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1814,7 +1814,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create item check list for task. Available only for authorized users.
       tags:
@@ -1843,7 +1843,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/checkList/{checkListId}/{checkListItemId}:
     parameters:
       - $ref: '#/components/parameters/checkListId'
@@ -1859,7 +1859,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update check list for task. Available only for authorized users.
       tags:
@@ -1888,7 +1888,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/tasks/massEdit/complete/:
     post:
@@ -1906,7 +1906,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/massEdit/archive/:
     post:
       description: Bulk editing tasks
@@ -1923,7 +1923,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/tasks/massEdit/delete/:
     post:
       description: Bulk editing tasks
@@ -1940,7 +1940,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /tasks/v1/transferToUser:
     post:
       description: Transfer tasks to another user. Available only for admin users.
@@ -1962,7 +1962,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/transferToDepartment:
     post:
@@ -1985,7 +1985,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /tasks/v1/tasks/{taskId}/start/:
     patch:
@@ -2146,7 +2146,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     put:
       description: Update settings. Available only for admin users.
       tags:
@@ -2168,7 +2168,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # tasks end
 
@@ -2197,7 +2197,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Upload one or more files
       tags:
@@ -2222,7 +2222,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?uploadId:
     get:
@@ -2253,7 +2253,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?entityIds[]:
     get:
@@ -2281,7 +2281,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files/{id}:
     patch:
@@ -2323,7 +2323,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Removes the uploaded file and info about it
       tags:
@@ -2342,7 +2342,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /files/v1/files?entityType&entityId:
     patch:
@@ -2383,7 +2383,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: >
         Removes the multiple files bound to the entity
@@ -2401,7 +2401,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # files end
 
@@ -2454,7 +2454,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Creates new comment
       tags:
@@ -2475,7 +2475,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments?entityIds[]:
     get:
@@ -2527,7 +2527,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments/{id}:
     patch:
@@ -2558,7 +2558,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Removes the comment
       tags:
@@ -2577,7 +2577,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /comments/v1/comments?entityType&entityId:
     delete:
@@ -2597,7 +2597,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   # comments end
 
@@ -2646,7 +2646,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create group. Available only for authorized users.
       tags:
@@ -2676,7 +2676,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /groups/v1/groups/{groupId}/:
     parameters:
       - $ref: '#/components/parameters/groupId'
@@ -2696,7 +2696,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Update group. Only available to group owner.
       tags:
@@ -2724,7 +2724,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete group. Only available to group owner.
       tags:
@@ -2737,7 +2737,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/upload_logo:
     parameters:
@@ -2768,7 +2768,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/attachUser/{userId}:
     parameters:
@@ -2791,7 +2791,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/detachUser/{userId}:
     parameters:
@@ -2814,7 +2814,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/joinGroup:
     parameters:
@@ -2836,7 +2836,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/leaveGroup:
     parameters:
@@ -2858,7 +2858,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/invites/:
     get:
@@ -2878,12 +2878,12 @@ paths:
                     type: array
                     items:
                       type: string
-                    example: ["2", "5"]
+                    example: [ "2", "5" ]
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Sending invitations to groups. Only available to group owner.
       tags:
@@ -2906,7 +2906,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/invites/{groupId}/:
     parameters:
@@ -2923,7 +2923,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToUser:
     post:
@@ -2946,7 +2946,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToDepartment:
     post:
@@ -2969,7 +2969,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/transferToGroupMembers:
     post:
@@ -2992,7 +2992,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/join/{groupId}:
     parameters:
@@ -3010,12 +3010,12 @@ paths:
                 type: array
                 items:
                   type: integer
-                example: [2, 5]
+                example: [ 2, 5 ]
                 description: The list of user ids
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/join/{groupId}/request:
     parameters:
@@ -3034,7 +3034,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /groups/v1/join/{groupId}/request/{userId}:
     parameters:
@@ -3071,7 +3071,7 @@ paths:
         '403':
           $ref: '#/components/schemas/JoinRequestNotFound'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # groups end
 
 
@@ -3098,7 +3098,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create entity. Available only for admin users.
       tags:
@@ -3126,7 +3126,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/field_types/:
     get:
@@ -3148,7 +3148,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/fields/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3179,7 +3179,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create field. Available only for admin users.
       tags:
@@ -3212,7 +3212,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/fields/{field}/:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3241,7 +3241,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit field by code. Available only for authorized users and crm maker.
       tags:
@@ -3272,7 +3272,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete field by code. Available only for admin users.
       tags:
@@ -3283,7 +3283,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /crm/v1/entities/{entity}/lists/{field}/:
@@ -3306,7 +3306,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Creating or editing list items. Available only for admin users.
       tags:
@@ -3328,7 +3328,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/lists/{field}/{value}:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3344,7 +3344,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/:
     parameters:
@@ -3372,7 +3372,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create  crm entity item. Available only for admin users.
       tags:
@@ -3395,7 +3395,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/companies/:
     get:
@@ -3447,7 +3447,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/contacts/:
     get:
       description: Get available contacts list.
@@ -3498,7 +3498,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/deals/:
     get:
       description: Get available deals list.
@@ -3555,7 +3555,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/leads/:
     get:
       description: Get available leads list.
@@ -3607,7 +3607,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/{itemId}/:
     parameters:
@@ -3629,7 +3629,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit crm entity item. Available only for authorized users and users who have access to crm.
       tags:
@@ -3652,7 +3652,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete crm entity item. Available only for admin users and users who have access to crm.
       tags:
@@ -3663,7 +3663,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/converting/{itemId}:
     parameters:
@@ -3697,7 +3697,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/static/tasks/:
     get:
@@ -3759,7 +3759,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create crm-task entity item. Available only for admin users.
       tags:
@@ -3781,7 +3781,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/static/task/{itemId}/:
     parameters:
       - $ref: '#/components/parameters/itemId'
@@ -3799,7 +3799,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Edit crm-task entity item. Available only for authorized users and users who have access to crm.
       tags:
@@ -3819,7 +3819,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Delete crm-task entity item. Available only for admin users and users who have access to crm.
       tags:
@@ -3830,7 +3830,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/funnel:
     parameters:
@@ -3858,7 +3858,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Funnel creating. Available only for admin users.
       tags:
@@ -3890,7 +3890,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/funnel/{funnelId}:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -3919,7 +3919,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Funnel editing. Available only for admin users.
       tags:
@@ -3946,7 +3946,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Funnel deleting. Available only for admin users.
       tags:
@@ -3957,7 +3957,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /crm/v1/entities/{entity}/kanban/stage:
@@ -3984,7 +3984,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Create a kanban stage. Available only for admin users.
       tags:
@@ -4019,7 +4019,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/kanban/stage/{stageId}:
     parameters:
@@ -4045,7 +4045,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     patch:
       description: Editing a Kanban Stage. Available only for admin users.
       tags:
@@ -4072,7 +4072,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Deleting a Kanban Stage. Available only for admin users.
       tags:
@@ -4083,7 +4083,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/entities/{entity}/{entity_id}/move/stage/{stageId}:
     parameters:
@@ -4123,7 +4123,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /crm/v1/reasons/{funnelId}:
     parameters:
@@ -4145,7 +4145,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     post:
       description: Funnel creating. Available only for admin users.
       tags:
@@ -4177,7 +4177,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /crm/v1/reasons/{reasonId}:
     parameters:
       - $ref: '#/components/parameters/reasonId'
@@ -4207,7 +4207,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
       description: Funnel deleting. Available only for admin users.
       tags:
@@ -4218,7 +4218,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   # crm end
 
 
@@ -4263,9 +4263,7 @@ paths:
         - name: data
           in: formData
           type: string
-        - name: token
-          in: formData
-          type: string
+
       responses:
         '200':
           description: OK
@@ -4278,9 +4276,11 @@ paths:
 
         '500':
           description: StatusInternalError
-
       tags:
         - fileImport
+      security:
+        - bearerAuth: [ ]
+
 
 
           # fileimport end
@@ -4482,7 +4482,7 @@ components:
             phone: "+3801234567"
             position: CTO
             active: true
-            departmentsIds: ["1111", "2222"]
+            departmentsIds: [ "1111", "2222" ]
             roles:
               - OWNER
               - ADMIN
@@ -4501,7 +4501,7 @@ components:
             name: "Frontend department"
             headId: "1111"
             parentDepartmentId: "1111"
-            usersIds: ["1111", "2222", "3333"]
+            usersIds: [ "1111", "2222", "3333" ]
     queryDepartments:
       allOf:
         - $ref: '#/components/parameters/query'
@@ -4693,7 +4693,7 @@ components:
         type: array
         items:
           type: string
-      example: ["1674432000,1679529600"]
+      example: [ "1674432000,1679529600" ]
     filterFunnel:
       name: funnel_id
       in: query
@@ -4763,7 +4763,7 @@ components:
             example: '01gdnpddf5xgzxqvcn4x83mc2s'
           type:
             type: string
-            enum: [WORK, MOBILE, HOME]
+            enum: [ WORK, MOBILE, HOME ]
             example: WORK
           value:
             type: string
@@ -5282,7 +5282,7 @@ components:
                 arrayDepartmentsIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
             usersIds:
               type: array
               items:
@@ -5294,7 +5294,7 @@ components:
                 arrayUsersIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
         include:
           type: object
           description: A field by which you can include the viewing of a post for users and / or departments
@@ -5310,7 +5310,7 @@ components:
                 arrayDepartmentsIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
             usersIds:
               type: array
               items:
@@ -5322,7 +5322,7 @@ components:
                 arrayUsersIds:
                   - "1"
                   - "2"
-                empty: []
+                empty: [ ]
     CreatePostDto:
       type: object
       properties:
@@ -5403,12 +5403,12 @@ components:
           type: array
           items:
             type: string
-          example: ["2", "3"]
+          example: [ "2", "3" ]
         auditorsIds:
           type: array
           items:
             type: string
-          example: ["4", "5"]
+          example: [ "4", "5" ]
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -5506,12 +5506,12 @@ components:
           type: array
           items:
             type: string
-          example: ["2", "3"]
+          example: [ "2", "3" ]
         auditorsIds:
           type: array
           items:
             type: string
-          example: ["4", "5"]
+          example: [ "4", "5" ]
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -5619,7 +5619,7 @@ components:
           type: array
           items:
             type: string
-          example: ["1", "2"]
+          example: [ "1", "2" ]
 
     TransferTask:
       type: object
@@ -5696,7 +5696,7 @@ components:
           type: array
           items:
             type: string
-          example: ["2", "3"]
+          example: [ "2", "3" ]
         acceptResult:
           type: boolean
           example: true
@@ -5705,7 +5705,7 @@ components:
           type: array
           items:
             type: string
-          example: ["4", "5"]
+          example: [ "4", "5" ]
 
     # tasks end
 
@@ -6730,7 +6730,7 @@ components:
           example: 10
         reasons:
           type: string
-          example: []
+          example: [ ]
 
     CrmStageWithReason:
       type: object
@@ -6845,7 +6845,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [123,234,345]
+          example: [ 123,234,345 ]
         contacts:
           type: array
           items:
@@ -6903,25 +6903,25 @@ components:
           items:
             type: integer
             format: int64
-          example: [123,234,345]
+          example: [ 123,234,345 ]
         deals:
           type: array
           items:
             type: integer
             format: int64
-          example: [56]
+          example: [ 56 ]
         leads:
           type: array
           items:
             type: integer
             format: int64
-          example: [34]
+          example: [ 34 ]
         contacts:
           type: array
           items:
             type: integer
             format: int64
-          example: [12,32]
+          example: [ 12,32 ]
 
     conversionBody:
       type: array

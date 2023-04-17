@@ -28,7 +28,7 @@ info:
 schemes:
   - https
 paths:
-  /fileimport/v1/csv_import:
+  /fileimport/v1/csv-import:
     post:
       consumes:
         - multipart/form-data
@@ -37,9 +37,6 @@ paths:
           in: formData
           type: file
         - name: data
-          in: formData
-          type: string
-        - name: token
           in: formData
           type: string
       responses:
