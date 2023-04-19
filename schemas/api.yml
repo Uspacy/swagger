@@ -4219,6 +4219,56 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
+  /crm/v1/events/call:
+    get:
+      description: Get call event data
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventCallList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      tags:
+        - crmService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallEventDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/EventCallList'
+
+  /crm/v1/events/call/{call_id}:
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/call_id'
+      description:
+        Delete call event. Available only for users with admin permissions.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
   # crm end
 
 
@@ -4664,6 +4714,13 @@ components:
       name: reasonId
       in: path
       description: reason id
+      required: true
+      schema:
+        type: string
+    call_id:
+      name: call_id
+      in: path
+      description: call id
       required: true
       schema:
         type: string
@@ -6993,6 +7050,124 @@ components:
         sort:
           type: integer
           example: 10
+
+    EventCallList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          task_id:
+            type: integer
+            example: null
+          contact_id:
+            type: integer
+            example: null
+          company_id:
+            type: integer
+            example: null
+          deal_id:
+            type: integer
+            example: null
+          lead_id:
+            type: integer
+            example: 249
+          entity_table:
+            type: string
+            example: leads
+          subject:
+            type: string
+            example: First call
+          call_type:
+            type: string
+            enum:
+              - outgoing
+              - incoming
+          ended_call_status:
+            type: string
+            enum:
+              - null
+              - success
+              - missed
+              - declined
+              - subscriber_unavailable
+              - number_not_exist
+              - call_failure
+          from:
+            type: string
+            example: 380632232232
+          to:
+            type: string
+            example: 380632232232
+          begin_time:
+            type: integer
+            example: 1681893335
+          end_time:
+            type: integer
+            example: 1681893685
+          duration:
+            type: integer
+            example: 350
+          call_record_link:
+            type: string
+            example: null
+          call_record_file:
+            type: string
+            example: null
+          note:
+            type: string
+            example: Fixed agenda
+
+    CallEventDto:
+      type: object
+      properties:
+        task_id:
+          type: integer
+          example: null
+        subject:
+          type: string
+          example: First call
+        call_type:
+          type: string
+          enum:
+            - outgoing
+            - incoming
+        ended_call_status:
+          type: string
+          enum:
+            - null
+            - success
+            - missed
+            - declined
+            - subscriber_unavailable
+            - number_not_exist
+            - call_failure
+        from:
+          type: string
+          example: 380632232232
+        to:
+          type: string
+          example: 380632232232
+        begin_time:
+          type: integer
+          example: 1681893335
+        end_time:
+          type: integer
+          example: 1681893685
+        duration:
+          type: integer
+          example: 350
+        call_record_link:
+          type: string
+          example: null
+        call_record_file:
+          type: string
+          example: null
+        note:
+          type: string
+          example: Fixed agenda
 
 
     # crm end
