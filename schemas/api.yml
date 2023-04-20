@@ -18,6 +18,7 @@ tags:
   - name: crmService
   - name: searchService
   - name: fileImport
+  - name: appService
 
 paths:
 
@@ -4330,11 +4331,108 @@ paths:
         - fileImport
       security:
         - bearerAuth: [ ]
+  # fileimport end
 
+  # appService being
+  /apps/v1/apps/:
+    get:
+      description: Get applications list.
+      tags:
+        - appService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/App'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create app
+      tags:
+        - appService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateAppDto'
+                - type: object
+                  properties:
+                    logo:
+                      type: string
+                      format: binary
+                      description: The file to upload.
+                  required:
+                    - name
+                    - code
+                    - short_description
+                    - redirect_url
+                    - callback_url
+                    - developer_name
+                    - logo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/App'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
-
-          # fileimport end
-
+  /apps/v1/apps/{app_id}:
+    patch:
+      description: Update app data
+      tags:
+        - appService
+      parameters:
+        - $ref: '#/components/parameters/app_id'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateUpdateAppDto'
+                - type: object
+                  properties:
+                    logo:
+                      type: string
+                      format: binary
+                      description: The file to upload.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/App'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete app
+      tags:
+        - appService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+  # appService end
 
 
 
@@ -4663,6 +4761,13 @@ components:
       name: groupId
       in: path
       description: Group id
+      required: true
+      schema:
+        type: string
+    app_id:
+      name: app_id
+      in: path
+      description: App id
       required: true
       schema:
         type: string
@@ -7269,5 +7374,74 @@ components:
           type: object
       type: object
 
-  # search end
 
+    # search end
+
+    # apps begin
+    App:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 3
+          name:
+            type: string
+            example: Unitalk telelephony
+          code:
+            type: string
+            example: unitalk_integration
+          short_description:
+            type: string
+            example: Take customer interaction to the next level with industry-leading telephony capabilities
+          position:
+            type: string
+            example: CTO
+          description:
+            type: string
+            example: null
+          logo:
+            type: string
+            example: bb/d6/bbd61f630cfebb0aaca6c90bd2a57eb7.svg
+          active:
+            type: boolean
+            example: true
+          paid:
+            type: boolean
+            example: false
+          price:
+            type: string
+            example: null
+          developer_name:
+            type: string
+            example: Mahoney
+          developer_link:
+            type: string
+            example: null
+
+    CreateUpdateAppDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Unitalk telelephony
+        code:
+          type: string
+          example: unitalk_integration
+        short_description:
+          type: string
+          example: Take customer interaction to the next level with industry-leading telephony capabilities
+        redirect_url:
+          type: string
+          example: http://localhost:8080
+        callback_url:
+          type: string
+          example: http://localhost:8080
+        developer_name:
+          type: string
+          example: Mahoney
+        developer_link:
+          type: string
+          example: https://blue-oyster.org
+    # apps end
