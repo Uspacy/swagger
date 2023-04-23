@@ -7224,10 +7224,24 @@ components:
           note:
             type: string
             example: Fixed agenda
+          integration_code:
+            type: string
+            example: unitalk_integration
+          external_id:
+            type: integer
+            example: 1
+            description: It should be unique for one particular integration_code
 
     CallEventDto:
       type: object
       properties:
+        integration_code:
+            type: string
+            example: unitalk_integration
+        external_id:
+          type: integer
+          example: 1
+          description: It should be unique for one particular integration_code
         task_id:
           type: integer
           example: null
@@ -7254,7 +7268,7 @@ components:
           example: 380632232232
         to:
           type: string
-          example: 380632232232
+          example: null
         begin_time:
           type: integer
           example: 1681893335
