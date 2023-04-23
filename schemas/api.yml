@@ -4254,6 +4254,23 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/EventCallList'
+    patch:
+      tags:
+        - crmService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallEventDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/EventCallList'
 
   /crm/v1/events/call/{call_id}:
     delete:
@@ -7235,6 +7252,10 @@ components:
     CallEventDto:
       type: object
       properties:
+        employees:
+          type: array
+          description: Employees that have been dialed during the call. Available only for PATCH method
+          example: [1, 2, 3]
         integration_code:
             type: string
             example: unitalk_integration
