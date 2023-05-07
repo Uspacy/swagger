@@ -4254,6 +4254,8 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/EventCallList'
+
+  /crm/v1/events/call/{call_event_id}:
     patch:
       tags:
         - crmService
@@ -4271,11 +4273,9 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/EventCallList'
-
-  /crm/v1/events/call/{call_id}:
     delete:
       parameters:
-        - $ref: '#/components/parameters/call_id'
+        - $ref: '#/components/parameters/call_event_id'
       description:
         Delete call event. Available only for users with admin permissions.
       tags:
@@ -4287,6 +4287,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
+
   # crm end
 
 
@@ -4839,10 +4840,10 @@ components:
       required: true
       schema:
         type: string
-    call_id:
-      name: call_id
+    call_event_id:
+      name: call_event_id
       in: path
-      description: call id
+      description: call event id
       required: true
       schema:
         type: string
@@ -7183,7 +7184,7 @@ components:
             example: 1
           task_id:
             type: integer
-            example: null
+            example: 1
           contact_id:
             type: integer
             example: null
@@ -7192,23 +7193,25 @@ components:
             example: null
           deal_id:
             type: integer
-            example: null
+            example: 1
           lead_id:
             type: integer
-            example: 249
+            example: null
           entity_table:
             type: string
-            example: leads
+            example: deals
           subject:
             type: string
-            example: First call
+            example: Sales contract negotiation
           call_type:
             type: string
+            example: incoming
             enum:
               - outgoing
               - incoming
           ended_call_status:
             type: string
+            example: missed
             enum:
               - null
               - success
@@ -7235,45 +7238,128 @@ components:
           call_record_link:
             type: string
             example: null
-          call_record_file:
-            type: string
-            example: null
           note:
             type: string
-            example: Fixed agenda
+            example: Call from the client
           integration_code:
             type: string
             example: unitalk_integration
           external_id:
             type: integer
-            example: 1
-            description: It should be unique for one particular integration_code
+            example: null
+            description: Non-required. Used for communication with integrations
+          tmp_id:
+            type: integer
+            example: null
+            description: Non-required. Used for communication with integrations
+          contacts:
+            items:
+              $ref: '#/components/schemas/CallEventContacts'
+            type: array
+          companies:
+            type: array
+            example: []
+            description: Having same format as contacts field. Or could be empty array
+          employees:
+            type: array
+            description: Employees that have been dialed during the call. Could be omitted if don't have such information
+            example: [1, 2, 3]
+          tasks:
+            type: object
+            description: The task data for provided task_id
+            properties:
+              id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: Missed call from 380667654321
 
     CallEventDto:
       type: object
       properties:
-        employees:
-          type: array
-          description: Employees that have been dialed during the call. Available only for PATCH method
-          example: [1, 2, 3]
         integration_code:
             type: string
             example: unitalk_integration
+            description: It could be integration_code or unique code of source where data are imported from
+            required: true
         external_id:
           type: integer
           example: 1
-          description: It should be unique for one particular integration_code
+          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
+          required: false
+        tmp_id:
+          type: integer
+          example: 1
+          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
+          required: false
         task_id:
           type: integer
           example: null
+          description: If task_id is provided the task's creation for missed incoming call is passing away
+          required: false
+        contact_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
+                       the automatic binding with existing crm entities is passing away
+          required: false
+        company_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
+                       the automatic binding with existing crm entities is passing away
+          required: false
+        lead_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
+                       the automatic binding with existing crm entities is passing away
+          required: false
+        deal_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
+                       the automatic binding with existing crm entities is passing away
+          required: false
+        entity_table:
+          type: string
+          description: The base entity the call event connected to could be provided or could be omitted in a case
+                       if just have usual call. In this the "empty" value will be automatically filled and
+                       the call event will be shown just in call logs history
+          enum:
+            - empty
+            - leads,
+            - deals
+            - contacts
+            - companies
+          required: false
+        employees:
+          type: array
+          description: Employees that have been dialed during the call. Could be omitted if don't have such information
+          example: [1, 2, 3]
+          required: false
+        contacts:
+          type: array
+          description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
+          example: [1, 2, 3]
+          required: false
+        companies:
+          type: array
+          description: The companies that have connection with particulat call event. Could be omitted if don't have such information
+          example: [1, 2, 3]
+          required: false
         subject:
           type: string
           example: First call
+          description: Could be omitted. In such case the default value will be "Call"
+          required: false
         call_type:
           type: string
           enum:
             - outgoing
             - incoming
+          required: true
         ended_call_status:
           type: string
           enum:
@@ -7287,29 +7373,44 @@ components:
         from:
           type: string
           example: 380632232232
+          required: true
         to:
           type: string
           example: null
+          description: Could be null cause on new event call from telephony we don't have "to" value for sure
+          required: false
         begin_time:
           type: integer
           example: 1681893335
+          required: false
         end_time:
           type: integer
           example: 1681893685
+          required: false
         duration:
           type: integer
           example: 350
+          required: false
         call_record_link:
           type: string
           example: null
-        call_record_file:
-          type: string
-          example: null
+          required: false
+          description: It could be call link that telephony provides or link issued by import flow (via files-backend)
         note:
           type: string
           example: Fixed agenda
+          required: false
 
 
+    CallEventContacts:
+      properties:
+        id:
+          example: 1
+          type: integer
+        title:
+          example: George Everest
+          type: string
+      type: object
     # crm end
 
 
