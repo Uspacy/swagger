@@ -3,7 +3,6 @@ info:
   description: |
     This is [Uspacy](https://uspacy.com)  API documentation. You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
     or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
-    For this sample, you can use the api key `special-key` to test the authorization filters.
 
     # Introduction
     To use this API you need to get Bearer token. To get Bearer token you have two options:
@@ -252,7 +251,7 @@ paths:
   /auth/v1/users/me/change_password/:
     patch:
       summary: Update password
-      description: Update self password. Available only for authorized users.
+      description: Update self password
       tags:
         - authService
       requestBody:
@@ -362,7 +361,7 @@ paths:
   # users begin
   /company/v1/users/:
     get:
-      description: Get users list. Available only for authorized users.
+      description: Get users list
       tags:
         - usersService
       parameters:
@@ -624,7 +623,7 @@ paths:
 
   /company/v1/users/me/twofa_status:
     get:
-      description: Get two-factor authentication status. Available only for authorized users.
+      description: Get two-factor authentication status
       tags:
         - usersService
       responses:
@@ -702,7 +701,7 @@ paths:
 
   /company/v1/users/search/:
     get:
-      description: Search. Available only for authorized users.
+      description: Search
       tags:
         - usersService
       parameters:
@@ -728,7 +727,7 @@ paths:
 
   /company/v1/users/upload_avatar:
     post:
-      description: Avatar upload. Available only for authorized users.
+      description: Avatar upload
       tags:
         - usersService
       requestBody:
@@ -816,7 +815,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update self password. Available only for authorized users.
+      description: Update self password
       tags:
         - usersService
       requestBody:
@@ -841,7 +840,7 @@ paths:
   # departments begin
   /company/v1/departments/:
     get:
-      description: Get departments list. Available only for authorized users.
+      description: Get departments list
       tags:
         - departments (usersService)
       parameters:
@@ -902,7 +901,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/departmentId'
     get:
-      description: Get department by id. Available only for authorized users.
+      description: Get department by id
       tags:
         - departments (usersService)
       responses:
@@ -1301,7 +1300,7 @@ paths:
   # newsfeed begin
   /newsfeed/v1/posts/:
     get:
-      description: Get posts list. Available only for authorized users.
+      description: Get posts list
       tags:
         - newsFeedService
       parameters:
@@ -1342,7 +1341,7 @@ paths:
         - bearerAuth: [ ]
     post:
       description: >
-        Create post. Available only for authorized users.
+        Create post
 
 
         Use one of `fileIds` or `uploadId` to bind earlier uploaded files to the post that is going to be created.
@@ -1416,7 +1415,7 @@ paths:
   # tasks begin
   /tasks/v1/tasks/:
     get:
-      description: Get available tasks list. Available only for authorized users.
+      description: Get available tasks list
       tags:
         - tasksService
       parameters:
@@ -1477,7 +1476,7 @@ paths:
         - bearerAuth: [ ]
     post:
       summary: Create task
-      description: Create task. Available only for authorized users.
+      description: Create task
       tags:
         - tasksService
       requestBody:
@@ -1595,7 +1594,7 @@ paths:
   /tasks/v1/tasks/{taskId}/denial/:
     post:
       summary: Abandoning a task
-      description: Abandoning a task. Available only for authorized users.
+      description: Abandoning a task
       tags:
         - tasksService
       parameters:
@@ -1616,7 +1615,7 @@ paths:
   /tasks/v1/stages/:
     get:
       summary: Get kanban stages
-      description: Get kanban stages. Available only for authorized users.
+      description: Get kanban stages
       tags:
         - tasksService
       responses:
@@ -1638,7 +1637,7 @@ paths:
         - bearerAuth: [ ]
     post:
       summary: Create kanban stage
-      description: Create kanban stage. Available only for authorized users.
+      description: Create kanban stage
       tags:
         - tasksService
       requestBody:
@@ -1670,7 +1669,7 @@ paths:
   /tasks/v1/stages/{stageId}/:
     get:
       summary: Get kanban stage by id
-      description: Get kanban stage by id. Available only for authorized users.
+      description: Get kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1688,7 +1687,7 @@ paths:
         - bearerAuth: [ ]
     patch:
       summary: Update kanban stage by id
-      description: Update kanban stage by id. Available only for authorized users.
+      description: Update kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1721,7 +1720,7 @@ paths:
         - bearerAuth: [ ]
     delete:
       summary: Delete kanban stage by id
-      description: Create kanban stage by id. Available only for authorized users.
+      description: Create kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1814,7 +1813,7 @@ paths:
       - $ref: '#/components/parameters/checkListId'
     patch:
       summary: Update checklist for task
-      description: Update checklist for task. Available only for authorized users.
+      description: Update checklist for task
       tags:
         - tasksService
       requestBody:
@@ -1838,7 +1837,7 @@ paths:
         - bearerAuth: [ ]
     delete:
       summary: Delete checklist from task by id
-      description: Delete checklist from task by id. Available only for authorized users.
+      description: Delete checklist from task by id
       tags:
         - tasksService
       responses:
@@ -1854,7 +1853,7 @@ paths:
       - $ref: '#/components/parameters/checkListId'
     get:
       summary: Get checklist items by id
-      description: Get checklist items by id. Available only for authorized users.
+      description: Get checklist items by id
       tags:
         - tasksService
       responses:
@@ -1880,7 +1879,7 @@ paths:
         - bearerAuth: [ ]
     post:
       summary: Create checklist for task
-      description: Create checklist for task. Available only for authorized users.
+      description: Create checklist for task
       tags:
         - tasksService
       requestBody:
@@ -1913,7 +1912,7 @@ paths:
       - $ref: '#/components/parameters/checkListId'
       - $ref: '#/components/parameters/checkListItemId'
     delete:
-      description: Delete item to checklist by id. Available only for authorized users.
+      description: Delete item to checklist by id
       tags:
         - tasksService
       responses:
@@ -1925,7 +1924,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update checklist for task. Available only for authorized users.
+      description: Update checklist for task
       tags:
         - tasksService
       requestBody:
@@ -2193,7 +2192,7 @@ paths:
 
   /tasks/v1/settings/:
     get:
-      description: Get available settings list. Available only for authorized users.
+      description: Get available settings list
       tags:
         - tasksService
       parameters:
@@ -2668,7 +2667,7 @@ paths:
   # group begin
   /groups/v1/groups/:
     get:
-      description: Get posts list. Available only for authorized users.
+      description: Get posts list
       tags:
         - groupService
       parameters:
@@ -2712,7 +2711,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create group. Available only for authorized users.
+      description: Create group
       tags:
         - groupService
       requestBody:
@@ -2745,7 +2744,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     get:
-      description: Shows the group info. Available only for authorized users.
+      description: Shows the group info
       tags:
         - groupService
       responses:
