@@ -1,9 +1,47 @@
 openapi: '3.0.1'
 info:
+  description: |
+    This is [Uspacy](https://uspacy.com)  API documentation. You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
+    or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
+
+    # Introduction
+    To use this API you need to get Bearer token. To get Bearer token you have two options:
+      - sign in on user's Uspacy using email and password
+      - create Marketplace application and get token in callback after your application was installed by user
+    
+    # SDKs and boilerplates
+    We provide SDKs for different languages to simplify integration with Uspacy API. You can find them on [Uspacy GitHub](https://github.com/Uspacy/)
+    We have also prepared a few boilerplates to help you start developing your application
+      - [Uspacy Marketplace application boilerplate](https://github.com/Uspacy/app-laravel-template) - Laravel application with Uspacy authentication and token refreshment
+      - [Uspacy Golang SDK](https://github.com/Uspacy/uspacy-go-sdk) – Golang SDK for Uspacy API, in active development
+      - [Uspacy TypeScript SDK](https://github.com/Uspacy/uspacy-sdk) – TypeScript SDK for Uspacy API, deprecated
+
+    # Marketplace applications development
+    To develop Marketplace application you need to create an application in Uspacy Marketplace. You can do it via request to [Uspacy support](mailto:support@uspacy.com).
+    You will receive ```client_id``` and ```client_secret``` for your application. You will also need to provide ```callback_uri``` for your application.
+    After user installs your application you will receive POST request with json in callback. It will contain ```jwt``` token and ```refreshToken```.
+    Example of request:
+    ```json
+    {
+      "expireInSeconds": 720,
+      "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w"
+    }
+    ```
+    You need to save ```jwt``` and ```refreshToken``` in your database. You will need to use ```jwt``` to make requests to Uspacy API. ```refreshToken``` is used to refresh ```jwt``` token when it expires. You should refresh ```jwt``` token before it expires. You can do it by making POST request to ```https://auth.uspacy.com/api/v1/auth/refresh_token/``` with ```refreshToken``` in body. You will receive new ```jwt``` and ```refreshToken``` in response. You need to save new ```jwt``` and ```refreshToken``` in your database.
+
+
   title: Uspacy api
-  version: 1.0.0
+  version: v1
 servers:
-  - url: http://127.0.0.1:8000
+  - url: https://{domain}.uspacy.ua
+    description: Ukrainian server
+  - url: https://{domain}.uspacy.eu
+    description: EU server
+  - url: https://{domain}.uspacy.com.br
+    description: Brazilian server
+  - url: https://{domain}.uspacy.com
+    description: International server
 tags:
   - name: authService
   - name: usersService
@@ -24,8 +62,9 @@ paths:
 
   # auth begin
   /auth/v1/auth/sign_in/:
-    description: Sign in user by email, password. Returns token, refreshToken
     post:
+      summary: Sign in
+      description: Sign in user by email, password. Returns token, refreshToken
       tags:
         - authService
       requestBody:
@@ -42,6 +81,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
         '403':
+          description: Access Denied
           content:
             application/json:
               schema:
@@ -62,8 +102,9 @@ paths:
                     type: boolean
                     example: true
   /auth/v1/auth/confirm_email/:
-    description: Confirm email user. Returns token, refreshToken
     post:
+      summary: Confirm user email
+      description: Confirm email user. Returns token, refreshToken
       tags:
         - authService
       requestBody:
@@ -80,8 +121,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
   /auth/v1/auth/refresh_token/:
-    description: refreshToken exprired token. Returns new token
     post:
+      summary: Refresh token
+      description: refreshToken exprired token. Returns new token, refreshToken
       tags:
         - authService
       responses:
@@ -93,6 +135,7 @@ paths:
                 $ref: '#/components/schemas/Token'
   /auth/v1/auth/register/:
     post:
+      summary: New user registration by invitation
       description: New user registration by invitation. Returns token, refreshToken
       tags:
         - authService
@@ -111,6 +154,7 @@ paths:
                 $ref: '#/components/schemas/Token'
   /auth/v1/users/:
     post:
+      summary: Sign up
       description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
       tags:
         - authService
@@ -151,6 +195,7 @@ paths:
         - bearerAuth: [ ]
   /auth/v1/users/forgot_password/:
     post:
+      summary: Reset password
       description: Reset password. Available to unauthorized users.
       tags:
         - authService
@@ -165,6 +210,7 @@ paths:
           description: OK
   /auth/v1/users/reset_password/:
     post:
+      summary: Reset password
       description: Reset password. Available to unauthorized users.
       tags:
         - authService
@@ -179,6 +225,7 @@ paths:
           description: OK
   /auth/v1/users/{userId}/change_password/:
     patch:
+      summary: Update user password
       parameters:
         - $ref: '#/components/parameters/userId'
       description: Update user password by id. Available only for users with admin permissions.
@@ -203,7 +250,8 @@ paths:
         - bearerAuth: [ ]
   /auth/v1/users/me/change_password/:
     patch:
-      description: Update self password. Available only for authorized users.
+      summary: Update password
+      description: Update self password
       tags:
         - authService
       requestBody:
@@ -225,6 +273,7 @@ paths:
         - bearerAuth: [ ]
   /auth/v1/users/check_email/:
     get:
+      summary: Email existence check
       description: Email existence check.
       tags:
         - authService
@@ -312,7 +361,7 @@ paths:
   # users begin
   /company/v1/users/:
     get:
-      description: Get users list. Available only for authorized users.
+      description: Get users list
       tags:
         - usersService
       parameters:
@@ -574,7 +623,7 @@ paths:
 
   /company/v1/users/me/twofa_status:
     get:
-      description: Get two-factor authentication status. Available only for authorized users.
+      description: Get two-factor authentication status
       tags:
         - usersService
       responses:
@@ -652,7 +701,7 @@ paths:
 
   /company/v1/users/search/:
     get:
-      description: Search. Available only for authorized users.
+      description: Search
       tags:
         - usersService
       parameters:
@@ -678,7 +727,7 @@ paths:
 
   /company/v1/users/upload_avatar:
     post:
-      description: Avatar upload. Available only for authorized users.
+      description: Avatar upload
       tags:
         - usersService
       requestBody:
@@ -766,7 +815,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update self password. Available only for authorized users.
+      description: Update self password
       tags:
         - usersService
       requestBody:
@@ -791,7 +840,7 @@ paths:
   # departments begin
   /company/v1/departments/:
     get:
-      description: Get departments list. Available only for authorized users.
+      description: Get departments list
       tags:
         - departments (usersService)
       parameters:
@@ -852,7 +901,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/departmentId'
     get:
-      description: Get department by id. Available only for authorized users.
+      description: Get department by id
       tags:
         - departments (usersService)
       responses:
@@ -1251,7 +1300,7 @@ paths:
   # newsfeed begin
   /newsfeed/v1/posts/:
     get:
-      description: Get posts list. Available only for authorized users.
+      description: Get posts list
       tags:
         - newsFeedService
       parameters:
@@ -1292,7 +1341,7 @@ paths:
         - bearerAuth: [ ]
     post:
       description: >
-        Create post. Available only for authorized users.
+        Create post
 
 
         Use one of `fileIds` or `uploadId` to bind earlier uploaded files to the post that is going to be created.
@@ -1366,7 +1415,7 @@ paths:
   # tasks begin
   /tasks/v1/tasks/:
     get:
-      description: Get available tasks list. Available only for authorized users.
+      description: Get available tasks list
       tags:
         - tasksService
       parameters:
@@ -1426,7 +1475,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create task. Available only for authorized users.
+      summary: Create task
+      description: Create task
       tags:
         - tasksService
       requestBody:
@@ -1543,7 +1593,8 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/denial/:
     post:
-      description: Abandoning a task. Available only for authorized users.
+      summary: Abandoning a task
+      description: Abandoning a task
       tags:
         - tasksService
       parameters:
@@ -1563,7 +1614,8 @@ paths:
 
   /tasks/v1/stages/:
     get:
-      description: Get canban stages. Available only for authorized users.
+      summary: Get kanban stages
+      description: Get kanban stages
       tags:
         - tasksService
       responses:
@@ -1584,7 +1636,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create canban stage. Available only for authorized users.
+      summary: Create kanban stage
+      description: Create kanban stage
       tags:
         - tasksService
       requestBody:
@@ -1615,7 +1668,8 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/:
     get:
-      description: Get canban stage by id. Available only for authorized users.
+      summary: Get kanban stage by id
+      description: Get kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1632,7 +1686,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update canban stage by id. Available only for authorized users.
+      summary: Update kanban stage by id
+      description: Update kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1664,7 +1719,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Create comment for task. Available only for authorized users.
+      summary: Delete kanban stage by id
+      description: Create kanban stage by id
       tags:
         - tasksService
       parameters:
@@ -1701,7 +1757,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/taskId'
     get:
-      description: Get comments task by id. Available only for authorized users and users who have access to task.
+      summary: Get checklist by task id
+      description: Get checklist by task id. Available only for authorized users and users who have access to task.
       tags:
         - tasksService
       responses:
@@ -1727,7 +1784,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create check list for task. Available only for authorized users and users who have access to task.
+      summary: Create checklist for task
+      description: Create checklist for task. Available only for authorized users and users who have access to task.
       tags:
         - tasksService
       requestBody:
@@ -1754,7 +1812,8 @@ paths:
       - $ref: '#/components/parameters/taskId'
       - $ref: '#/components/parameters/checkListId'
     patch:
-      description: Update check list for task. Available only for authorized users.
+      summary: Update checklist for task
+      description: Update checklist for task
       tags:
         - tasksService
       requestBody:
@@ -1777,7 +1836,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Delete check list to task by id. Available only for authorized users.
+      summary: Delete checklist from task by id
+      description: Delete checklist from task by id
       tags:
         - tasksService
       responses:
@@ -1792,7 +1852,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/checkListId'
     get:
-      description: Get items check list by id. Available only for authorized users.
+      summary: Get checklist items by id
+      description: Get checklist items by id
       tags:
         - tasksService
       responses:
@@ -1808,7 +1869,7 @@ paths:
                       properties:
                         id:
                           type: string
-                          description: Check list item id
+                          description: checklist item id
                           example: 1
                     - $ref: '#/components/schemas/CheckListItem'
 
@@ -1817,7 +1878,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create item check list for task. Available only for authorized users.
+      summary: Create checklist for task
+      description: Create checklist for task
       tags:
         - tasksService
       requestBody:
@@ -1837,7 +1899,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        description: Check list item id
+                        description: checklist item id
                         example: 1
                   - $ref: '#/components/schemas/CheckListItem'
 
@@ -1850,7 +1912,7 @@ paths:
       - $ref: '#/components/parameters/checkListId'
       - $ref: '#/components/parameters/checkListItemId'
     delete:
-      description: Delete item to check list by id. Available only for authorized users.
+      description: Delete item to checklist by id
       tags:
         - tasksService
       responses:
@@ -1862,7 +1924,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update check list for task. Available only for authorized users.
+      description: Update checklist for task
       tags:
         - tasksService
       requestBody:
@@ -1882,7 +1944,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        description: Check list item id
+                        description: checklist item id
                         example: 1
                   - $ref: '#/components/schemas/CheckListItem'
 
@@ -2130,7 +2192,7 @@ paths:
 
   /tasks/v1/settings/:
     get:
-      description: Get available settings list. Available only for authorized users.
+      description: Get available settings list
       tags:
         - tasksService
       parameters:
@@ -2605,7 +2667,7 @@ paths:
   # group begin
   /groups/v1/groups/:
     get:
-      description: Get posts list. Available only for authorized users.
+      description: Get posts list
       tags:
         - groupService
       parameters:
@@ -2649,7 +2711,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create group. Available only for authorized users.
+      description: Create group
       tags:
         - groupService
       requestBody:
@@ -2682,7 +2744,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     get:
-      description: Shows the group info. Available only for authorized users.
+      description: Shows the group info
       tags:
         - groupService
       responses:
@@ -4730,14 +4792,14 @@ components:
     checkListId:
       name: checkListId
       in: path
-      description: Check List id
+      description: checklist id
       required: true
       schema:
         type: string
     checkListItemId:
       name: checkListItemId
       in: path
-      description: Check List item id
+      description: checklist item id
       required: true
       schema:
         type: string
@@ -5766,18 +5828,18 @@ components:
       properties:
         title:
           type: string
-          example: New check list
+          example: New checklist
 
     CheckList:
       type: object
       properties:
         id:
           type: string
-          description: Check list id
+          description: checklist id
           example: 1
         title:
           type: string
-          example: New check list
+          example: New checklist
 
     CheckListItem:
       type: object
