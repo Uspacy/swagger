@@ -177,6 +177,12 @@ body {
 	}
 }
 
+@media (max-width: 1800px) {
+	.circle {
+		right: calc(100% - 70%);
+	}
+}
+
 @media (max-width: 1400px) {
 	.text-container {
 		gap: 25px;
@@ -192,6 +198,11 @@ body {
 
 	.footer {
 		height: 60px;
+	}
+
+	.circle {
+		right: calc(100% - 79%);
+		top: 34.5%;
 	}
 }
 
@@ -227,6 +238,7 @@ body {
 @media (max-width: 768px) {
 	.circle {
 		right: 0;
+		top: 42%;
 	}
 
 	.content {
