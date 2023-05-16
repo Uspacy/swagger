@@ -168,6 +168,10 @@ body {
 }
 
 @media (max-width: 2600px) {
+	.right-block {
+		padding-bottom: 0;
+	}
+
 	.circle {
 		right: calc(100% - 55%);
 	}
