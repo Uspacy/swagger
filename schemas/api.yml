@@ -8,7 +8,7 @@ info:
     To use this API you need to get Bearer token. To get Bearer token you have two options:
       - sign in on user's Uspacy using email and password
       - create Marketplace application and get token in callback after your application was installed by user
-    
+
     # SDKs and boilerplates
     We provide SDKs for different languages to simplify integration with Uspacy API. You can find them on [Uspacy GitHub](https://github.com/Uspacy/)
     We have also prepared a few boilerplates to help you start developing your application
@@ -4350,6 +4350,36 @@ paths:
       security:
         - bearerAuth: [ ]
 
+  /crm/v1/entities/{entity}/{itemId}/related/{entity_code}:
+    parameters:
+      - $ref: '#/components/parameters/entity'
+      - $ref: '#/components/parameters/itemId'
+      - $ref: '#/components/parameters/entity_code'
+    get:
+      description: Get available  crm entity items list. Available only for admin users.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/CrmEntity'
+                        - $ref: '#/components/schemas/CrmEAdditionalFields'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
   # crm end
 
 
@@ -4906,6 +4936,13 @@ components:
       name: call_event_id
       in: path
       description: call event id
+      required: true
+      schema:
+        type: string
+    entity_code:
+      name: entity_code
+      in: path
+      description: entity code
       required: true
       schema:
         type: string
