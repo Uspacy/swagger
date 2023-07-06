@@ -7865,6 +7865,12 @@ components:
         article:
           type: string
           example: ART 123456789
+        type:
+          type: string
+          example: goods
+          enum:
+            - goods
+            - service
         is_active:
           type: boolean
           example: true
