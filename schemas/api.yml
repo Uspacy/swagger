@@ -4380,6 +4380,279 @@ paths:
       security:
         - bearerAuth: [ ]
 
+  /crm/v1/static/product-categories/:
+    get:
+      description: Get all product categories in tree view.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductCategory'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create product category.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCategoryDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCategory'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/static/product-categories/{itemId}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Get product category.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCategory'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Edit product category.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCategoryDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCategory'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete product category.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /crm/v1/static/measurement-units/:
+    get:
+      description: Get all measurement units.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MeasurementUnit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create measurement unit.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeasurementUnit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementUnit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/static/measurement-units/{itemId}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Get measurement unit.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementUnit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Update measurement unit.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeasurementUnit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementUnit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete measurement unit.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /crm/v1/static/products/:
+    get:
+      description: Get products paginated list.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create product.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/static/products{itemId}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Get product.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Update product.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete product.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
   # crm end
 
 
@@ -7510,6 +7783,125 @@ components:
           example: George Everest
           type: string
       type: object
+
+    ProductCategory:
+      properties:
+        id:
+          type: integer
+          example: 2
+        parent_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Main category
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+        child_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCategory'
+
+    ProductCategoryDto:
+      properties:
+        parent_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Laptops
+        is_active:
+          type: boolean
+          example: true
+
+    MeasurementUnit:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Kilograms
+        abbr:
+          type: string
+          example: Kg
+        is_default:
+          type: boolean
+          example: true
+
+    ProductPrice:
+      properties:
+        price:
+          type: integer
+          example: 10000
+        currency:
+          type: string
+          example: USD
+        is_default:
+          type: boolean
+          example: true
+
+    Product:
+      properties:
+        id:
+          type: integer
+          example: 1
+        product_category_id:
+          type: integer
+          example: 1
+        measurement_unit_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Some laptop
+        article:
+          type: string
+          example: ART 123456789
+        is_active:
+          type: boolean
+          example: true
+        availability:
+          type: string
+          example: available
+          enum:
+            - available
+            - not_available
+            - pending
+        quantity:
+          type: number
+          example: 1.0001
+        reserved_quantity:
+          type: number
+          example: 0.0001
+        description:
+          type: string
+          example: Some product description
+        comment:
+          type: string
+          example: Some product comment
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+        product_category:
+          $ref: '#/components/schemas/ProductCategory'
+        measurement_unit:
+          $ref: '#/components/schemas/MeasurementUnit'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductPrice'
+
     # crm end
 
 
