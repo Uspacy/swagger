@@ -4659,26 +4659,32 @@ paths:
           description: Search by availability
           required: false
           schema:
-            type: string
-            enum:
-              - available
-              - not_available
-              - pending
+            type: array
+            items:
+              type: string
+              enum:
+                - available
+                - not_available
+                - pending
         - name: type
           in: query
           description: Search by type
           required: false
           schema:
-            type: string
-            enum:
-              - goods
-              - service
+            type: array
+            items:
+              type: string
+              enum:
+                - goods
+                - service
         - name: is_active
           in: query
           description: Get by activation status
           required: false
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
         - name: balance_from
           in: query
           description: Get only if balance more than value
