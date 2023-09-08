@@ -4891,7 +4891,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/lits-products/{itemID}:
+  /crm/v1/static/list-products/{itemID}:
     get:
       description: Get list product.
       tags:
@@ -4938,7 +4938,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/static/lits-products/bulk:
+  /crm/v1/static/list-products/bulk:
     patch:
       description: Mass update list products.
       tags:
