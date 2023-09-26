@@ -4995,6 +4995,21 @@ paths:
       tags:
         - crmService
       parameters:
+        - description: current page
+          in: query
+          example: 1
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - description: how many items should be per page
+          name: list
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 20
+          example: 10
         - description: Filter by entities
           in: query
           name: binding_entities
