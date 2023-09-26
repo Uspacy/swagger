@@ -4890,7 +4890,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-
   /crm/v1/static/list-products/{itemID}:
     get:
       description: Get list product.
@@ -4984,10 +4983,284 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  # crm end
+
+  # documents module begin
 
 
-  # search begin
+  # documents template begin
+
+  /crm/v1/documents/templates:
+    get:
+      description: Get document templates list
+      tags:
+        - crmService
+      parameters:
+        - description: Filter by entities
+          in: query
+          name: bindingEntities
+          schema:
+            type: array
+            items:
+              type: number
+          example: [23132,12124,3423]
+        - description: Search by name
+          in: query
+          name: search
+        - description: Filter by active
+          in: query
+          name: isActive
+        - description: Filter by date create, first element from date, second element to date
+          in: query
+          name: createBetween
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ 2023-09-21, 2023-09-22 ]
+        - description: Filter by date update, first element from date, second element to date
+          in: query
+          name: updateBetween
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ 2023-09-21, 2023-09-22 ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentTemplate'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create new document template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentTemplate'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Update document template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentTemplate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Mass delete document templates by IDs
+      tags:
+        - crmService
+      parameters:
+        - description: Array of list document templates IDs
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          name: list_document_templates
+      responses:
+        '204':
+          description: No content
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/templates/fields:
+    get:
+      description: Get document available fields list
+      tags:
+        - crmService
+      parameters:
+        - description: Filter fields by entities
+          in: query
+          name: bindingEntities
+          schema:
+            type: array
+            items:
+              type: number
+        - description: Search by field name
+          in: query
+          schema:
+            type: string
+          name: search
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentTemplateField'
+      security:
+        - bearerAuth: [ ]
+
+  # documents template end
+
+
+  # documents begin
+
+  /crm/v1/documents:
+    get:
+      description: Get documents list of entity
+      tags:
+        - crmService
+      parameters:
+        - description: Entity type
+          in: query
+          schema:
+            type: string
+          name: entityType
+        - description: Entity id
+          in: query
+          schema:
+            type: integer
+          name: entityId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Generate new document for entity
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocument'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/{documentId}:
+    parameters:
+      - description: Document id
+        in: path
+        name: documentId
+        schema:
+          type: integer
+    patch:
+      description: Update document
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromDate:
+                  type: string
+                number:
+                  type: string
+                sign:
+                  type: boolean
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/{documentId}/fields:
+    parameters:
+      - description: Document id
+        in: path
+        name: documentId
+        schema:
+          type: integer
+    get:
+      description: Getting filled fields of document
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                      example: 'Date created'
+                    symbolCode:
+                      type: string
+                      example: '{LeadDateCreate}'
+                    value:
+                      type: string
+                      example: '2023-09-20'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Fill fields of document new values
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  symbolCode:
+                    required: true
+                    example: '{LeadDateCreate}'
+                    type: string
+                  value:
+                    required: true
+                    type: string
+                    example: '2023-09-22'
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+
+  # documents end
+
+
+  # documents module end
+
+
   /search/v1/search:
     parameters:
       - description: Name search by q
@@ -8334,7 +8607,180 @@ components:
           example: 1500
         product:
           $ref: '#/components/schemas/Product'
-
+    DocumentTemplate:
+        type: object
+        properties:
+          name:
+            type: string
+            required: true
+          isActive:
+            type: boolean
+            required: true
+          file:
+            type: object
+            properties:
+              name:
+                type: string
+              size:
+                type: string
+              extension:
+                type: string
+              downloadLink:
+                type: string
+          bindingEntities:
+            type: array
+            items:
+              type: object
+              properties:
+                entityId:
+                  type: number
+                  required: true
+                  example: 123
+                funnels:
+                  type: array
+                  items:
+                    type: number
+                    example: 1
+          createdAt:
+            type: string
+          updatedAt:
+            type: string
+          createdBy:
+            type: integer
+            description: User who created
+          updatedBy:
+            type: integer
+            description: User who updated
+    CreateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        isActive:
+          type: boolean
+          required: true
+        file:
+          type: string
+          format: binary
+        bindingEntities:
+          type: array
+          items:
+            type: object
+            properties:
+              entityId:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+    UpdateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        isActive:
+          type: boolean
+        file:
+          type: string
+          format: binary
+        bindingEntities:
+          type: array
+          items:
+            type: object
+            properties:
+              entityId:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+    DocumentTemplateField:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Дата створення'
+        entity:
+          type: string
+          example: 'Угоди'
+        symbolCode:
+          type: string
+          example: '{DealDateCreate}'
+    CreateDocument:
+      type: object
+      properties:
+        entityType:
+          type: string
+          required: true
+          example: 'leads'
+        entityId:
+          type: integer
+          required: true
+          example: '3425'
+        templateId:
+          type: integer
+          required: true
+          example: 2
+    Document:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+          example: 'Рахунок на оплату 05.07.23 №1'
+          description: Template name + document number
+        createdDate:
+          type: string
+          required: true
+          example: '2023-09-21'
+        updatedDate:
+          type: string
+          required: true
+          example: '2023-09-21'
+        fromDate:
+          type: string
+          required: true
+          example: '2023-09-20'
+          description: Custom edition date, default = dateCreated
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              format:
+                type: string
+                enum: [ PDF, DOCX ]
+                description: New formats will be added in the future
+                example: 'PDF'
+              links:
+                type: object
+                properties:
+                  internal:
+                    type: string
+                    description: Internal link for download & preview
+                  external:
+                    type: string
+                    description: External download link for clients
+        number:
+          type: string
+          description: Editing number of document
+        sign:
+          type: boolean
+          default: false
+          description: Signature and seal
+        createdBy:
+          type: integer
+          description: User who created
+        updatedBy:
+          type: integer
+          description: User who updated
     # crm end
 
 
