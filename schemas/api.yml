@@ -4997,7 +4997,7 @@ paths:
       parameters:
         - description: Filter by entities
           in: query
-          name: bindingEntities
+          name: binding_entities
           schema:
             type: array
             items:
@@ -5008,10 +5008,10 @@ paths:
           name: search
         - description: Filter by active
           in: query
-          name: isActive
+          name: is_active
         - description: Filter by date create, first element from date, second element to date
           in: query
-          name: createBetween
+          name: create_between
           schema:
             type: array
             items:
@@ -5019,7 +5019,7 @@ paths:
             example: [ 2023-09-21, 2023-09-22 ]
         - description: Filter by date update, first element from date, second element to date
           in: query
-          name: updateBetween
+          name: update_between
           schema:
             type: array
             items:
@@ -5031,9 +5031,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DocumentTemplate'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentTemplate'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
       security:
         - bearerAuth: [ ]
     post:
@@ -5097,7 +5102,7 @@ paths:
       parameters:
         - description: Filter fields by entities
           in: query
-          name: bindingEntities
+          name: binding_entities
           schema:
             type: array
             items:
@@ -5134,12 +5139,12 @@ paths:
           in: query
           schema:
             type: string
-          name: entityType
+          name: entity_type
         - description: Entity id
           in: query
           schema:
             type: integer
-          name: entityId
+          name: entity_id
       responses:
         '200':
           description: OK
@@ -5173,7 +5178,7 @@ paths:
     parameters:
       - description: Document id
         in: path
-        name: documentId
+        name: document_id
         schema:
           type: integer
     patch:
@@ -5186,7 +5191,7 @@ paths:
             schema:
               type: object
               properties:
-                fromDate:
+                from_date:
                   type: string
                 number:
                   type: string
@@ -5201,7 +5206,7 @@ paths:
     parameters:
       - description: Document id
         in: path
-        name: documentId
+        name: document_id
         schema:
           type: integer
     get:
@@ -5221,7 +5226,7 @@ paths:
                     label:
                       type: string
                       example: 'Date created'
-                    symbolCode:
+                    symbol_code:
                       type: string
                       example: '{LeadDateCreate}'
                     value:
@@ -5241,7 +5246,7 @@ paths:
               items:
                 type: object
                 properties:
-                  symbolCode:
+                  symbol_code:
                     required: true
                     example: '{LeadDateCreate}'
                     type: string
@@ -8613,7 +8618,7 @@ components:
           name:
             type: string
             required: true
-          isActive:
+          is_active:
             type: boolean
             required: true
           file:
@@ -8625,14 +8630,14 @@ components:
                 type: string
               extension:
                 type: string
-              downloadLink:
+              download_link:
                 type: string
-          bindingEntities:
+          binding_entities:
             type: array
             items:
               type: object
               properties:
-                entityId:
+                entity_id:
                   type: number
                   required: true
                   example: 123
@@ -8641,14 +8646,14 @@ components:
                   items:
                     type: number
                     example: 1
-          createdAt:
+          created_at:
             type: string
-          updatedAt:
+          updated_at:
             type: string
-          createdBy:
+          created_by:
             type: integer
             description: User who created
-          updatedBy:
+          updated_by:
             type: integer
             description: User who updated
     CreateDocumentTemplate:
@@ -8657,18 +8662,18 @@ components:
         name:
           type: string
           required: true
-        isActive:
+        is_active:
           type: boolean
           required: true
         file:
           type: string
           format: binary
-        bindingEntities:
+        binding_entities:
           type: array
           items:
             type: object
             properties:
-              entityId:
+              entity_id:
                 type: number
                 required: true
                 example: 123
@@ -8682,17 +8687,17 @@ components:
       properties:
         name:
           type: string
-        isActive:
+        is_active:
           type: boolean
         file:
           type: string
           format: binary
-        bindingEntities:
+        binding_entities:
           type: array
           items:
             type: object
             properties:
-              entityId:
+              entity_id:
                 type: number
                 required: true
                 example: 123
@@ -8710,21 +8715,21 @@ components:
         entity:
           type: string
           example: 'Угоди'
-        symbolCode:
+        symbol_code:
           type: string
           example: '{DealDateCreate}'
     CreateDocument:
       type: object
       properties:
-        entityType:
+        entity_type:
           type: string
           required: true
           example: 'leads'
-        entityId:
+        entity_id:
           type: integer
           required: true
           example: '3425'
-        templateId:
+        template_id:
           type: integer
           required: true
           example: 2
@@ -8736,15 +8741,15 @@ components:
           required: true
           example: 'Рахунок на оплату 05.07.23 №1'
           description: Template name + document number
-        createdDate:
+        created_date:
           type: string
           required: true
           example: '2023-09-21'
-        updatedDate:
+        updated_date:
           type: string
           required: true
           example: '2023-09-21'
-        fromDate:
+        from_date:
           type: string
           required: true
           example: '2023-09-20'
@@ -8775,10 +8780,10 @@ components:
           type: boolean
           default: false
           description: Signature and seal
-        createdBy:
+        created_by:
           type: integer
           description: User who created
-        updatedBy:
+        updated_by:
           type: integer
           description: User who updated
     # crm end
