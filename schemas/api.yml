@@ -8681,6 +8681,22 @@ components:
                   items:
                     type: number
                     example: 1
+          access:
+            type: object
+            properties:
+              departments:
+                type: array
+                items:
+                  description: Department id
+                  type: integer
+              users:
+                type: array
+                items:
+                  description: User id
+                  type: integer
+          numerator_id:
+            type: integer
+            required: true
           created_at:
             type: string
           updated_at:
