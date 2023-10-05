@@ -5301,6 +5301,345 @@ paths:
   # documents module end
 
 
+  # Requisites begin
+  /requisites/regions:
+    get:
+      description: Get available regions for requisites
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    code:
+                      type: string
+      security:
+        - bearerAuth: [ ]
+  /requisites/templates:
+    get:
+      description: Get requisite templates
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        allOf:
+                          - $ref: '#/components/schemas/RequisiteTemplate'
+                          - type: object
+                            properties:
+                              created_at:
+                                type: string
+                              updated_at:
+                                type: string
+                              created_by:
+                                type: integer
+                              updated_by:
+                                type: integer
+                    meta:
+                      $ref: '#/components/schemas/Meta'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create requisite template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisiteTemplate'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RequisiteTemplate'
+                  - type: object
+                    properties:
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      created_by:
+                        type: integer
+                      updated_by:
+                        type: integer
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/templates/{requisite_id}:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+    patch:
+      description: Update requisite template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisiteTemplate'
+      responses:
+        '200':
+          description: OK
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete requisite template
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: OK
+        '409':
+          description: Conflict, The template has requisites with it
+      security:
+        - bearerAuth: [ ]
+
+  /requisites:
+    get:
+      description: Get requisites
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Requisite'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequisite'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id}:
+    get:
+      description: Get requisite by id
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+      security:
+        - bearerAuth: [ ]
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+    patch:
+      description: Update requisite by id
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequisite'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete requisite by id
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id}/bank_requisites:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+        required: true
+    get:
+      description: Bank requisites
+      tags:
+        - crmService
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/BankRequisite'
+                    - type: object
+                      properties:
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                        created_by:
+                          type: integer
+                        updated_by:
+                          type: integer
+    post:
+      description: Create bank requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankRequisite'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BankRequisite'
+                  - type: object
+                    properties:
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      created_by:
+                        type: integer
+                      updated_by:
+                        type: integer
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id/bank_requisites}/{bank_requisite_id}:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+        required: true
+      - description: Bank requisite id
+        in: path
+        schema:
+          type: integer
+        name: bank_requisite_id
+        required: true
+    patch:
+      description: Update bank requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankRequisite'
+      responses:
+        '200':
+          description: OK
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete bank requisite
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+
+  # Requisites end
+
+
+
+
   /search/v1/search:
     parameters:
       - description: Name search by q
@@ -8869,7 +9208,120 @@ components:
         updated_by:
           type: integer
           description: User who updated
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    BankRequisite:
+      type: object
+      properties:
+        name:
+          type: string
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [ string ]
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [ string, array, object ]
+                  description: Field code => field value
+    CreateRequisite:
+      type: object
+      properties:
+        name:
+          type: string
+        template_id:
+          type: integer
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            field_code:
+              enum: [ string, array, object ]
+              description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankRequisite'
+    Requisite:
+      type: object
+      properties:
+        name:
+          type: string
+        is_basic:
+          type: boolean
+        template_id:
+          type: integer
+        fields:
+          description: Fields list
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [ datetime, string, integer, boolean, file ]
+
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [ string, array, object ]
+                  description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankRequisite'
+
+    RequisiteTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Name of requisite
+        region:
+          type: object
+          properties:
+            name:
+              type: string
+            code:
+              type: string
+        fields:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Field'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [ datetime, string, integer, boolean, file ]
+
+
     # crm end
+
 
 
     # search begin
