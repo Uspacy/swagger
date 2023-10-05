@@ -18,17 +18,26 @@ info:
 
     # Marketplace applications development
     To develop Marketplace application you need to create an application in Uspacy Marketplace. You can do it via request to [Uspacy support](mailto:support@uspacy.com).
-    You will receive ```client_id``` and ```client_secret``` for your application. You will also need to provide ```callback_uri``` for your application.
-    After user installs your application you will receive POST request with json in callback. It will contain ```jwt``` token and ```refreshToken```.
+    You will receive ```client_id``` and ```client_secret``` for your application. You will also need to provide ```callback_url``` for your application.
+    After that, the install/uninstall endpoints for your applications should be implemented. Please note that the path for these endpoints should follow this format:
+    ```{{callback_url}}/portals/install``` and ```{{callback_url}}/portals/uninstall```, respectively.
+    For example, if your ```callback_url``` is ```https://google.com/handler/v1```, we will send webhook to ```https://google.com/handler/v1/portals/install``` on install and ```https://google.com/handler/v1/portals/uninstall``` on uninstall.
+    After a user installs your application, you will receive a POST request with JSON in the callback.
+    This will contain the ```token```, ```refresh_token```, and ```expiry_date``` fields.
+    Additionally, the ```integration_token``` will be provided as a Bearer token in the Authorization header.
+    It is signed using the ```client_secret``` and the SHA-256 algorithm. All future requests from your application's frontend to its backend should be secured with the ```integration_token```.
+    The ```integration_token``` is accessible through using the [appService](#tag/appService) for users with administrative rights.
     Example of request:
     ```json
     {
-      "expireInSeconds": 720,
-      "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w"
+      "expiry_date": 1683649235,
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w"
     }
     ```
-    You need to save ```jwt``` and ```refreshToken``` in your database. You will need to use ```jwt``` to make requests to Uspacy API. ```refreshToken``` is used to refresh ```jwt``` token when it expires. You should refresh ```jwt``` token before it expires. You can do it by making POST request to ```https://auth.uspacy.com/api/v1/auth/refresh_token/``` with ```refreshToken``` in body. You will receive new ```jwt``` and ```refreshToken``` in response. You need to save new ```jwt``` and ```refreshToken``` in your database.
+    You need to save ```token```, ```refresh_token``` and ```expiry_date```  in your database. You will need to use ```token``` to make requests to Uspacy API. ```refresh_token``` is used to refresh ```token``` when it expires.
+    You should refresh the ```token``` before it expires. To do this, make a POST request to ```https://{domain}/auth/v1/auth/refresh_token/``` with the ```refresh_token``` in the body. The ```domain``` refers to the portal's domain that you received from the user's token headers upon application installation.
+    You will receive new ```jwt```, ```refreshToken``` and ```expireInSeconds``` in response. You need to save new ```token```, ```refresh_token``` and update ```expiry_date``` in your database.
 
 
   title: Uspacy api
