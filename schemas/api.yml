@@ -7247,10 +7247,11 @@ components:
                     type: array
                     items:
                       type: string
-                      example: join request not found
+                    default:
+                      - join request not found
               status:
                 type: boolean
-                example: true
+                default: false
 
     # group end
 
