@@ -1,4 +1,4 @@
-openapi: '3.0.1'
+openapi: '3.1.0'
 info:
   description: |
     This is [Uspacy](https://uspacy.com)  API documentation. You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
@@ -257,7 +257,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password/:
+  /auth/v1/users/me/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -376,8 +376,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryUsers'
-        - $ref: '#/components/parameters/filterUsers'
       responses:
         '200':
           description: OK
@@ -461,7 +459,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/activate/:
+  /company/v1/users/{userId}/activate:
     post:
       description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
       tags:
@@ -481,7 +479,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/update_roles/:
+  /company/v1/users/{userId}/update_roles:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
       tags:
@@ -508,7 +506,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/update_position/:
+  /company/v1/users/{userId}/update_position:
     patch:
       description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
       tags:
@@ -536,7 +534,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/users/{userId}/settings/:
+  /company/v1/users/{userId}/settings:
     get:
       tags:
         - usersService
@@ -673,6 +671,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
+          description: 'The code has expired'
           content:
             application/json:
               schema:
@@ -708,7 +707,7 @@ paths:
         - bearerAuth: [ ]
 
 
-  /company/v1/users/search/:
+  /company/v1/users/search:
     get:
       description: Search
       tags:
@@ -855,8 +854,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryDepartments'
-        - $ref: '#/components/parameters/filterDepartments'
       responses:
         '200':
           description: OK
@@ -1430,40 +1427,49 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: parent_id
+        - in: query
+          name: parent_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
         - in: query
           name: q
           description: Text search pattern
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: status
-              example: [ "suspended", "not_planned" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: setter_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: responsible_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: accomplices
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: group_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: priority
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: deadline
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "suspended", "not_planned" ]
+        - in: query
+          name: setter_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: responsible_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: accomplices
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: group_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: priority
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: deadline
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
 
       responses:
         '200':
@@ -2490,25 +2496,27 @@ paths:
       parameters:
         - name: entity_type
           in: query
-          allOf:
-            - $ref: '#/components/parameters/entityType'
-            - description: >
-                Entity type name.
-                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-                And only the child comments are being sent in this case.
-                Use along with `childList` and `lastId` to paginate the child comments.
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: '#/components/parameters/entityType/schema'
         - $ref: '#/components/parameters/entityId'
-        - allOf:
-            - $ref: '#/components/parameters/list'
-            - description: >
-                Use this to define the number of top level comments to retrieve.
-                Retrieve all if missing or retrieve the rest if `nextId` is present.
-            - example: 3
-            - default: 3
-            - required: false
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: '#/components/parameters/list/schema'
+          example: 3
+
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
+
       responses:
         '200':
           description: Successful response
@@ -2560,25 +2568,27 @@ paths:
       parameters:
         - name: entity_type
           in: query
-          allOf:
-            - $ref: '#/components/parameters/entityType'
-            - description: >
-                Entity type name.
-                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-                And only the child comments are being sent in this case.
-                Use along with `childList` and `lastId` to paginate the child comments.
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: '#/components/parameters/entityType/schema'
         - $ref: '#/components/parameters/entityIds'
-        - allOf:
-            - $ref: '#/components/parameters/list'
-            - description: >
-                Use this to define the number of top level comments to retrieve.
-                Retrieve all if missing or retrieve the rest if `nextId` is present.
-            - example: 3
-            - default: 3
-            - required: false
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: '#/components/parameters/list/schema'
+          example: 3
+
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
+
       responses:
         '200':
           description: Successful response
@@ -3126,7 +3136,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          $ref: '#/components/schemas/JoinRequestNotFound'
+          $ref: '#/components/responses/JoinRequestNotFound'
     delete:
       description: Decline private group join request
       tags:
@@ -3141,7 +3151,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          $ref: '#/components/schemas/JoinRequestNotFound'
+          $ref: '#/components/responses/JoinRequestNotFound'
       security:
         - bearerAuth: [ ]
   # groups end
@@ -3483,23 +3493,28 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: company_label
-              example: [ "partner", "competitor" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
+        - in: query
+          name: company_label
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "partner", "competitor" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
       responses:
         '200':
           description: OK
@@ -3534,23 +3549,29 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: contact_label
-              example: [ "partner", "competitor" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
+        - in: query
+          name: contact_label
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "partner", "competitor" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+
       responses:
         '200':
           description: OK
@@ -3585,29 +3606,35 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: kanban_status
-              example: [ "FAIL", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-              example: [ "NEW", "SUCCESS" ]
+        - in: query
+          name: kanban_status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "FAIL", "SUCCESS" ]
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+          example: [ "NEW", "SUCCESS" ]
         - in: query
           name: funnel_id
           description: filter by funnel id
           schema:
             type: integer
           example: 12
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: tasks
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: tasks
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+
       responses:
         '200':
           description: OK
@@ -3642,24 +3669,29 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: kanban_status
-              example: [ "FAIL", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-              example: [ "NEW", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
+        - in: query
+          name: kanban_status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "FAIL", "SUCCESS" ]
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+          example: [ "NEW", "SUCCESS" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
       responses:
         '200':
           description: OK
@@ -3785,35 +3817,45 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: status
-              example: [ "planned", "done" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: type
-              example: [ "call", "meeting" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: start_time
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: responsible_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: participants
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: company_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: contacts
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: leads
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "planned", "done" ]
+        - in: query
+          name: type
+          schema:
+            $ref: '#/components/parameters/filter_string_enum/schema'
+          example: [ "call", "meeting" ]
+        - in: query
+          name: start_time
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
+        - in: query
+          name: responsible_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: participants
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: company_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: contacts
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+        - in: query
+          name: leads
+          schema:
+            $ref: '#/components/parameters/filter_number_enum/schema'
+
       responses:
         '200':
           description: OK
@@ -5002,6 +5044,8 @@ paths:
       - description: Name search by q
         in: query
         name: q
+        schema:
+          type: string
     get:
       description: Search data from all services
       responses:
@@ -5030,14 +5074,17 @@ paths:
   # fileimport begin
   /fileimport/v1/csv-import:
     post:
-      parameters:
-        - name: file
-          in: formData
-          type: file
-        - name: data
-          in: formData
-          type: string
-
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                data:
+                  type: string
       responses:
         '200':
           description: OK
@@ -5173,6 +5220,25 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    JoinRequestNotFound:
+      description: Join request not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  text:
+                    type: array
+                    items:
+                      type: string
+                    default:
+                      - join request not found
+              status:
+                type: boolean
+                default: false
 
     # search serivce
     SearchErrorMessage:
@@ -5341,44 +5407,6 @@ components:
       style: deepObject
       schema:
         type: object
-    filterUsers:
-      allOf:
-        - $ref: '#/components/parameters/filter'
-        - type: object
-          description: Fields, corresponding to the available list of fields user.
-          example:
-            email: rar.stas@gmail.com
-            firstName: Stas
-            lastName: Raranetskyi
-            phone: "+3801234567"
-            position: CTO
-            active: true
-            departmentsIds: [ "1111", "2222" ]
-            roles:
-              - OWNER
-              - ADMIN
-    queryUsers:
-      allOf:
-        - $ref: '#/components/parameters/query'
-        - type: string
-          description: Search by email, firstName, lastName
-          example: rar.stas@gmail.com
-    filterDepartments:
-      allOf:
-        - $ref: '#/components/parameters/filter'
-        - type: object
-          description: Fields, corresponding to the available list of fields department.
-          example:
-            name: "Frontend department"
-            headId: "1111"
-            parentDepartmentId: "1111"
-            usersIds: [ "1111", "2222", "3333" ]
-    queryDepartments:
-      allOf:
-        - $ref: '#/components/parameters/query'
-        - type: string
-          description: Search by name department
-          example: Frontend department
     postId:
       name: postId
       in: path
@@ -5451,7 +5479,6 @@ components:
       name: entityType
       schema:
         $ref: '#/components/schemas/EntityTypes'
-      required: true
       description: Entity type name
     entityId:
       in: query
@@ -5769,7 +5796,7 @@ components:
           type: string
           example: RWPIRBJCIUJITLPC
         qrCodeUri:
-          type: text
+          type: string
           example: "data:image/png;base64,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"
     TwoFactorStatusEnabled:
       type: object
@@ -6017,7 +6044,6 @@ components:
         lastName:
           type: string
           example: Stark
-          required: false
         domain:
           type: string
           example: stark
@@ -6170,11 +6196,6 @@ components:
               example:
                 - "1"
                 - "2"
-              examples:
-                arrayDepartmentsIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
             usersIds:
               type: array
               items:
@@ -6182,11 +6203,6 @@ components:
               example:
                 - "1"
                 - "2"
-              examples:
-                arrayUsersIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
         include:
           type: object
           description: A field by which you can include the viewing of a post for users and / or departments
@@ -6198,11 +6214,6 @@ components:
               example:
                 - "3"
                 - "4"
-              examples:
-                arrayDepartmentsIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
             usersIds:
               type: array
               items:
@@ -6210,11 +6221,6 @@ components:
               example:
                 - "3"
                 - "4"
-              examples:
-                arrayUsersIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
     CreatePostDto:
       type: object
       properties:
@@ -7244,24 +7250,6 @@ components:
             - "11"
             - "22"
 
-    JoinRequestNotFound:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              errors:
-                type: object
-                properties:
-                  text:
-                    type: array
-                    items:
-                      type: string
-                      example: join request not found
-              status:
-                type: boolean
-                example: true
-
     # group end
 
     # crm begin
@@ -7994,46 +7982,38 @@ components:
             type: string
             example: unitalk_integration
             description: It could be integration_code or unique code of source where data are imported from
-            required: true
         external_id:
           type: integer
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-          required: false
         tmp_id:
           type: integer
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-          required: false
         task_id:
           type: integer
           example: null
           description: If task_id is provided the task's creation for missed incoming call is passing away
-          required: false
         contact_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         company_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         lead_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         deal_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         entity_table:
           type: string
           description: The base entity the call event connected to could be provided or could be omitted in a case
@@ -8045,33 +8025,27 @@ components:
             - deals
             - contacts
             - companies
-          required: false
         employees:
           type: array
           description: Employees that have been dialed during the call. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         contacts:
           type: array
           description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         companies:
           type: array
           description: The companies that have connection with particulat call event. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         subject:
           type: string
           example: First call
           description: Could be omitted. In such case the default value will be "Call"
-          required: false
         call_type:
           type: string
           enum:
             - outgoing
             - incoming
-          required: true
         ended_call_status:
           type: string
           enum:
@@ -8085,33 +8059,30 @@ components:
         from:
           type: string
           example: 380632232232
-          required: true
         to:
           type: string
           example: null
           description: Could be null cause on new event call from telephony we don't have "to" value for sure
-          required: false
         begin_time:
           type: integer
           example: 1681893335
-          required: false
         end_time:
           type: integer
           example: 1681893685
-          required: false
         duration:
           type: integer
           example: 350
-          required: false
         call_record_link:
           type: string
           example: null
-          required: false
           description: It could be call link that telephony provides or link issued by import flow (via files-backend)
         note:
           type: string
           example: Fixed agenda
-          required: false
+      required: 
+        -  integration_code
+        -  call_type
+        -  from
 
 
     CallEventContacts:
