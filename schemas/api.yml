@@ -2496,25 +2496,28 @@ paths:
       parameters:
         - name: entity_type
           in: query
-          allOf:
-            - $ref: '#/components/parameters/entityType'
-            - description: >
-                Entity type name.
-                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-                And only the child comments are being sent in this case.
-                Use along with `childList` and `lastId` to paginate the child comments.
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: '#/components/parameters/entityType'
         - $ref: '#/components/parameters/entityId'
-        - allOf:
-            - $ref: '#/components/parameters/list'
-            - description: >
-                Use this to define the number of top level comments to retrieve.
-                Retrieve all if missing or retrieve the rest if `nextId` is present.
-            - example: 3
-            - default: 3
-            - required: false
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: '#/components/parameters/list'
+          example: 3
+          default: 3
+          required: false
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
+
       responses:
         '200':
           description: Successful response
@@ -2566,25 +2569,28 @@ paths:
       parameters:
         - name: entity_type
           in: query
-          allOf:
-            - $ref: '#/components/parameters/entityType'
-            - description: >
-                Entity type name.
-                If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-                And only the child comments are being sent in this case.
-                Use along with `childList` and `lastId` to paginate the child comments.
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: '#/components/parameters/entityType'
         - $ref: '#/components/parameters/entityIds'
-        - allOf:
-            - $ref: '#/components/parameters/list'
-            - description: >
-                Use this to define the number of top level comments to retrieve.
-                Retrieve all if missing or retrieve the rest if `nextId` is present.
-            - example: 3
-            - default: 3
-            - required: false
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: '#/components/parameters/list'
+          example: 3
+          default: 3
+          required: false
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
+
       responses:
         '200':
           description: Successful response
