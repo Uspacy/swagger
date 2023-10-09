@@ -257,7 +257,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password/:
+  /auth/v1/users/me/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -459,7 +459,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/activate/:
+  /company/v1/users/{userId}/activate:
     post:
       description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
       tags:
@@ -479,7 +479,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/update_roles/:
+  /company/v1/users/{userId}/update_roles:
     patch:
       description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
       tags:
@@ -506,7 +506,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/update_position/:
+  /company/v1/users/{userId}/update_position:
     patch:
       description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
       tags:
@@ -534,7 +534,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/users/{userId}/settings/:
+  /company/v1/users/{userId}/settings:
     get:
       tags:
         - usersService
@@ -707,7 +707,7 @@ paths:
         - bearerAuth: [ ]
 
 
-  /company/v1/users/search/:
+  /company/v1/users/search:
     get:
       description: Search
       tags:
@@ -2502,7 +2502,7 @@ paths:
             And only the child comments are being sent in this case.
             Use along with `childList` and `lastId` to paginate the child comments.
           schema:
-            $ref: '#/components/parameters/entityType'
+            $ref: '#/components/parameters/entityType/schema'
         - $ref: '#/components/parameters/entityId'
         - name: list
           in: query
@@ -2510,10 +2510,9 @@ paths:
             Use this to define the number of top level comments to retrieve.
             Retrieve all if missing or retrieve the rest if `nextId` is present.
           schema:
-            $ref: '#/components/parameters/list'
+            $ref: '#/components/parameters/list/schema'
           example: 3
-          default: 3
-          required: false
+
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
@@ -2575,7 +2574,7 @@ paths:
             And only the child comments are being sent in this case.
             Use along with `childList` and `lastId` to paginate the child comments.
           schema:
-            $ref: '#/components/parameters/entityType'
+            $ref: '#/components/parameters/entityType/schema'
         - $ref: '#/components/parameters/entityIds'
         - name: list
           in: query
@@ -2583,10 +2582,9 @@ paths:
             Use this to define the number of top level comments to retrieve.
             Retrieve all if missing or retrieve the rest if `nextId` is present.
           schema:
-            $ref: '#/components/parameters/list'
+            $ref: '#/components/parameters/list/schema'
           example: 3
-          default: 3
-          required: false
+
         - $ref: '#/components/parameters/childList'
         - $ref: '#/components/parameters/nextId'
         - $ref: '#/components/parameters/lastId'
@@ -3138,7 +3136,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          $ref: '#/components/schemas/JoinRequestNotFound'
+          $ref: '#/components/responses/JoinRequestNotFound'
     delete:
       description: Decline private group join request
       tags:
@@ -3153,7 +3151,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          $ref: '#/components/schemas/JoinRequestNotFound'
+          $ref: '#/components/responses/JoinRequestNotFound'
       security:
         - bearerAuth: [ ]
   # groups end
@@ -3856,7 +3854,7 @@ paths:
         - in: query
           name: leads
           schema:
-            $ref: '#/components/parameters/filter_number_enum/schema/'
+            $ref: '#/components/parameters/filter_number_enum/schema'
 
       responses:
         '200':
@@ -5222,6 +5220,25 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    JoinRequestNotFound:
+      description: Join request not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  text:
+                    type: array
+                    items:
+                      type: string
+                    default:
+                      - join request not found
+              status:
+                type: boolean
+                default: false
 
     # search serivce
     SearchErrorMessage:
@@ -7233,26 +7250,6 @@ components:
             - "11"
             - "22"
 
-    JoinRequestNotFound:
-      description: Join request not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              errors:
-                type: object
-                properties:
-                  text:
-                    type: array
-                    items:
-                      type: string
-                    default:
-                      - join request not found
-              status:
-                type: boolean
-                default: false
-
     # group end
 
     # crm begin
@@ -7985,46 +7982,38 @@ components:
             type: string
             example: unitalk_integration
             description: It could be integration_code or unique code of source where data are imported from
-            required: true
         external_id:
           type: integer
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-          required: false
         tmp_id:
           type: integer
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-          required: false
         task_id:
           type: integer
           example: null
           description: If task_id is provided the task's creation for missed incoming call is passing away
-          required: false
         contact_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         company_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         lead_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         deal_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
                        the automatic binding with existing crm entities is passing away
-          required: false
         entity_table:
           type: string
           description: The base entity the call event connected to could be provided or could be omitted in a case
@@ -8036,33 +8025,27 @@ components:
             - deals
             - contacts
             - companies
-          required: false
         employees:
           type: array
           description: Employees that have been dialed during the call. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         contacts:
           type: array
           description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         companies:
           type: array
           description: The companies that have connection with particulat call event. Could be omitted if don't have such information
           example: [1, 2, 3]
-          required: false
         subject:
           type: string
           example: First call
           description: Could be omitted. In such case the default value will be "Call"
-          required: false
         call_type:
           type: string
           enum:
             - outgoing
             - incoming
-          required: true
         ended_call_status:
           type: string
           enum:
@@ -8076,33 +8059,30 @@ components:
         from:
           type: string
           example: 380632232232
-          required: true
         to:
           type: string
           example: null
           description: Could be null cause on new event call from telephony we don't have "to" value for sure
-          required: false
         begin_time:
           type: integer
           example: 1681893335
-          required: false
         end_time:
           type: integer
           example: 1681893685
-          required: false
         duration:
           type: integer
           example: 350
-          required: false
         call_record_link:
           type: string
           example: null
-          required: false
           description: It could be call link that telephony provides or link issued by import flow (via files-backend)
         note:
           type: string
           example: Fixed agenda
-          required: false
+      required: 
+        -  integration_code
+        -  call_type
+        -  from
 
 
     CallEventContacts:
