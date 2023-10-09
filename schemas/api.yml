@@ -2024,7 +2024,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/transferToUser:
     post:
-      description: Transfer tasks to another user. Available only for admin users.
+      description: Transfer tasks to another user. 
       tags:
         - tasksService
       requestBody:
@@ -2047,7 +2047,7 @@ paths:
 
   /tasks/v1/transferToDepartment:
     post:
-      description: Transfer tasks to department. Available only for admin users.
+      description: Transfer tasks to department. 
       tags:
         - tasksService
       requestBody:
@@ -2229,7 +2229,7 @@ paths:
       security:
         - bearerAuth: [ ]
     put:
-      description: Update settings. Available only for admin users.
+      description: Update settings. 
       tags:
         - tasksService
       requestBody:
@@ -2364,8 +2364,9 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /files/v1/files/{id}:
+  /files/v1/files/{fileId}:
     patch:
+      summary: Update file by id
       description: Update the `entity_id` for one file
       tags:
         - filesService
@@ -2406,6 +2407,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete file by id
       description: Removes the uploaded file and info about it
       tags:
         - filesService
@@ -2490,6 +2492,7 @@ paths:
 
   /comments/v1/comments:
     get:
+      summary: Get comments list
       description: >
         Lists the comments related to some entity.
         `nextId` and `prevId` fields in response help to do pagination.
@@ -2539,6 +2542,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
+      summary: Create a comment
       description: Creates new comment
       tags:
         - commentsService
@@ -2614,8 +2618,9 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /comments/v1/comments/{id}:
+  /comments/v1/comments/{commentId}:
     patch:
+      summary: Update comment by id
       description: Updates the comment
       tags:
         - commentsService
@@ -2645,6 +2650,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete comment by id
       description: Removes the comment
       tags:
         - commentsService
@@ -3012,7 +3018,7 @@ paths:
 
   /groups/v1/transferToUser:
     post:
-      description: Transfer groups to another user. Available only for admin users.
+      description: Transfer groups to another user. 
       tags:
         - groupService
       requestBody:
@@ -3035,7 +3041,7 @@ paths:
 
   /groups/v1/transferToDepartment:
     post:
-      description: Transfer groups to another user. Available only for admin users.
+      description: Transfer groups to another user. 
       tags:
         - groupService
       requestBody:
@@ -3058,7 +3064,7 @@ paths:
 
   /groups/v1/transferToGroupMembers:
     post:
-      description: Transfer groups to another user. Available only for admin users.
+      description: Transfer groups to another user. 
       tags:
         - groupService
       requestBody:
@@ -3163,7 +3169,7 @@ paths:
   # crm begin
   /crm/v1/entity:
     get:
-      description: Get available entities list. Available only for admin users.
+      description: Get available entities list. 
       tags:
         - crmService
       responses:
@@ -3185,7 +3191,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create entity. Available only for admin users.
+      description: Create entity. 
       tags:
         - crmService
       requestBody:
@@ -3238,7 +3244,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      description: Get available fields list. Available only for admin users.
+      description: Get available fields list. 
       tags:
         - crmService
       responses:
@@ -3266,7 +3272,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create field. Available only for admin users.
+      description: Create field. 
       tags:
         - crmService
       requestBody:
@@ -3359,7 +3365,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Delete field by code. Available only for admin users.
+      description: Delete field by code. 
       tags:
         - crmService
       responses:
@@ -3393,7 +3399,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Creating or editing list items. Available only for admin users.
+      description: Creating or editing list items. 
       tags:
         - crmService
       requestBody:
@@ -3420,7 +3426,7 @@ paths:
       - $ref: '#/components/parameters/field'
       - $ref: '#/components/parameters/value'
     delete:
-      description: Deleting a list item. Available only for admin users.
+      description: Deleting a list item. 
       tags:
         - crmService
       responses:
@@ -3435,7 +3441,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      description: Get available  crm entity items list. Available only for admin users.
+      description: Get available  crm entity items list. 
       tags:
         - crmService
       responses:
@@ -3459,7 +3465,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create  crm entity item. Available only for admin users.
+      description: Create  crm entity item. 
       tags:
         - crmService
       requestBody:
@@ -3808,7 +3814,7 @@ paths:
 
   /crm/v1/static/tasks:
     get:
-      description: Get available crm-task entity items list. Available only for admin users.
+      description: Get available crm-task entity items list. 
       tags:
         - crmService
       parameters:
@@ -3878,7 +3884,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create crm-task entity item. Available only for admin users.
+      description: Create crm-task entity item. 
       tags:
         - crmService
       requestBody:
@@ -3953,7 +3959,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      description: Get funnels. Available only for admin users.
+      description: Get funnels. 
       tags:
         - crmService
       responses:
@@ -3977,7 +3983,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Funnel creating. Available only for admin users.
+      description: Funnel creating. 
       tags:
         - crmService
       requestBody:
@@ -4013,7 +4019,7 @@ paths:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/funnelId'
     get:
-      description: Get funnels. Available only for admin users.
+      description: Get funnels. 
       tags:
         - crmService
       responses:
@@ -4038,7 +4044,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Funnel editing. Available only for admin users.
+      description: Funnel editing. 
       tags:
         - crmService
       requestBody:
@@ -4065,7 +4071,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Funnel deleting. Available only for admin users.
+      description: Funnel deleting. 
       tags:
         - crmService
       responses:
@@ -4103,7 +4109,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create a kanban stage. Available only for admin users.
+      description: Create a kanban stage. 
       tags:
         - crmService
       requestBody:
@@ -4164,7 +4170,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Editing a Kanban Stage. Available only for admin users.
+      description: Editing a Kanban Stage. 
       tags:
         - crmService
       requestBody:
@@ -4191,7 +4197,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Deleting a Kanban Stage. Available only for admin users.
+      description: Deleting a Kanban Stage. 
       tags:
         - crmService
       responses:
@@ -4246,7 +4252,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/funnelId'
     get:
-      description: Get funnels. Available only for admin users.
+      description: Get funnels. 
       tags:
         - crmService
       responses:
@@ -4264,7 +4270,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Funnel creating. Available only for admin users.
+      description: Funnel creating. 
       tags:
         - crmService
       requestBody:
@@ -4299,7 +4305,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/reasonId'
     patch:
-      description: Funnel editing. Available only for admin users.
+      description: Funnel editing. 
       tags:
         - crmService
       requestBody:
@@ -4326,7 +4332,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Funnel deleting. Available only for admin users.
+      description: Funnel deleting. 
       tags:
         - crmService
       responses:
@@ -4373,6 +4379,8 @@ paths:
 
   /crm/v1/events/call/{call_event_id}:
     patch:
+      parameters:
+        - $ref: '#/components/parameters/call_event_id'
       tags:
         - crmService
       requestBody:
@@ -4410,7 +4418,7 @@ paths:
       - $ref: '#/components/parameters/itemId'
       - $ref: '#/components/parameters/entity_code'
     get:
-      description: Get available  crm entity items list. Available only for admin users.
+      description: Get available  crm entity items list. 
       tags:
         - crmService
       responses:
@@ -4494,6 +4502,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Edit product category.
       tags:
         - crmService
@@ -4514,6 +4524,9 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete product category by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Delete product category.
       tags:
         - crmService
@@ -4527,6 +4540,7 @@ paths:
 
   /crm/v1/static/measurement-units:
     get:
+      summary: Get measurement units list
       description: Get all measurement units.
       tags:
         - crmService
@@ -4565,6 +4579,7 @@ paths:
         - bearerAuth: [ ]
   /crm/v1/static/measurement-units/{itemId}:
     get:
+      summary: Get measurement unit by id
       parameters:
         - $ref: '#/components/parameters/itemId'
       description: Get measurement unit.
@@ -4582,6 +4597,9 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      summary: Update measurement unit by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Update measurement unit.
       tags:
         - crmService
@@ -4602,6 +4620,9 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Detete measurement unit by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Delete measurement unit.
       tags:
         - crmService
@@ -4615,6 +4636,7 @@ paths:
 
   /crm/v1/static/taxes:
     get:
+      summary: Get taxes list
       description: Get all taxes
       tags:
         - crmService
@@ -4632,6 +4654,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
+      summary: Create tax
       description: Create tax.
       tags:
         - crmService
@@ -4653,6 +4676,14 @@ paths:
         - bearerAuth: [ ]
   /crm/v1/static/taxes/{itemId}:
     patch:
+      parameters: 
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      summary: Update tax by id
       description: Update tax.
       tags:
         - crmService
@@ -4673,6 +4704,14 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete tax by id
+      parameters: 
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
       description: Delete tax.
       tags:
         - crmService
@@ -4686,6 +4725,7 @@ paths:
 
   /crm/v1/static/products:
     get:
+      summary: Get products list
       description: Get products paginated list.
       tags:
         - crmService
@@ -4799,6 +4839,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
+      summary: Create product
       description: Create product.
       tags:
         - crmService
@@ -4821,6 +4862,7 @@ paths:
 
   /crm/v1/static/products/{itemId}:
     get:
+      summary: Get product by id
       parameters:
         - $ref: '#/components/parameters/itemId'
       description: Get product.
@@ -4838,6 +4880,9 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      summary: Update product by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Update product.
       tags:
         - crmService
@@ -4858,6 +4903,9 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete product by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Delete product.
       tags:
         - crmService
@@ -4901,8 +4949,11 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/entity-product-lists/{ItemID}:
+  /crm/v1/static/entity-product-lists/{itemId}:
     patch:
+      summary: Update entity product list by id
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Update entity product list.
       tags:
         - crmService
@@ -4945,8 +4996,10 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/list-products/{itemID}:
+  /crm/v1/static/list-products/{itemId}:
     get:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Get list product.
       tags:
         - crmService
@@ -4962,6 +5015,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Update list product.
       tags:
         - crmService
@@ -4982,6 +5037,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Delete list product.
       tags:
         - crmService
@@ -5194,6 +5251,8 @@ paths:
         - bearerAuth: [ ]
     delete:
       description: Delete app
+      parameters:
+        - $ref: '#/components/parameters/app_id'
       tags:
         - appService
       responses:
