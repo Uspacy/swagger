@@ -376,8 +376,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryUsers'
-        - $ref: '#/components/parameters/filterUsers'
       responses:
         '200':
           description: OK
@@ -855,8 +853,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        # - $ref: '#/components/parameters/queryDepartments'
-        - $ref: '#/components/parameters/filterDepartments'
       responses:
         '200':
           description: OK
@@ -5341,44 +5337,6 @@ components:
       style: deepObject
       schema:
         type: object
-    filterUsers:
-      allOf:
-        - $ref: '#/components/parameters/filter'
-        - type: object
-          description: Fields, corresponding to the available list of fields user.
-          example:
-            email: rar.stas@gmail.com
-            firstName: Stas
-            lastName: Raranetskyi
-            phone: "+3801234567"
-            position: CTO
-            active: true
-            departmentsIds: [ "1111", "2222" ]
-            roles:
-              - OWNER
-              - ADMIN
-    queryUsers:
-      allOf:
-        - $ref: '#/components/parameters/query'
-        - type: string
-          description: Search by email, firstName, lastName
-          example: rar.stas@gmail.com
-    filterDepartments:
-      allOf:
-        - $ref: '#/components/parameters/filter'
-        - type: object
-          description: Fields, corresponding to the available list of fields department.
-          example:
-            name: "Frontend department"
-            headId: "1111"
-            parentDepartmentId: "1111"
-            usersIds: [ "1111", "2222", "3333" ]
-    queryDepartments:
-      allOf:
-        - $ref: '#/components/parameters/query'
-        - type: string
-          description: Search by name department
-          example: Frontend department
     postId:
       name: postId
       in: path
@@ -5769,7 +5727,7 @@ components:
           type: string
           example: RWPIRBJCIUJITLPC
         qrCodeUri:
-          type: text
+          type: string
           example: "data:image/png;base64,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"
     TwoFactorStatusEnabled:
       type: object
