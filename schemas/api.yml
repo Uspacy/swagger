@@ -70,7 +70,7 @@ tags:
 paths:
 
   # auth begin
-  /auth/v1/auth/sign_in/:
+  /auth/v1/auth/sign_in:
     post:
       summary: Sign in
       description: Sign in user by email, password. Returns token, refreshToken
@@ -110,7 +110,7 @@ paths:
                   status:
                     type: boolean
                     example: true
-  /auth/v1/auth/confirm_email/:
+  /auth/v1/auth/confirm_email:
     post:
       summary: Confirm user email
       description: Confirm email user. Returns token, refreshToken
@@ -129,7 +129,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
-  /auth/v1/auth/refresh_token/:
+  /auth/v1/auth/refresh_token:
     post:
       summary: Refresh token
       description: refreshToken exprired token. Returns new token, refreshToken
@@ -142,7 +142,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
-  /auth/v1/auth/register/:
+  /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
       description: New user registration by invitation. Returns token, refreshToken
@@ -161,10 +161,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
-  /auth/v1/users/:
+  /auth/v1/users:
     post:
       summary: Sign up
-      description: Sign up user by firstName, lastName, email, password. Available only for users with admin permissions. Returns created user
+      description: Sign up user by firstName, lastName, email, password.  Returns created user
       tags:
         - authService
       requestBody:
@@ -202,7 +202,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/forgot_password/:
+  /auth/v1/users/forgot_password:
     post:
       summary: Reset password
       description: Reset password. Available to unauthorized users.
@@ -217,7 +217,7 @@ paths:
       responses:
         '200':
           description: OK
-  /auth/v1/users/reset_password/:
+  /auth/v1/users/reset_password:
     post:
       summary: Reset password
       description: Reset password. Available to unauthorized users.
@@ -232,12 +232,12 @@ paths:
       responses:
         '200':
           description: OK
-  /auth/v1/users/{userId}/change_password/:
+  /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
       parameters:
         - $ref: '#/components/parameters/userId'
-      description: Update user password by id. Available only for users with admin permissions.
+      description: Update user password by id. 
       tags:
         - authService
       requestBody:
@@ -280,7 +280,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/check_email/:
+  /auth/v1/users/check_email:
     get:
       summary: Email existence check
       description: Email existence check.
@@ -306,7 +306,7 @@ paths:
           $ref: '#/components/responses/NoContent'
       security:
         - bearerAuth: [ ]
-  /auth/v1/portals/:
+  /auth/v1/portals:
     get:
       description: Portal domain availability check.
       tags:
@@ -368,7 +368,7 @@ paths:
 
 
   # users begin
-  /company/v1/users/:
+  /company/v1/users:
     get:
       description: Get users list
       tags:
@@ -395,13 +395,13 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/users/{userId}/:
+  /company/v1/users/{userId}:
     parameters:
       - $ref: '#/components/parameters/userId'
     get:
       tags:
         - usersService
-      description: Get user by id. Available only for authorized users
+      description: Get user by id. 
       responses:
         '200':
           description: OK
@@ -414,7 +414,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update user data by id. Available only for authorized users
+      description: Update user data by id. 
       tags:
         - usersService
       requestBody:
@@ -434,9 +434,9 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/{userId}/deactivate/:
+  /company/v1/users/{userId}/deactivate:
     post:
-      description: "Deactivate user by id. Available only for users with admin permissions. Returns user data with active: false"
+      description: "Deactivate user by id.  Returns user data with active: false"
       tags:
         - usersService
       parameters:
@@ -461,7 +461,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/activate:
     post:
-      description: "Activate user by id. Available only for users with admin permissions. Returns user data with active: true"
+      description: "Activate user by id.  Returns user data with active: true"
       tags:
         - usersService
       parameters:
@@ -481,7 +481,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/update_roles:
     patch:
-      description: Update user roles by id. Available only for users with admin permissions. Returns user data with new roles
+      description: Update user roles by id.  Returns user data with new roles
       tags:
         - usersService
       parameters:
@@ -508,7 +508,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/update_position:
     patch:
-      description: Update user position by id. Available only for users with admin permissions. Returns user data with new position
+      description: Update user position by id.  Returns user data with new position
       tags:
         - usersService
       parameters:
@@ -538,7 +538,7 @@ paths:
     get:
       tags:
         - usersService
-      description: Get persinal settings by id. Available only for users with admin permissions
+      description: Get persinal settings by id. 
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
@@ -553,7 +553,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Update personal settings by id. Available only for users with admin permissions.
+      description: Update personal settings by id. 
       tags:
         - usersService
       parameters:
@@ -577,7 +577,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_status:
     get:
-      description: Get two-factor authentication status by id. Available only for users with admin permissions.
+      description: Get two-factor authentication status by id. 
       tags:
         - usersService
       parameters:
@@ -595,7 +595,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_disable:
     patch:
-      description: Disable two-factor authentication by id. Available only for users with admin permissions.
+      description: Disable two-factor authentication by id. 
       tags:
         - usersService
       parameters:
@@ -611,11 +611,11 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /company/v1/users/me/:
+  /company/v1/users/me:
     get:
       tags:
         - usersService
-      description: Get self profile. Available only for authorized users
+      description: Get self profile. 
       responses:
         '200':
           description: OK
@@ -776,7 +776,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/users/get_users_by_field/:
+  /company/v1/users/get_users_by_field:
     post:
       description: Getting a list of users by filter. Available to unauthorized users.
       tags:
@@ -806,11 +806,11 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/users/me/settings/:
+  /company/v1/users/me/settings:
     get:
       tags:
         - usersService
-      description: Get self profile. Available only for authorized users
+      description: Get self profile. 
       responses:
         '200':
           description: OK
@@ -846,7 +846,7 @@ paths:
   # users end
 
   # departments begin
-  /company/v1/departments/:
+  /company/v1/departments:
     get:
       description: Get departments list
       tags:
@@ -873,7 +873,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create department. Available only for users with admin permissions
+      description: Create department. 
       tags:
         - departments (usersService)
       requestBody:
@@ -903,7 +903,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/departments/{departmentId}/:
+  /company/v1/departments/{departmentId}:
     parameters:
       - $ref: '#/components/parameters/departmentId'
     get:
@@ -946,7 +946,7 @@ paths:
         - bearerAuth: [ ]
     delete:
       description:
-        Delete department. Available only for users with admin permissions.
+        Delete department. 
       tags:
         - departments (usersService)
       responses:
@@ -956,9 +956,9 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /company/v1/departments/{departmentId}/updateRoles/:
+  /company/v1/departments/{departmentId}/updateRoles:
     patch:
-      description: Update department roles by id. Available only for users with admin permissions. Returns department data with new roles
+      description: Update department roles by id.  Returns department data with new roles
       tags:
         - departments (usersService)
       parameters:
@@ -983,9 +983,9 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /company/v1/departments/{departmentId}/addUsers/:
+  /company/v1/departments/{departmentId}/addUsers:
     patch:
-      description: Update department users by id. Available only for users with admin permissions.
+      description: Update department users by id. 
       tags:
         - departments (usersService)
       parameters:
@@ -1009,9 +1009,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/departments/{departmentId}/deleteUsers/:
+  /company/v1/departments/{departmentId}/deleteUsers:
     patch:
-      description: Update department users by id. Available only for users with admin permissions.
+      summary: Delete users from department
+      description: Delete users from department by ids.
       tags:
         - departments (usersService)
       parameters:
@@ -1038,9 +1039,10 @@ paths:
   # departments end
 
   # roles begin
-  /company/v1/permissions/:
+  /company/v1/permissions:
     get:
-      description: Get permissions list. Only available to authorized users with the owner or administrator role.
+      summary: Get permissions list.
+      description: Get permissions list. 
       tags:
         - roles (usersService)
       responses:
@@ -1054,9 +1056,10 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /company/v1/roles/:
+  /company/v1/roles:
     get:
-      description: Get role list. Only available to authorized users with the owner or administrator role.
+      summary: Get roles list.
+      description: Get roles list. 
       tags:
         - roles (usersService)
       responses:
@@ -1078,7 +1081,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      description: Create role. Only available to authorized users with the owner or administrator role.
+      description: Create role. 
       tags:
         - roles (usersService)
       requestBody:
@@ -1101,11 +1104,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /company/v1/roles/{roleId}/:
+  /company/v1/roles/{roleId}:
     parameters:
       - $ref: '#/components/parameters/roleId'
     get:
-      description: Get role by id. Only available to authorized users with the owner or administrator role.
+      description: Get role by id. 
       tags:
         - roles (usersService)
       responses:
@@ -1126,7 +1129,7 @@ paths:
         - bearerAuth: [ ]
     patch:
       description:
-        Update role data. Only available to authorized users with the owner or administrator role.
+        Update role data. 
       tags:
         - roles (usersService)
       requestBody:
@@ -1167,7 +1170,7 @@ paths:
         - bearerAuth: [ ]
     delete:
       description:
-        Delete role. Only available to authorized users with the owner or administrator role.
+        Delete role. 
       tags:
         - roles (usersService)
       responses:
@@ -1180,7 +1183,7 @@ paths:
   # roles end
 
   # invite begin
-  /company/v1/users/check_invite/:
+  /company/v1/users/check_invite:
     get:
       description: Checking if an invitation exists.
       tags:
@@ -1222,7 +1225,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/invites/email:
     post:
-      description: Create invites. Only available to authorized users with the owner or administrator role.
+      description: Create invites. 
       tags:
         - invite (usersService)
       requestBody:
@@ -1242,7 +1245,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/invites/email/batch:
     post:
-      description: Create invites. Only available to authorized users with the owner or administrator role.
+      description: Create invites. 
       tags:
         - invite (usersService)
       requestBody:
@@ -1270,7 +1273,7 @@ paths:
 
     patch:
       description:
-        Resending an invitation. Only available to authorized users with the owner or administrator role.
+        Resending an invitation. 
       tags:
         - invite (usersService)
 
@@ -1285,13 +1288,13 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /company/v1/invites/email/{userId}/:
+  /company/v1/invites/email/{userId}:
     parameters:
       - $ref: '#/components/parameters/userId'
 
     delete:
       description:
-        Delete invitation. Only available to authorized users with the owner or administrator role.
+        Delete invitation. 
       tags:
         - invite (usersService)
       responses:
@@ -1304,7 +1307,7 @@ paths:
   # invite begin
 
   # newsfeed begin
-  /newsfeed/v1/posts/:
+  /newsfeed/v1/posts:
     get:
       description: Get posts list
       tags:
@@ -1378,7 +1381,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /newsfeed/v1/posts/{postId}/:
+  /newsfeed/v1/posts/{postId}:
     parameters:
       - $ref: '#/components/parameters/postId'
     patch:
@@ -1419,7 +1422,7 @@ paths:
   # newsfeed end
 
   # tasks begin
-  /tasks/v1/tasks/:
+  /tasks/v1/tasks:
     get:
       description: Get available tasks list
       tags:
@@ -1546,11 +1549,11 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/:
+  /tasks/v1/tasks/{taskId}:
     parameters:
       - $ref: '#/components/parameters/taskId'
     get:
-      description: Get task by id. Available only for authorized users and users who have access to task.
+      description: Get task by id.  and users who have access to task.
       tags:
         - tasksService
       responses:
@@ -1565,7 +1568,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Edit task by id. Available only for authorized users and task maker.
+      description: Edit task by id.  and task maker.
       tags:
         - tasksService
       requestBody:
@@ -1596,7 +1599,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      description: Delete task by id. Available only for authorized users and task maker.
+      description: Delete task by id.  and task maker.
       tags:
         - tasksService
       responses:
@@ -1606,7 +1609,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/denial/:
+  /tasks/v1/tasks/{taskId}/denial:
     post:
       summary: Abandoning a task
       description: Abandoning a task
@@ -1627,7 +1630,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/stages/:
+  /tasks/v1/stages:
     get:
       summary: Get kanban stages
       description: Get kanban stages
@@ -1681,7 +1684,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/stages/{stageId}/:
+  /tasks/v1/stages/{stageId}:
     get:
       summary: Get kanban stage by id
       description: Get kanban stage by id
@@ -1748,7 +1751,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/stages/{stageId}/moveTask/:
+  /tasks/v1/stages/{stageId}/moveTask:
     post:
       description: Moving a task to stage
       tags:
@@ -1768,12 +1771,12 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/tasks/{taskId}/checkList/:
+  /tasks/v1/tasks/{taskId}/checkList:
     parameters:
       - $ref: '#/components/parameters/taskId'
     get:
       summary: Get checklist by task id
-      description: Get checklist by task id. Available only for authorized users and users who have access to task.
+      description: Get checklist by task id.  and users who have access to task.
       tags:
         - tasksService
       responses:
@@ -1800,7 +1803,7 @@ paths:
         - bearerAuth: [ ]
     post:
       summary: Create checklist for task
-      description: Create checklist for task. Available only for authorized users and users who have access to task.
+      description: Create checklist for task.  and users who have access to task.
       tags:
         - tasksService
       requestBody:
@@ -1822,7 +1825,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/checkList/{checkListId}/:
+  /tasks/v1/tasks/{taskId}/checkList/{checkListId}:
     parameters:
       - $ref: '#/components/parameters/taskId'
       - $ref: '#/components/parameters/checkListId'
@@ -1863,7 +1866,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/checkList/{checkListId}/:
+  /tasks/v1/checkList/{checkListId}:
     parameters:
       - $ref: '#/components/parameters/checkListId'
     get:
@@ -1968,7 +1971,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/tasks/massEdit/complete/:
+  /tasks/v1/tasks/massEdit/complete:
     post:
       description: Bulk editing tasks
       tags:
@@ -1985,7 +1988,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/archive/:
+  /tasks/v1/tasks/massEdit/archive:
     post:
       description: Bulk editing tasks
       tags:
@@ -2002,7 +2005,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/delete/:
+  /tasks/v1/tasks/massEdit/delete:
     post:
       description: Bulk editing tasks
       tags:
@@ -2065,7 +2068,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/tasks/{taskId}/start/:
+  /tasks/v1/tasks/{taskId}/start:
     patch:
       description: Take on a task. Available to users related to the task.
       tags:
@@ -2089,7 +2092,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/stop/:
+  /tasks/v1/tasks/{taskId}/stop:
     patch:
       description: Stopped the task. Available to users related to the task.
       tags:
@@ -2113,7 +2116,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/ready/:
+  /tasks/v1/tasks/{taskId}/ready:
     patch:
       description: Complete the task. Sets different statuses depending on who initiated the action. Available to users related to the task.
       tags:
@@ -2142,7 +2145,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/restart/:
+  /tasks/v1/tasks/{taskId}/restart:
     patch:
       description: Restart the task. Available to users related to the task.
       tags:
@@ -2166,7 +2169,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/watch/:
+  /tasks/v1/tasks/{taskId}/watch:
     patch:
       description: Watch the task. Available to users related to the task.
       tags:
@@ -2185,7 +2188,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/unwatch/:
+  /tasks/v1/tasks/{taskId}/unwatch:
     patch:
       description: Unwatch the task. Available to users related to the task.
       tags:
@@ -2205,7 +2208,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/settings/:
+  /tasks/v1/settings:
     get:
       description: Get available settings list
       tags:
@@ -2485,7 +2488,7 @@ paths:
 
   # comments begin
 
-  /comments/v1/comments/:
+  /comments/v1/comments:
     get:
       description: >
         Lists the comments related to some entity.
@@ -2684,7 +2687,7 @@ paths:
   # comments end
 
   # group begin
-  /groups/v1/groups/:
+  /groups/v1/groups:
     get:
       description: Get posts list
       tags:
@@ -2759,7 +2762,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /groups/v1/groups/{groupId}/:
+  /groups/v1/groups/{groupId}:
     parameters:
       - $ref: '#/components/parameters/groupId'
     get:
@@ -2942,7 +2945,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /groups/v1/invites/:
+  /groups/v1/invites:
     get:
       description: Getting a list of invitations to groups of the current user.
       tags:
@@ -2990,7 +2993,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /groups/v1/invites/{groupId}/:
+  /groups/v1/invites/{groupId}:
     parameters:
       - $ref: '#/components/parameters/groupId'
     delete:
@@ -3158,7 +3161,7 @@ paths:
 
 
   # crm begin
-  /crm/v1/entity/:
+  /crm/v1/entity:
     get:
       description: Get available entities list. Available only for admin users.
       tags:
@@ -3210,7 +3213,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/field_types/:
+  /crm/v1/field_types:
     get:
       description: Get available field types list. Available only for all users.
       tags:
@@ -3231,7 +3234,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/entities/{entity}/fields/:
+  /crm/v1/entities/{entity}/fields:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
@@ -3295,12 +3298,12 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/entities/{entity}/fields/{field}/:
+  /crm/v1/entities/{entity}/fields/{field}:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/field'
     get:
-      description: Get field by code. Available only for authorized users and users who have access to crm.
+      description: Get field by code.  and users who have access to crm.
       tags:
         - crmService
       responses:
@@ -3325,7 +3328,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Edit field by code. Available only for authorized users and crm maker.
+      description: Edit field by code.  and crm maker.
       tags:
         - crmService
       requestBody:
@@ -3368,7 +3371,7 @@ paths:
         - bearerAuth: [ ]
 
 
-  /crm/v1/entities/{entity}/lists/{field}/:
+  /crm/v1/entities/{entity}/lists/{field}:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/field'
@@ -3428,7 +3431,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/entities/{entity}/:
+  /crm/v1/entities/{entity}:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
@@ -3479,7 +3482,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/entities/companies/:
+  /crm/v1/entities/companies:
     get:
       description: Get available companies list.
       tags:
@@ -3535,7 +3538,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/entities/contacts/:
+  /crm/v1/entities/contacts:
     get:
       description: Get available contacts list.
       tags:
@@ -3592,7 +3595,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/entities/deals/:
+  /crm/v1/entities/deals:
     get:
       description: Get available deals list.
       tags:
@@ -3655,7 +3658,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/entities/leads/:
+  /crm/v1/entities/leads:
     get:
       description: Get available leads list.
       tags:
@@ -3713,12 +3716,12 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/entities/{entity}/{itemId}/:
+  /crm/v1/entities/{entity}/{itemId}:
     parameters:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/itemId'
     get:
-      description: Get crm entity item. Available only for authorized users and users who have access to crm.
+      description: Get crm entity item.  and users who have access to crm.
       tags:
         - crmService
       responses:
@@ -3735,7 +3738,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Edit crm entity item. Available only for authorized users and users who have access to crm.
+      description: Edit crm entity item.  and users who have access to crm.
       tags:
         - crmService
       requestBody:
@@ -3803,7 +3806,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/tasks/:
+  /crm/v1/static/tasks:
     get:
       description: Get available crm-task entity items list. Available only for admin users.
       tags:
@@ -3896,11 +3899,11 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/static/task/{itemId}/:
+  /crm/v1/static/task/{itemId}:
     parameters:
       - $ref: '#/components/parameters/itemId'
     get:
-      description: Get crm-task entity item. Available only for authorized users and users who have access to crm.
+      description: Get crm-task entity item.  and users who have access to crm.
       tags:
         - crmService
       responses:
@@ -3915,7 +3918,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      description: Edit crm-task entity item. Available only for authorized users and users who have access to crm.
+      description: Edit crm-task entity item.  and users who have access to crm.
       tags:
         - crmService
       requestBody:
@@ -4390,7 +4393,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/call_event_id'
       description:
-        Delete call event. Available only for users with admin permissions.
+        Delete call event. 
       tags:
         - crmService
       responses:
@@ -4431,7 +4434,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/product-categories/:
+  /crm/v1/static/product-categories:
     get:
       description: Get all product categories in tree view.
       tags:
@@ -4522,7 +4525,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/measurement-units/:
+  /crm/v1/static/measurement-units:
     get:
       description: Get all measurement units.
       tags:
@@ -4610,7 +4613,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/taxes/:
+  /crm/v1/static/taxes:
     get:
       description: Get all taxes
       tags:
@@ -4681,7 +4684,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/products/:
+  /crm/v1/static/products:
     get:
       description: Get products paginated list.
       tags:
@@ -4866,7 +4869,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/entity-product-lists/:
+  /crm/v1/static/entity-product-lists:
     get:
       description: Get or create product list for entity.
       tags:
@@ -4920,7 +4923,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /crm/v1/static/list-products/:
+  /crm/v1/static/list-products:
     post:
       description: Create new list product.
       tags:
@@ -5104,7 +5107,7 @@ paths:
   # fileimport end
 
   # appService being
-  /apps/v1/apps/:
+  /apps/v1/apps:
     get:
       description: Get applications list.
       tags:
