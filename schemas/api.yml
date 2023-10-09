@@ -671,6 +671,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
+          description: 'The code has expired'
           content:
             application/json:
               schema:
@@ -1426,41 +1427,50 @@ paths:
       parameters:
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/list'
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: parent_id
+        - in: query
+          name: parent_id
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
         - in: query
           name: q
           description: Text search pattern
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: status
-              example: [ "suspended", "not_planned" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: setter_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: responsible_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: accomplices
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: group_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: priority
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: deadline
-
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/StringEnum'
+          example: [ "suspended", "not_planned" ]
+        - in: query
+          name: setter_id
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: responsible_id
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: accomplices
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: group_id
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: priority
+          schema:
+            $ref: '#/components/schemas/NumberEnum'
+        - in: query
+          name: deadline
+          schema:
+            $ref: '#/components/schemas/ArrayOfTimeRanges'
+            
       responses:
         '200':
           description: OK
@@ -6127,11 +6137,6 @@ components:
               example:
                 - "1"
                 - "2"
-              examples:
-                arrayDepartmentsIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
             usersIds:
               type: array
               items:
@@ -6139,11 +6144,6 @@ components:
               example:
                 - "1"
                 - "2"
-              examples:
-                arrayUsersIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
         include:
           type: object
           description: A field by which you can include the viewing of a post for users and / or departments
