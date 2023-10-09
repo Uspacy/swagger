@@ -1430,7 +1430,7 @@ paths:
         - in: query
           name: parent_id
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: q
           description: Text search pattern
@@ -1440,37 +1440,37 @@ paths:
         - in: query
           name: status
           schema:
-            $ref: '#/components/schemas/StringEnum'
+            $ref: '#/components/parameters/filter_string_enum'
           example: [ "suspended", "not_planned" ]
         - in: query
           name: setter_id
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: responsible_id
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: accomplices
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: group_id
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: stages
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: priority
           schema:
-            $ref: '#/components/schemas/NumberEnum'
+            $ref: '#/components/parameters/filter_number_enum'
         - in: query
           name: deadline
           schema:
-            $ref: '#/components/schemas/ArrayOfTimeRanges'
-            
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+
       responses:
         '200':
           description: OK
@@ -3489,23 +3489,28 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: company_label
-              example: [ "partner", "competitor" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
+        - in: query
+          name: company_label
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "partner", "competitor" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
       responses:
         '200':
           description: OK
@@ -3540,23 +3545,29 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: contact_label
-              example: [ "partner", "competitor" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
+        - in: query
+          name: contact_label
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "partner", "competitor" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+
       responses:
         '200':
           description: OK
@@ -3591,29 +3602,35 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: kanban_status
-              example: [ "FAIL", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-              example: [ "NEW", "SUCCESS" ]
+        - in: query
+          name: kanban_status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "FAIL", "SUCCESS" ]
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+          example: [ "NEW", "SUCCESS" ]
         - in: query
           name: funnel_id
           description: filter by funnel id
           schema:
             type: integer
           example: 12
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: tasks
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: tasks
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+
       responses:
         '200':
           description: OK
@@ -3648,24 +3665,29 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: kanban_status
-              example: [ "FAIL", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: stages
-              example: [ "NEW", "SUCCESS" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: source
-              example: [ "recommendation", "advertising" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: created_at
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: owner
+        - in: query
+          name: kanban_status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "FAIL", "SUCCESS" ]
+        - in: query
+          name: stages
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+          example: [ "NEW", "SUCCESS" ]
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "recommendation", "advertising" ]
+        - in: query
+          name: created_at
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+        - in: query
+          name: owner
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
       responses:
         '200':
           description: OK
@@ -3791,35 +3813,45 @@ paths:
           schema:
             type: string
           example: expecting
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: status
-              example: [ "planned", "done" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_string_enum'
-            - name: type
-              example: [ "call", "meeting" ]
-        - allOf:
-            - $ref: '#/components/parameters/filter_array_of_time_ranges'
-            - name: start_time
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: responsible_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: participants
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: company_id
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: contacts
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: deals
-        - allOf:
-            - $ref: '#/components/parameters/filter_number_enum'
-            - name: leads
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "planned", "done" ]
+        - in: query
+          name: type
+          schema:
+            $ref: '#/components/parameters/filter_string_enum'
+          example: [ "call", "meeting" ]
+        - in: query
+          name: start_time
+          schema:
+            $ref: '#/components/parameters/filter_array_of_time_ranges'
+        - in: query
+          name: responsible_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: participants
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: company_id
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: contacts
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: deals
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+        - in: query
+          name: leads
+          schema:
+            $ref: '#/components/parameters/filter_number_enum'
+
       responses:
         '200':
           description: OK
@@ -6155,11 +6187,6 @@ components:
               example:
                 - "3"
                 - "4"
-              examples:
-                arrayDepartmentsIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
             usersIds:
               type: array
               items:
@@ -6167,11 +6194,6 @@ components:
               example:
                 - "3"
                 - "4"
-              examples:
-                arrayUsersIds:
-                  - "1"
-                  - "2"
-                empty: [ ]
     CreatePostDto:
       type: object
       properties:
