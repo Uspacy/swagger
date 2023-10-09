@@ -5046,6 +5046,8 @@ paths:
       - description: Name search by q
         in: query
         name: q
+        schema:
+          type: string
     get:
       description: Search data from all services
       responses:
@@ -5074,14 +5076,17 @@ paths:
   # fileimport begin
   /fileimport/v1/csv-import:
     post:
-      parameters:
-        - name: file
-          in: formData
-          type: file
-        - name: data
-          in: formData
-          type: string
-
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                data:
+                  type: string
       responses:
         '200':
           description: OK
@@ -5457,7 +5462,6 @@ components:
       name: entityType
       schema:
         $ref: '#/components/schemas/EntityTypes'
-      required: true
       description: Entity type name
     entityId:
       in: query
@@ -7230,6 +7234,7 @@ components:
             - "22"
 
     JoinRequestNotFound:
+      description: Join request not found
       content:
         application/json:
           schema:
