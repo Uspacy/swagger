@@ -306,66 +306,6 @@ paths:
           $ref: '#/components/responses/NoContent'
       security:
         - bearerAuth: [ ]
-  /auth/v1/portals:
-    get:
-      summary: Portal domain availability check.
-      description: Portal domain availability check.
-      tags:
-        - authService
-      parameters:
-        - $ref: '#/components/parameters/searchPortalDomain'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: success
-        '422':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: object
-                    properties:
-                      domain:
-                        type: array
-                        items:
-                          example: 'The domain has already been taken.'
-                  status:
-                    type: boolean
-                    example: true
-      security:
-        - bearerAuth: [ ]
-    post:
-      summary: Create portal
-      description: Create portal
-      tags:
-        - authService
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatePortal'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Portal'
-
   # auth end
 
 
@@ -404,6 +344,7 @@ paths:
     get:
       tags:
         - usersService
+      summary: Get user by id
       description: Get user by id. 
       responses:
         '200':
@@ -440,6 +381,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
     post:
+      summary: Deactivate user by id
       description: "Deactivate user by id.  Returns user data with active: false"
       tags:
         - usersService
@@ -465,6 +407,7 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/activate:
     post:
+      summary: Activate user by id
       description: "Activate user by id.  Returns user data with active: true"
       tags:
         - usersService
@@ -624,6 +567,7 @@ paths:
     get:
       tags:
         - usersService
+      summary: Get self profile
       description: Get self profile. 
       responses:
         '200':
@@ -825,7 +769,8 @@ paths:
     get:
       tags:
         - usersService
-      description: Get self profile. 
+      summary: Get self settings
+      description: Get self settings. 
       responses:
         '200':
           description: OK
@@ -941,6 +886,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      summary: Update department by id
       description:
         Update department data (set head department, move users, set parent department)
         Available only for head parent department or users with admin permissions. Returns updated department data
@@ -964,6 +910,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete department
       description:
         Delete department. 
       tags:
@@ -1130,7 +1077,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/roleId'
     get:
-      summary: Get role by id. 
+      summary: Get role by id
       description: Get role by id. 
       tags:
         - roles (usersService)
@@ -1151,6 +1098,7 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
+      summary: Update role by id
       description:
         Update role data. 
       tags:
@@ -1192,6 +1140,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete role by id
       description:
         Delete role. 
       tags:
@@ -1296,13 +1245,12 @@ paths:
   /company/v1/invites/email/{userId}/repeat_invitation:
     parameters:
       - $ref: '#/components/parameters/userId'
-
     patch:
+      summary: Resend an invitation
       description:
         Resending an invitation. 
       tags:
         - invite (usersService)
-
       responses:
         '200':
           description: OK
@@ -1317,8 +1265,8 @@ paths:
   /company/v1/invites/email/{userId}:
     parameters:
       - $ref: '#/components/parameters/userId'
-
     delete:
+      summary: Delete invitation
       description:
         Delete invitation. 
       tags:
@@ -1376,6 +1324,7 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
+      summary: Create post
       description: >
         Create post
 
@@ -1412,7 +1361,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/postId'
     patch:
-      summary: Update post. Available only for author.
+      summary: Update post
       description: Update post. Available only for author.
       tags:
         - newsFeedService
@@ -1435,7 +1384,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Delete post. Available only for author or users with admin permissions.
+      summary: Delete post
       description: Delete post. Available only for author or users with admin permissions.
       tags:
         - newsFeedService
@@ -1583,8 +1532,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/taskId'
     get:
-      summary: Get task by id.  and users who have access to task.
-      description: Get task by id.  and users who have access to task.
+      summary: Get task by id
+      description: Get task by id
       tags:
         - tasksService
       responses:
@@ -1599,8 +1548,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Edit task by id.  and task maker.
-      description: Edit task by id.  and task maker.
+      summary: Edit task by id
+      description: Edit task by id
       tags:
         - tasksService
       requestBody:
@@ -1631,8 +1580,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Delete task by id.  and task maker.
-      description: Delete task by id.  and task maker.
+      summary: Delete task by id
+      description: Delete task by id
       tags:
         - tasksService
       responses:
@@ -1644,7 +1593,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/denial:
     post:
-      summary: Abandoning a task
+      summary: Abandon a task
       description: Abandoning a task
       tags:
         - tasksService
@@ -2111,7 +2060,7 @@ paths:
 
   /tasks/v1/tasks/{taskId}/start:
     patch:
-      summary: Take on a task. Available to users related to the task.
+      summary: Take on a task. 
       description: Take on a task. Available to users related to the task.
       tags:
         - tasksService
@@ -2136,7 +2085,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/stop:
     patch:
-      summary: Stopped the task. Available to users related to the task.
+      summary: Stopped the task. 
       description: Stopped the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2161,7 +2110,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/ready:
     patch:
-      summary: Complete the task. Sets different statuses depending on who initiated the action. Available to users related to the task.
+      summary: Complete the task
       description: Complete the task. Sets different statuses depending on who initiated the action. Available to users related to the task.
       tags:
         - tasksService
@@ -2191,7 +2140,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/restart:
     patch:
-      summary: Restart the task. Available to users related to the task.
+      summary: Restart the task
       description: Restart the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2216,7 +2165,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/watch:
     patch:
-      summary: Watch the task. Available to users related to the task.
+      summary: Watch the task. 
       description: Watch the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2236,7 +2185,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/unwatch:
     patch:
-      summary: Unwatch the task. Available to users related to the task.
+      summary: Unwatch the task. 
       description: Unwatch the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2277,6 +2226,7 @@ paths:
       security:
         - bearerAuth: [ ]
     put:
+      summary: Update tasks settings
       description: Update settings. 
       tags:
         - tasksService
@@ -2481,6 +2431,7 @@ paths:
 
   /files/v1/files?entityType&entityId:
     patch:
+      summary: Update files by entity
       description: >
         Update the `entity_id` for a group of files determined by `entityType` and `entityId`
 
@@ -2520,6 +2471,7 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
+      summary: Delete files by entity
       description: >
         Removes the multiple files bound to the entity
 
@@ -2618,6 +2570,7 @@ paths:
 
   /comments/v1/comments?entityIds[]:
     get:
+      summary: Get comments list by array of entity ids
       description: >
         Lists the comments related to the list of entities.
         `nextId` and `prevId` fields in response help to do pagination.
@@ -2724,6 +2677,7 @@ paths:
 
   /comments/v1/comments?entityType&entityId:
     delete:
+      summary: Delete comments to entity
       description: >
         Removes the multiple comments bound to the entity
 
