@@ -204,7 +204,7 @@ paths:
         - bearerAuth: [ ]
   /auth/v1/users/forgot_password:
     post:
-      summary: Reset password
+      summary: Initiate password reset
       description: Reset password. Available to unauthorized users.
       tags:
         - authService
@@ -219,7 +219,7 @@ paths:
           description: OK
   /auth/v1/users/reset_password:
     post:
-      summary: Reset password
+      summary: Change password with token
       description: Reset password. Available to unauthorized users.
       tags:
         - authService
@@ -3405,7 +3405,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-
 
   /crm/v1/entities/{entity}/lists/{field}:
     parameters:
