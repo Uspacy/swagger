@@ -5352,6 +5352,7 @@ paths:
           in: query
           schema:
             type: string
+      tags: messengerService
       responses:
         '200':
           description: The chats list
