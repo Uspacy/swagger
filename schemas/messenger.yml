@@ -218,23 +218,6 @@ paths:
       tags: messengerService
       security:
         - bearerAuth: [ ]
-  /messenger/v1/mobile-notifications/push-tokens:
-    post:
-      parameters: []
-      responses:
-        '201':
-          description: ''
-    delete:
-      parameters: []
-      responses:
-        '200':
-          description: ''
-  /messenger/v1/webpush:
-    post:
-      parameters: []
-      responses:
-        '201':
-          description: ''
   /messenger/v1/messages:
     get:
       parameters:
@@ -546,24 +529,6 @@ paths:
       tags: messengerService
       security:
         - bearerAuth: [ ]
-  /messenger/v1/health:
-    get:
-      parameters: []
-      responses:
-        '200':
-          description: ''
-  /messenger/v1/telephony/call/start:
-    post:
-      parameters: []
-      responses:
-        '201':
-          description: ''
-  /messenger/v1/telephony/call/end:
-    post:
-      parameters: []
-      responses:
-        '201':
-          description: ''
   /messenger/v1/search/messages:
     get:
       parameters:
@@ -593,7 +558,6 @@ paths:
                   $ref: '#/components/schemas/MessageResponseDto'
       security:
         - bearerAuth: [ ]
-
   /messenger/v1/search/{chatId}:
     get:
       parameters:
