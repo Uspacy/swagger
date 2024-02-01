@@ -14,7 +14,8 @@ paths:
           in: query
           schema:
             type: string
-      tags: messengerService
+      tags:
+        - messengerService
       responses:
         '200':
           description: The chats list
@@ -41,7 +42,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     patch:
@@ -59,7 +61,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}:
@@ -77,7 +80,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     delete:
@@ -94,7 +98,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/members:
@@ -112,7 +117,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     delete:
@@ -129,7 +135,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/leave:
@@ -147,7 +154,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/setActiveValue:
@@ -165,7 +173,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/pin:
@@ -179,7 +188,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/unpin:
@@ -193,7 +203,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/mute:
@@ -207,7 +218,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/chats/{id}/unmute:
@@ -221,7 +233,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages:
@@ -279,7 +292,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     patch:
@@ -291,7 +305,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/readMessages:
@@ -300,7 +315,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/{id}/goToMessage:
@@ -320,7 +336,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/forwardMessages:
@@ -335,7 +352,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/getPinnedMessages:
@@ -355,7 +373,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/{id}/pin:
@@ -373,7 +392,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/{id}/unpin:
@@ -391,7 +411,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/deleteMessages:
@@ -414,7 +435,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/readAll:
@@ -423,7 +445,8 @@ paths:
       responses:
         '201':
           description: ''
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/messages/{id}:
@@ -441,7 +464,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/external-lines:
@@ -474,7 +498,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/external-lines/{id}:
@@ -492,7 +517,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     delete:
@@ -509,7 +535,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
     patch:
@@ -532,7 +559,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   /messenger/v1/search/messages:
@@ -594,7 +622,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchResponseDto'
-      tags: messengerService
+      tags:
+        - messengerService
       security:
         - bearerAuth: [ ]
   # messengerService end
