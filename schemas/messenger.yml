@@ -1,3 +1,9 @@
+openapi: '3.1.0'
+info:
+  title: Messenger Backend
+  version: 'v1'
+schemes:
+  - https
 paths:
 # messengerService begin
   /messenger/v1/chats:
