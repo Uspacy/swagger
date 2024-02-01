@@ -614,7 +614,7 @@ components:
     NoContent:
       description: No Content
 
-    # messenger start
+  schemas:
 
     ExternalLineResponseDto:
       type: object
