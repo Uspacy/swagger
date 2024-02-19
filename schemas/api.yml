@@ -5322,7 +5322,31 @@ paths:
                   $ref: '#/components/schemas/DocumentTemplateField'
       security:
         - bearerAuth: [ ]
-
+  /crm/v1/documents/templates/fields/filter-entities:
+    get:
+      description: Get available entities for filter fields
+      tags:
+        - crmService
+      parameters:
+        - description: With funnels or not
+          in: query
+          schema:
+            type: boolean
+          name: with-funnels
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentTemplateFilterEntity'
   # documents template end
 
 
@@ -8981,6 +9005,15 @@ components:
         is_active:
           type: boolean
           required: true
+        code:
+          type: string
+          required: true
+        id:
+          type: number
+          required: true
+        disabled:
+          type: boolean
+          required: true
         file:
           type: object
           properties:
@@ -9114,6 +9147,33 @@ components:
         numerator_id:
           type: integer
           required: true
+    DocumentTemplateFilterEntity:
+      type: object
+      properties:
+        for_all_users:
+          type: boolean
+        display_in_menu:
+          type: boolean
+        kanban:
+          type: boolean
+        is_static:
+          type: boolean
+        table_name:
+          type: string
+        funnels:
+          type: array
+        title:
+          type: string
+          required: true
+        title_singular:
+          type: string
+        type:
+          type: string
+          required: true
+        updated_at:
+          type: number
+          required: true
+          description: Updated at in timestamp format
     DocumentTemplateField:
       type: object
       properties:
@@ -9149,6 +9209,9 @@ components:
           required: true
           example: 'Рахунок на оплату 05.07.23 №1'
           description: Template name + document number
+        template_id:
+          type: number
+          required: true
         created_date:
           type: string
           required: true
@@ -9158,29 +9221,27 @@ components:
           required: true
           example: '2023-09-21'
         from_date:
-          type: string
+          type: number
           required: true
-          example: '2023-09-20'
-          description: Custom edition date, default = dateCreated
+          description: Custom edition date, default = dateCreated in timestamp
+        requisite:
+          $ref: '#/components/schemas/Requisite'
+        bank_requisite:
+          $ref: '#/components/schemas/BankRequisite'
         files:
           type: array
           items:
             type: object
             properties:
-              format:
+              extension:
                 type: string
-                enum: [ PDF, DOCX ]
+                enum: [ pdf, docx ]
                 description: New formats will be added in the future
-                example: 'PDF'
-              links:
-                type: object
-                properties:
-                  internal:
-                    type: string
-                    description: Internal link for download & preview
-                  external:
-                    type: string
-                    description: External download link for clients
+                example: 'pdf'
+              file:
+                type: number
+                required: true
+                description: id of file
         number:
           type: string
           description: Editing number of document
@@ -9204,6 +9265,13 @@ components:
     BankRequisite:
       type: object
       properties:
+        id:
+          type: number
+        created_by:
+          type: number
+        requisite_id:
+          type: number
+          required: true
         name:
           type: string
         is_basic:
@@ -9227,6 +9295,11 @@ components:
                 field_code:
                   enum: [ string, array, object ]
                   description: Field code => field value
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity
     CreateRequisite:
       type: object
       properties:
@@ -9246,15 +9319,41 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BankRequisite'
+    Region:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        image:
+          type: number
+        id:
+          type: number
     Requisite:
       type: object
       properties:
         name:
           type: string
+        seal_picture:
+          type: number
+        sign_picture:
+          type: number
+        template_name:
+          type: string
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity
         is_basic:
           type: boolean
+        id:
+          type: number
         template_id:
           type: integer
+        region:
+          $ref: '#/components/schemas/Region'
         fields:
           description: Fields list
           type: object
