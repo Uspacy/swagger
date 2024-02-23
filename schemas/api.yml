@@ -237,7 +237,7 @@ paths:
       summary: Update user password
       parameters:
         - $ref: '#/components/parameters/userId'
-      description: Update user password by id. 
+      description: Update user password by id.
       tags:
         - authService
       requestBody:
@@ -345,7 +345,7 @@ paths:
       tags:
         - usersService
       summary: Get user by id
-      description: Get user by id. 
+      description: Get user by id.
       responses:
         '200':
           description: OK
@@ -358,8 +358,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update user data by id. 
-      description: Update user data by id. 
+      summary: Update user data by id.
+      description: Update user data by id.
       tags:
         - usersService
       requestBody:
@@ -487,7 +487,7 @@ paths:
     get:
       tags:
         - usersService
-      description: Get persinal settings by id. 
+      description: Get persinal settings by id.
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
@@ -502,8 +502,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update personal settings by id. 
-      description: Update personal settings by id. 
+      summary: Update personal settings by id.
+      description: Update personal settings by id.
       tags:
         - usersService
       parameters:
@@ -527,8 +527,8 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_status:
     get:
-      summary: Get two-factor authentication status by id. 
-      description: Get two-factor authentication status by id. 
+      summary: Get two-factor authentication status by id.
+      description: Get two-factor authentication status by id.
       tags:
         - usersService
       parameters:
@@ -546,8 +546,8 @@ paths:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_disable:
     patch:
-      summary: Disable two-factor authentication by id. 
-      description: Disable two-factor authentication by id. 
+      summary: Disable two-factor authentication by id.
+      description: Disable two-factor authentication by id.
       tags:
         - usersService
       parameters:
@@ -568,7 +568,7 @@ paths:
       tags:
         - usersService
       summary: Get self profile
-      description: Get self profile. 
+      description: Get self profile.
       responses:
         '200':
           description: OK
@@ -770,7 +770,7 @@ paths:
       tags:
         - usersService
       summary: Get self settings
-      description: Get self settings. 
+      description: Get self settings.
       responses:
         '200':
           description: OK
@@ -835,8 +835,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create department. 
-      description: Create department. 
+      summary: Create department.
+      description: Create department.
       tags:
         - departments (usersService)
       requestBody:
@@ -912,7 +912,7 @@ paths:
     delete:
       summary: Delete department
       description:
-        Delete department. 
+        Delete department.
       tags:
         - departments (usersService)
       responses:
@@ -952,8 +952,8 @@ paths:
 
   /company/v1/departments/{departmentId}/addUsers:
     patch:
-      summary: Update department users by id. 
-      description: Update department users by id. 
+      summary: Update department users by id.
+      description: Update department users by id.
       tags:
         - departments (usersService)
       parameters:
@@ -1010,7 +1010,7 @@ paths:
   /company/v1/permissions:
     get:
       summary: Get permissions list.
-      description: Get permissions list. 
+      description: Get permissions list.
       tags:
         - roles (usersService)
       responses:
@@ -1027,7 +1027,7 @@ paths:
   /company/v1/roles:
     get:
       summary: Get roles list.
-      description: Get roles list. 
+      description: Get roles list.
       tags:
         - roles (usersService)
       responses:
@@ -1049,8 +1049,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create role. 
-      description: Create role. 
+      summary: Create role.
+      description: Create role.
       tags:
         - roles (usersService)
       requestBody:
@@ -1078,7 +1078,7 @@ paths:
       - $ref: '#/components/parameters/roleId'
     get:
       summary: Get role by id
-      description: Get role by id. 
+      description: Get role by id.
       tags:
         - roles (usersService)
       responses:
@@ -1100,7 +1100,7 @@ paths:
     patch:
       summary: Update role by id
       description:
-        Update role data. 
+        Update role data.
       tags:
         - roles (usersService)
       requestBody:
@@ -1142,7 +1142,7 @@ paths:
     delete:
       summary: Delete role by id
       description:
-        Delete role. 
+        Delete role.
       tags:
         - roles (usersService)
       responses:
@@ -1198,8 +1198,8 @@ paths:
         - bearerAuth: [ ]
   /company/v1/invites/email:
     post:
-      summary: Create invites. 
-      description: Create invites. 
+      summary: Create invites.
+      description: Create invites.
       tags:
         - invite (usersService)
       requestBody:
@@ -1219,8 +1219,8 @@ paths:
         - bearerAuth: [ ]
   /company/v1/invites/email/batch:
     post:
-      summary: Create invites. 
-      description: Create invites. 
+      summary: Create invites.
+      description: Create invites.
       tags:
         - invite (usersService)
       requestBody:
@@ -1248,7 +1248,7 @@ paths:
     patch:
       summary: Resend an invitation
       description:
-        Resending an invitation. 
+        Resending an invitation.
       tags:
         - invite (usersService)
       responses:
@@ -1268,7 +1268,7 @@ paths:
     delete:
       summary: Delete invitation
       description:
-        Delete invitation. 
+        Delete invitation.
       tags:
         - invite (usersService)
       responses:
@@ -2012,8 +2012,8 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/transferToUser:
     post:
-      summary: Transfer tasks to another user. 
-      description: Transfer tasks to another user. 
+      summary: Transfer tasks to another user.
+      description: Transfer tasks to another user.
       tags:
         - tasksService
       requestBody:
@@ -2036,8 +2036,8 @@ paths:
 
   /tasks/v1/transferToDepartment:
     post:
-      summary: Transfer tasks to department. 
-      description: Transfer tasks to department. 
+      summary: Transfer tasks to department.
+      description: Transfer tasks to department.
       tags:
         - tasksService
       requestBody:
@@ -2060,7 +2060,7 @@ paths:
 
   /tasks/v1/tasks/{taskId}/start:
     patch:
-      summary: Take on a task. 
+      summary: Take on a task.
       description: Take on a task. Available to users related to the task.
       tags:
         - tasksService
@@ -2085,7 +2085,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/stop:
     patch:
-      summary: Stopped the task. 
+      summary: Stopped the task.
       description: Stopped the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2165,7 +2165,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/watch:
     patch:
-      summary: Watch the task. 
+      summary: Watch the task.
       description: Watch the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2185,7 +2185,7 @@ paths:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/unwatch:
     patch:
-      summary: Unwatch the task. 
+      summary: Unwatch the task.
       description: Unwatch the task. Available to users related to the task.
       tags:
         - tasksService
@@ -2227,7 +2227,7 @@ paths:
         - bearerAuth: [ ]
     put:
       summary: Update tasks settings
-      description: Update settings. 
+      description: Update settings.
       tags:
         - tasksService
       requestBody:
@@ -3033,8 +3033,8 @@ paths:
 
   /groups/v1/transferToUser:
     post:
-      summary: Transfer groups to another user. 
-      description: Transfer groups to another user. 
+      summary: Transfer groups to another user.
+      description: Transfer groups to another user.
       tags:
         - groupService
       requestBody:
@@ -3057,8 +3057,8 @@ paths:
 
   /groups/v1/transferToDepartment:
     post:
-      summary: Transfer groups to another user. 
-      description: Transfer groups to another user. 
+      summary: Transfer groups to another user.
+      description: Transfer groups to another user.
       tags:
         - groupService
       requestBody:
@@ -3081,8 +3081,8 @@ paths:
 
   /groups/v1/transferToGroupMembers:
     post:
-      summary: Transfer groups to another user. 
-      description: Transfer groups to another user. 
+      summary: Transfer groups to another user.
+      description: Transfer groups to another user.
       tags:
         - groupService
       requestBody:
@@ -3191,8 +3191,8 @@ paths:
   # crm begin
   /crm/v1/entity:
     get:
-      summary: Get available entities list. 
-      description: Get available entities list. 
+      summary: Get available entities list.
+      description: Get available entities list.
       tags:
         - crmService
       responses:
@@ -3214,8 +3214,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create entity. 
-      description: Create entity. 
+      summary: Create entity.
+      description: Create entity.
       tags:
         - crmService
       requestBody:
@@ -3269,8 +3269,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      summary: Get available fields list. 
-      description: Get available fields list. 
+      summary: Get available fields list.
+      description: Get available fields list.
       tags:
         - crmService
       responses:
@@ -3298,8 +3298,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create field. 
-      description: Create field. 
+      summary: Create field.
+      description: Create field.
       tags:
         - crmService
       requestBody:
@@ -3394,8 +3394,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Delete field by code. 
-      description: Delete field by code. 
+      summary: Delete field by code.
+      description: Delete field by code.
       tags:
         - crmService
       responses:
@@ -3429,8 +3429,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Creating or editing list items. 
-      description: Creating or editing list items. 
+      summary: Creating or editing list items.
+      description: Creating or editing list items.
       tags:
         - crmService
       requestBody:
@@ -3457,8 +3457,8 @@ paths:
       - $ref: '#/components/parameters/field'
       - $ref: '#/components/parameters/value'
     delete:
-      summary: Deleting a list item. 
-      description: Deleting a list item. 
+      summary: Deleting a list item.
+      description: Deleting a list item.
       tags:
         - crmService
       responses:
@@ -3473,8 +3473,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      summary: Get available  crm entity items list. 
-      description: Get available  crm entity items list. 
+      summary: Get available  crm entity items list.
+      description: Get available  crm entity items list.
       tags:
         - crmService
       responses:
@@ -3498,8 +3498,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create  crm entity item. 
-      description: Create  crm entity item. 
+      summary: Create  crm entity item.
+      description: Create  crm entity item.
       tags:
         - crmService
       requestBody:
@@ -3856,8 +3856,8 @@ paths:
 
   /crm/v1/static/tasks:
     get:
-      summary: Get available crm-task entity items list. 
-      description: Get available crm-task entity items list. 
+      summary: Get available crm-task entity items list.
+      description: Get available crm-task entity items list.
       tags:
         - crmService
       parameters:
@@ -3927,8 +3927,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create crm-task entity item. 
-      description: Create crm-task entity item. 
+      summary: Create crm-task entity item.
+      description: Create crm-task entity item.
       tags:
         - crmService
       requestBody:
@@ -4006,8 +4006,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/entity'
     get:
-      summary: Get funnels. 
-      description: Get funnels. 
+      summary: Get funnels.
+      description: Get funnels.
       tags:
         - crmService
       responses:
@@ -4031,8 +4031,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Funnel creating. 
-      description: Funnel creating. 
+      summary: Funnel creating.
+      description: Funnel creating.
       tags:
         - crmService
       requestBody:
@@ -4068,8 +4068,8 @@ paths:
       - $ref: '#/components/parameters/entity'
       - $ref: '#/components/parameters/funnelId'
     get:
-      summary: Get funnels. 
-      description: Get funnels. 
+      summary: Get funnels.
+      description: Get funnels.
       tags:
         - crmService
       responses:
@@ -4094,8 +4094,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Funnel editing. 
-      description: Funnel editing. 
+      summary: Funnel editing.
+      description: Funnel editing.
       tags:
         - crmService
       requestBody:
@@ -4122,8 +4122,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Funnel deleting. 
-      description: Funnel deleting. 
+      summary: Funnel deleting.
+      description: Funnel deleting.
       tags:
         - crmService
       responses:
@@ -4162,8 +4162,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Create a kanban stage. 
-      description: Create a kanban stage. 
+      summary: Create a kanban stage.
+      description: Create a kanban stage.
       tags:
         - crmService
       requestBody:
@@ -4225,8 +4225,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Editing a Kanban Stage. 
-      description: Editing a Kanban Stage. 
+      summary: Editing a Kanban Stage.
+      description: Editing a Kanban Stage.
       tags:
         - crmService
       requestBody:
@@ -4253,8 +4253,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Deleting a Kanban Stage. 
-      description: Deleting a Kanban Stage. 
+      summary: Deleting a Kanban Stage.
+      description: Deleting a Kanban Stage.
       tags:
         - crmService
       responses:
@@ -4310,8 +4310,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/funnelId'
     get:
-      summary: Get funnels. 
-      description: Get funnels. 
+      summary: Get funnels.
+      description: Get funnels.
       tags:
         - crmService
       responses:
@@ -4329,8 +4329,8 @@ paths:
       security:
         - bearerAuth: [ ]
     post:
-      summary: Funnel creating. 
-      description: Funnel creating. 
+      summary: Funnel creating.
+      description: Funnel creating.
       tags:
         - crmService
       requestBody:
@@ -4365,8 +4365,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/reasonId'
     patch:
-      summary: Funnel editing. 
-      description: Funnel editing. 
+      summary: Funnel editing.
+      description: Funnel editing.
       tags:
         - crmService
       requestBody:
@@ -4393,8 +4393,8 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      summary: Funnel deleting. 
-      description: Funnel deleting. 
+      summary: Funnel deleting.
+      description: Funnel deleting.
       tags:
         - crmService
       responses:
@@ -4464,7 +4464,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/call_event_id'
       description:
-        Delete call event. 
+        Delete call event.
       tags:
         - crmService
       responses:
@@ -4481,8 +4481,8 @@ paths:
       - $ref: '#/components/parameters/itemId'
       - $ref: '#/components/parameters/entity_code'
     get:
-      summary: Get available  crm entity items list. 
-      description: Get available  crm entity items list. 
+      summary: Get available  crm entity items list.
+      description: Get available  crm entity items list.
       tags:
         - crmService
       responses:
@@ -4743,7 +4743,7 @@ paths:
         - bearerAuth: [ ]
   /crm/v1/static/taxes/{itemId}:
     patch:
-      parameters: 
+      parameters:
         - name: itemId
           in: path
           required: true
@@ -4772,7 +4772,7 @@ paths:
         - bearerAuth: [ ]
     delete:
       summary: Delete tax by id
-      parameters: 
+      parameters:
         - name: itemId
           in: path
           required: true
@@ -5165,6 +5165,700 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
+
+
+
+  # documents module begin
+
+
+  # documents template begin
+
+  /crm/v1/documents/templates:
+    get:
+      description: Get document templates list
+      tags:
+        - crmService
+      parameters:
+        - description: current page
+          in: query
+          example: 1
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - description: how many items should be per page
+          name: list
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 20
+          example: 10
+        - description: Filter by entities
+          in: query
+          name: binding_entities
+          schema:
+            type: array
+            items:
+              type: number
+          example: [23132,12124,3423]
+        - description: Search by name
+          in: query
+          name: search
+        - description: Filter by active
+          in: query
+          name: is_active
+        - description: Filter by date create, first element from date, second element to date
+          in: query
+          name: create_between
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ 2023-09-21, 2023-09-22 ]
+        - description: Filter by date update, first element from date, second element to date
+          in: query
+          name: update_between
+          schema:
+            type: array
+            items:
+              type: string
+            example: [ 2023-09-21, 2023-09-22 ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentTemplate'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create new document template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentTemplate'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Update document template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentTemplate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Mass delete document templates by IDs
+      tags:
+        - crmService
+      parameters:
+        - description: Array of list document templates IDs
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          name: list_document_templates
+      responses:
+        '204':
+          description: No content
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/templates/fields:
+    get:
+      description: Get document available fields list
+      tags:
+        - crmService
+      parameters:
+        - description: Filter fields by entities
+          in: query
+          name: binding_entities
+          schema:
+            type: array
+            items:
+              type: number
+        - description: Search by field name
+          in: query
+          schema:
+            type: string
+          name: search
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentTemplateField'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/templates/fields/filter-entities:
+    get:
+      description: Get available entities for filter fields
+      tags:
+        - crmService
+      parameters:
+        - description: With funnels or not
+          in: query
+          schema:
+            type: boolean
+          name: with-funnels
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentTemplateFilterEntity'
+  # documents template end
+
+
+  # documents begin
+
+  /crm/v1/documents:
+    get:
+      description: Get documents list of entity
+      tags:
+        - crmService
+      parameters:
+        - description: current page
+          in: query
+          example: 1
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - description: how many items should be per page
+          name: list
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 20
+          example: 10
+        - description: Entity type
+          in: query
+          schema:
+            type: string
+          name: entity_type
+        - description: Entity id
+          in: query
+          schema:
+            type: integer
+          name: entity_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Generate new document for entity
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocument'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/{documentId}:
+    parameters:
+      - description: Document id
+        in: path
+        name: document_id
+        schema:
+          type: integer
+    patch:
+      description: Update document
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_date:
+                  type: string
+                number:
+                  type: string
+                sign:
+                  type: boolean
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+  /crm/v1/documents/{documentId}/fields:
+    parameters:
+      - description: Document id
+        in: path
+        name: document_id
+        schema:
+          type: integer
+    get:
+      description: Getting filled fields of document
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                      example: 'Date created'
+                    symbol_code:
+                      type: string
+                      example: '{LeadDateCreate}'
+                    value:
+                      type: string
+                      example: '2023-09-20'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      description: Fill fields of document new values
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  symbol_code:
+                    required: true
+                    example: '{LeadDateCreate}'
+                    type: string
+                  value:
+                    required: true
+                    type: string
+                    example: '2023-09-22'
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+
+  # documents end
+
+
+  # documents module end
+
+
+  # Requisites begin
+  /requisites/regions:
+    get:
+      description: Get available regions for requisites
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    code:
+                      type: string
+      security:
+        - bearerAuth: [ ]
+  /requisites/templates:
+    get:
+      description: Get requisite templates
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/RequisiteTemplate'
+                        - type: object
+                          properties:
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
+                            created_by:
+                              type: integer
+                            updated_by:
+                              type: integer
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create requisite template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisiteTemplate'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RequisiteTemplate'
+                  - type: object
+                    properties:
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      created_by:
+                        type: integer
+                      updated_by:
+                        type: integer
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/templates/{requisite_id}:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+    patch:
+      description: Update requisite template
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisiteTemplate'
+      responses:
+        '200':
+          description: OK
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete requisite template
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: OK
+        '409':
+          description: Conflict, The template has requisites with it
+      security:
+        - bearerAuth: [ ]
+
+  /requisites:
+    get:
+      description: Get requisites
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Requisite'
+      security:
+        - bearerAuth: [ ]
+    post:
+      description: Create requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequisite'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id}:
+    get:
+      description: Get requisite by id
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+      security:
+        - bearerAuth: [ ]
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+    patch:
+      description: Update requisite by id
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequisite'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisite'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete requisite by id
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id}/bank_requisites:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+        required: true
+    get:
+      description: Bank requisites
+      tags:
+        - crmService
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/BankRequisite'
+                    - type: object
+                      properties:
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                        created_by:
+                          type: integer
+                        updated_by:
+                          type: integer
+    post:
+      description: Create bank requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankRequisite'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BankRequisite'
+                  - type: object
+                    properties:
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      created_by:
+                        type: integer
+                      updated_by:
+                        type: integer
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Delete list product.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /requisites/{requisite_id/bank_requisites}/{bank_requisite_id}:
+    parameters:
+      - description: Requisite id
+        in: path
+        schema:
+          type: integer
+        name: requisite_id
+        required: true
+      - description: Bank requisite id
+        in: path
+        schema:
+          type: integer
+        name: bank_requisite_id
+        required: true
+    patch:
+      description: Update bank requisite
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankRequisite'
+      responses:
+        '200':
+          description: OK
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: Delete bank requisite
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: OK
+      security:
+        - bearerAuth: [ ]
+
+  # Requisites end
 
   # crm end
 
@@ -8117,9 +8811,9 @@ components:
       type: object
       properties:
         integration_code:
-            type: string
-            example: unitalk_integration
-            description: It could be integration_code or unique code of source where data are imported from
+          type: string
+          example: unitalk_integration
+          description: It could be integration_code or unique code of source where data are imported from
         external_id:
           type: integer
           example: 1
@@ -8136,27 +8830,27 @@ components:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         company_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         lead_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         deal_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         entity_table:
           type: string
           description: The base entity the call event connected to could be provided or could be omitted in a case
-                       if just have usual call. In this the "empty" value will be automatically filled and
-                       the call event will be shown just in call logs history
+            if just have usual call. In this the "empty" value will be automatically filled and
+            the call event will be shown just in call logs history
           enum:
             - empty
             - leads,
@@ -8217,7 +8911,7 @@ components:
         note:
           type: string
           example: Fixed agenda
-      required: 
+      required:
         -  integration_code
         -  call_type
         -  from
@@ -8301,6 +8995,416 @@ components:
           example: true
         tax:
           $ref: '#/components/schemas/Tax'
+
+    DocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        is_active:
+          type: boolean
+          required: true
+        code:
+          type: string
+          required: true
+        id:
+          type: number
+          required: true
+        disabled:
+          type: boolean
+          required: true
+        file:
+          type: object
+          properties:
+            name:
+              type: string
+            size:
+              type: string
+            extension:
+              type: string
+            download_link:
+              type: string
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        created_by:
+          type: integer
+          description: User who created
+        updated_by:
+          type: integer
+          description: User who updated
+    CreateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        is_active:
+          type: boolean
+          required: true
+        file:
+          type: string
+          format: binary
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+    UpdateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        is_active:
+          type: boolean
+        file:
+          type: string
+          format: binary
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+    DocumentTemplateFilterEntity:
+      type: object
+      properties:
+        for_all_users:
+          type: boolean
+        display_in_menu:
+          type: boolean
+        kanban:
+          type: boolean
+        is_static:
+          type: boolean
+        table_name:
+          type: string
+        funnels:
+          type: array
+        title:
+          type: string
+          required: true
+        title_singular:
+          type: string
+        type:
+          type: string
+          required: true
+        updated_at:
+          type: number
+          required: true
+          description: Updated at in timestamp format
+    DocumentTemplateField:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Дата створення'
+        entity:
+          type: string
+          example: 'Угоди'
+        symbol_code:
+          type: string
+          example: '{DealDateCreate}'
+    CreateDocument:
+      type: object
+      properties:
+        entity_type:
+          type: string
+          required: true
+          example: 'leads'
+        entity_id:
+          type: integer
+          required: true
+          example: '3425'
+        template_id:
+          type: integer
+          required: true
+          example: 2
+    Document:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+          example: 'Рахунок на оплату 05.07.23 №1'
+          description: Template name + document number
+        template_id:
+          type: number
+          required: true
+        created_date:
+          type: string
+          required: true
+          example: '2023-09-21'
+        updated_date:
+          type: string
+          required: true
+          example: '2023-09-21'
+        from_date:
+          type: number
+          required: true
+          description: Custom edition date, default = dateCreated in timestamp
+        requisite:
+          $ref: '#/components/schemas/Requisite'
+        bank_requisite:
+          $ref: '#/components/schemas/BankRequisite'
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              extension:
+                type: string
+                enum: [ pdf, docx ]
+                description: New formats will be added in the future
+                example: 'pdf'
+              file:
+                type: number
+                required: true
+                description: id of file
+        number:
+          type: string
+          description: Editing number of document
+        sign:
+          type: boolean
+          default: false
+          description: Signature and seal
+        created_by:
+          type: integer
+          description: User who created
+        updated_by:
+          type: integer
+          description: User who updated
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    BankRequisite:
+      type: object
+      properties:
+        id:
+          type: number
+        created_by:
+          type: number
+        requisite_id:
+          type: number
+          required: true
+        name:
+          type: string
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [ string ]
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [ string, array, object ]
+                  description: Field code => field value
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity
+    CreateRequisite:
+      type: object
+      properties:
+        name:
+          type: string
+        template_id:
+          type: integer
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            field_code:
+              enum: [ string, array, object ]
+              description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankRequisite'
+    Region:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        image:
+          type: number
+        id:
+          type: number
+    Requisite:
+      type: object
+      properties:
+        name:
+          type: string
+        seal_picture:
+          type: number
+        sign_picture:
+          type: number
+        template_name:
+          type: string
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity
+        is_basic:
+          type: boolean
+        id:
+          type: number
+        template_id:
+          type: integer
+        region:
+          $ref: '#/components/schemas/Region'
+        fields:
+          description: Fields list
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [ datetime, string, integer, boolean, file ]
+
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [ string, array, object ]
+                  description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankRequisite'
+
+    RequisiteTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Name of requisite
+        region:
+          type: object
+          properties:
+            name:
+              type: string
+            code:
+              type: string
+        fields:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Field'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [ datetime, string, integer, boolean, file ]
+
+
 
     Product:
       properties:
