@@ -1,21 +1,14 @@
-openapi: '3.1.0'
-info:
-  title: Messenger Backend
-  version: 'v1'
-schemes:
-  - https
+openapi: 3.0.0
 paths:
-# messengerService begin
   /messenger/v1/chats:
     get:
+      operationId: ChatsController_handleGetChats
       parameters:
         - name: type
           required: true
           in: query
           schema:
             type: string
-      tags:
-        - messengerService
       responses:
         '200':
           description: The chats list
@@ -25,9 +18,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ChatResponseDto'
+      tags:
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     post:
+      operationId: ChatsController_handleCreateChat
       parameters: []
       requestBody:
         required: true
@@ -43,10 +39,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     patch:
+      operationId: ChatsController_handleUpdateChat
       parameters: []
       requestBody:
         required: true
@@ -62,11 +59,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}:
     get:
+      operationId: ChatsController_handleGetChat
       parameters:
         - name: id
           required: true
@@ -81,10 +79,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     delete:
+      operationId: ChatsController_handleDeleteChat
       parameters:
         - name: id
           required: true
@@ -99,17 +98,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/members:
     post:
+      operationId: ChatsController_handleAddMembers
       parameters:
         - name: id
           required: true
           in: path
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMemebersDto'
       responses:
         '200':
           description: Updated chat with new members
@@ -118,16 +124,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     delete:
+      operationId: ChatsController_handleDeleteMembers
       parameters:
         - name: id
           required: true
           in: path
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMemebersDto'
       responses:
         '200':
           description: Updated chat with new members
@@ -136,11 +149,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/leave:
     post:
+      operationId: ChatsController_handleLeaveChat
       parameters:
         - name: id
           required: true
@@ -155,11 +169,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/setActiveValue:
     post:
+      operationId: ChatsController_handleSetActiveValue
       parameters:
         - name: id
           required: true
@@ -174,11 +189,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatResponseDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/pin:
     post:
+      operationId: ChatsController_handlePinChat
       parameters:
         - name: id
           required: true
@@ -186,14 +202,19 @@ paths:
           schema:
             type: string
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Id of pinned chat
+          content:
+            application/json:
+              schema:
+                type: string
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/unpin:
     post:
+      operationId: ChatsController_handleUnpinChat
       parameters:
         - name: id
           required: true
@@ -201,14 +222,19 @@ paths:
           schema:
             type: string
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Id of unpinned chat
+          content:
+            application/json:
+              schema:
+                type: string
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/mute:
     post:
+      operationId: ChatsController_handleMuteChatChat
       parameters:
         - name: id
           required: true
@@ -216,14 +242,19 @@ paths:
           schema:
             type: string
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Chat settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSettingsDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/chats/{id}/unmute:
     post:
+      operationId: ChatsController_handleUnmuteChatChat
       parameters:
         - name: id
           required: true
@@ -231,14 +262,19 @@ paths:
           schema:
             type: string
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Chat settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSettingsDto'
       tags:
-        - messengerService
+        - chats
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages:
     get:
+      operationId: MessagesController_handleGetMessages
       parameters:
         - name: chatId
           required: true
@@ -274,10 +310,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
+      tags:
+        - messages
       security:
-        - bearerAuth: [ ]
-
+        - bearer: []
     post:
+      operationId: MessagesController_handleCreateMessage
       parameters: []
       requestBody:
         required: true
@@ -293,11 +331,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     patch:
+      operationId: MessagesController_handleUpdateMessage
       parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageDto'
       responses:
         '200':
           description: The updated message
@@ -306,21 +351,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/readMessages:
     post:
+      operationId: MessagesController_handleReadMessages
       parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagesIdsChatIdDto'
       responses:
-        '201':
-          description: ''
+        '200':
+          description: The updated message
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessagesIdsChatIdDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/{id}/goToMessage:
     get:
+      operationId: MessagesController_handleGoToMessage
       parameters:
         - name: id
           required: true
@@ -329,7 +388,7 @@ paths:
             type: string
       responses:
         '200':
-          description: ''
+          description: The messages before and after the message with the given id
           content:
             application/json:
               schema:
@@ -337,12 +396,19 @@ paths:
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/forwardMessages:
     post:
+      operationId: MessagesController_handleForwardMessages
       parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagesIdsChatIdDto'
       responses:
         '200':
           description: ''
@@ -353,11 +419,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/getPinnedMessages:
     get:
+      operationId: MessagesController_handleGetPinnedMessages
       parameters:
         - name: chatId
           required: true
@@ -374,11 +441,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/{id}/pin:
     post:
+      operationId: MessagesController_handlePinMessage
       parameters:
         - name: id
           required: true
@@ -393,11 +461,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/{id}/unpin:
     post:
+      operationId: MessagesController_handleUnpinMessage
       parameters:
         - name: id
           required: true
@@ -412,11 +481,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/deleteMessages:
     delete:
+      operationId: MessagesController_handleDeleteMessages
       parameters: []
       requestBody:
         required: true
@@ -428,7 +498,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: ''
+          description: The deleted messages
           content:
             application/json:
               schema:
@@ -436,21 +506,35 @@ paths:
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/readAll:
     post:
+      operationId: MessagesController_handleReadAll
       parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatIdDto'
       responses:
-        '201':
-          description: ''
+        '200':
+          description: The read messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatIdDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/messages/{id}:
     delete:
+      operationId: MessagesController_handleDeleteMessage
       parameters:
         - name: id
           required: true
@@ -459,17 +543,18 @@ paths:
             type: string
       responses:
         '200':
-          description: ''
+          description: The deleted message
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponseDto'
       tags:
-        - messengerService
+        - messages
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/external-lines:
     get:
+      operationId: ExternalLinesController_getExternalLines
       parameters: []
       responses:
         '200':
@@ -480,10 +565,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExternalLineResponseDto'
+      tags:
+        - external-lines
       security:
-        - bearerAuth: [ ]
-
+        - bearer: []
     post:
+      operationId: ExternalLinesController_createExternalLine
       parameters: []
       requestBody:
         required: true
@@ -499,11 +586,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
       tags:
-        - messengerService
+        - external-lines
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/external-lines/{id}:
     get:
+      operationId: ExternalLinesController_getExternalLineById
       parameters:
         - name: id
           required: true
@@ -518,10 +606,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
       tags:
-        - messengerService
+        - external-lines
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     delete:
+      operationId: ExternalLinesController_deleteExternalLineById
       parameters:
         - name: id
           required: true
@@ -536,10 +625,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
       tags:
-        - messengerService
+        - external-lines
       security:
-        - bearerAuth: [ ]
+        - bearer: []
     patch:
+      operationId: ExternalLinesController_updateExternalLine
       parameters:
         - name: id
           required: true
@@ -560,11 +650,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalLineResponseDto'
       tags:
-        - messengerService
+        - external-lines
       security:
-        - bearerAuth: [ ]
+        - bearer: []
+  /messenger/v1/telephony/call/start:
+    post:
+      operationId: TelephonyController_handleCallStart
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallEventDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - telephony
+  /messenger/v1/telephony/call/end:
+    post:
+      operationId: TelephonyController_handleCallEnd
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallEventDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - telephony
   /messenger/v1/search/messages:
     get:
+      operationId: SearchController_handleSearchMessages
       parameters:
         - name: query
           required: true
@@ -590,10 +711,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageResponseDto'
+      tags:
+        - search
       security:
-        - bearerAuth: [ ]
+        - bearer: []
   /messenger/v1/search/{chatId}:
     get:
+      operationId: SearchController_handleSearchAll
       parameters:
         - name: query
           required: true
@@ -623,45 +747,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchResponseDto'
       tags:
-        - messengerService
+        - search
       security:
-        - bearerAuth: [ ]
-  # messengerService end
-
+        - bearer: []
+info:
+  title: Messenger service
+  description: ''
+  version: v1
+  contact: {}
+tags: []
+servers:
+  - url: https://{domain}.uspacy.ua
+    description: Ukrainian server
+  - url: https://{domain}.uspacy.eu
+    description: EU server
+  - url: https://{domain}.uspacy.com.br
+    description: Brazilian server
+  - url: https://{domain}.uspacy.com
+    description: International server
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
       bearerFormat: JWT
-
-  responses:
-    UnauthorizedError:
-      description: Access token is missing or invalid
-    Forbidden:
-      description: Forbidden
-    NoContent:
-      description: No Content
-
+      type: http
   schemas:
-
     ExternalLineResponseDto:
       type: object
       properties:
         id:
           type: string
+          description: External line id
+          example: 659ff121fd62e43063340f2f
         name:
           type: string
+          description: External line name
+          example: Main line
         icon:
           type: string
+          description: External line icon
+          example: https://example.com/icon.png
         externalId:
           type: string
+          description: External line external id
+          example: externalId
         timestamp:
           type: number
+          description: External line timestamp
+          example: 1620211200000
         portal:
           type: string
+          description: External line portal
+          example: portal
         phoneNumber:
           type: string
+          description: External line phone number
+          example: '+1234567890'
       required:
         - id
         - name
@@ -674,19 +815,33 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: object
+          description: Attached file id
+          example: 1
         entityId:
           type: string
+          description: Attached file entity id
+          example: 659ff121fd62e43063340f2f
         entityType:
           type: string
+          description: Attached file entity type
+          example: chat_message
         lastModified:
           type: number
+          description: Attached file created date
+          example: 1613491200000
         originalFilename:
           type: string
+          description: Attached file original filename
+          example: file.jpg
         size:
           type: string
+          description: Attached file size
+          example: '1024'
         url:
           type: string
+          description: Attached file url
+          example: https://example.com/file.jpg
       required:
         - id
         - entityId
@@ -704,22 +859,34 @@ components:
             - create
             - update
             - delete
+          example: create
+          description: Action
         service:
           type: string
           enum:
             - crm
+          example: crm
+          description: Service
         entity:
           type: string
           enum:
             - lead
             - contact
             - deal
+          example: contact
+          description: Entity
         name:
           type: string
+          description: Entity id
+          example: 659ff121fd62e43063340f2f
         pictureUrl:
           type: string
+          description: Entity picture url
+          example: https://example.com/picture.jpg
         entityId:
           type: string
+          description: Entity id
+          example: 659ff121fd62e43063340f2f
       required:
         - action
         - service
@@ -732,23 +899,35 @@ components:
       properties:
         chatId:
           type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
         authorId:
           type: number
-        refMessageId:
+          example: 1
+          description: Author id
+        messageId:
           type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Message id
       required:
         - chatId
         - authorId
-        - refMessageId
+        - messageId
     MessageResponseDto:
       type: object
       properties:
         id:
           type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Message id
         timestamp:
           type: number
+          example: 1709043064088
+          description: Timestamp of message
         message:
           type: string
+          example: Hello, world!
+          description: Message text
         type:
           type: string
           enum:
@@ -757,37 +936,54 @@ components:
             - VIDEO
             - GIF
             - SYSTEM
+          example: MESSAGE
+          description: Message type
         chatId:
           type: string
-        parentMessage:
-          $ref: '#/components/schemas/MessageResponseDto'
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
         readBy:
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
+          description: Members ids
           type: array
           items:
             type: number
         externalLine:
-          $ref: '#/components/schemas/ExternalLineResponseDto'
+          description: External line
+          allOf:
+            - $ref: '#/components/schemas/ExternalLineResponseDto'
         attachedFiles:
+          description: Attached files
           type: array
           items:
             $ref: '#/components/schemas/AttachedFile'
         relations:
+          description: Relations
           type: array
           items:
             $ref: '#/components/schemas/MessageRelation'
         externalAuthorId:
           type: string
+          description: External author id
+          example: '123456'
         externalId:
           type: string
+          description: External id
+          example: '123456'
         ref:
-          $ref: '#/components/schemas/Reference'
+          description: Reference
+          allOf:
+            - $ref: '#/components/schemas/Reference'
       required:
         - id
         - timestamp
         - message
         - type
         - chatId
-        - parentMessage
         - readBy
         - externalLine
         - attachedFiles
@@ -802,6 +998,7 @@ components:
           type: string
           enum:
             - phone
+            - widgetUser
             - username
             - facebook
             - instagram
@@ -809,26 +1006,57 @@ components:
             - twitter
             - viber
             - whatsapp
+          example: telegram
+          description: Meta type
         value:
           type: string
+          example: '1234567890'
+          description: Meta value
       required:
         - type
         - value
+    ChatSettingsDto:
+      type: object
+      properties:
+        muteUntil:
+          example: forever
+          description: Mute until
+          type: array
+          items:
+            type: number
+      required:
+        - muteUntil
     ChatResponseDto:
       type: object
       properties:
         id:
           type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
         members:
           type: string
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
+          description: Members ids
         timestamp:
           type: number
+          example: 1709043064088
+          description: Timestamp of last message in chat
         ownerId:
           type: number
+          example: 1
+          description: Owner id
         name:
           type: string
+          example: Chat name
+          description: Chat name
         pictureUrl:
           type: string
+          example: https://example.com/picture.jpg
+          description: Chat picture url
         type:
           type: string
           enum:
@@ -837,13 +1065,22 @@ components:
             - GROUP
             - DIRECT
             - EXTERNAL
+          example: GROUP
+          description: Chat type
         groupId:
           type: number
+          example: 1
+          description: Group id
         portals:
+          example:
+            - portal1
+            - portal2
+          description: Portals
           type: array
           items:
             type: string
         externalLines:
+          description: External lines
           type: array
           items:
             $ref: '#/components/schemas/ExternalLineResponseDto'
@@ -855,8 +1092,24 @@ components:
             $ref: '#/components/schemas/ChatMeta'
         active:
           type: boolean
+          example: true
+          description: Chat active
         unreadCount:
           type: number
+          example: 1
+          description: Unread messages count
+        pinned:
+          type: boolean
+          example: true
+          description: Pinned chat
+        pinnedTimestamp:
+          type: number
+          example: 1709043064088
+          description: Pinned timestamp
+        setting:
+          description: Chat settings
+          allOf:
+            - $ref: '#/components/schemas/ChatSettingsDto'
       required:
         - id
         - members
@@ -872,13 +1125,20 @@ components:
         - meta
         - active
         - unreadCount
+        - pinned
+        - pinnedTimestamp
+        - setting
     CreateChatDto:
       type: object
       properties:
         members:
+          example:
+            - 1
+            - 2
+            - 3
           type: array
           items:
-            type: string
+            type: number
         type:
           type: string
           enum:
@@ -887,19 +1147,29 @@ components:
             - GROUP
             - DIRECT
             - EXTERNAL
+          example: GROUP
         ownerId:
           type: number
+          example: 1
         name:
           type: string
+          example: Group name
         pictureUrl:
           type: string
+          example: Group description
         groupId:
           type: number
+          example: 1
+          description: Group id
         externalLines:
+          example:
+            - 659ff121fd62e43063340f2f
+          description: External lines
           type: array
           items:
             type: string
         meta:
+          description: Chat meta
           type: array
           items:
             $ref: '#/components/schemas/ChatMeta'
@@ -911,25 +1181,46 @@ components:
       properties:
         id:
           type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
         ownerId:
           type: number
+          example: 1
+          description: Owner id
         name:
           type: string
+          example: Chat name
+          description: Chat name
         pictureUrl:
           type: string
+          example: https://example.com/picture.jpg
+          description: Chat picture url
         groupId:
           type: number
+          example: 1
+          description: Group id
         portals:
           type: array
           items:
             type: string
         members:
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
+          description: Members ids
           type: array
           items:
-            type: string
+            type: number
         active:
           type: boolean
+          example: true
+          description: Chat active
         externalLines:
+          example:
+            - 659ff121fd62e43063340f2f
+          description: External lines
           type: array
           items:
             type: string
@@ -939,15 +1230,251 @@ components:
             $ref: '#/components/schemas/ChatMeta'
       required:
         - id
+    ChatMemebersDto:
+      type: object
+      properties:
+        members:
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
+          description: Members ids
+          type: array
+          items:
+            type: number
+      required:
+        - members
     MessageDto:
       type: object
-      properties: {}
+      properties:
+        id:
+          type: string
+          description: Message id
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+        timestamp:
+          type: number
+          description: Timestamp of message
+          example: 1709043064088
+        message:
+          type: string
+          description: Message text
+          example: Hello, world!
+        type:
+          type: string
+          enum:
+            - MESSAGE
+            - AUDIO
+            - VIDEO
+            - GIF
+            - SYSTEM
+          description: Message type
+          example: MESSAGE
+        chatId:
+          type: string
+          description: Chat id
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+        parentMessage:
+          type: string
+          description: Parent message id
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+        readBy:
+          description: Members ids
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
+          type: array
+          items:
+            type: number
+        externalLine:
+          type: string
+          description: External line
+          example: '123123123123123123'
+        attachedFiles:
+          description: Attached files
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachedFile'
+        relations:
+          description: Relations
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageRelation'
+        externalAuthorId:
+          type: string
+          description: External author id
+          example: '123456'
+        externalId:
+          type: string
+          description: External id
+          example: '123456'
+        ref:
+          description: Reference
+          allOf:
+            - $ref: '#/components/schemas/Reference'
+        mentioned:
+          description: Mentioned users
+          example:
+            - 1
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - timestamp
+        - message
+        - type
+        - chatId
+        - parentMessage
+        - readBy
+        - externalLine
+        - attachedFiles
+        - relations
+        - externalAuthorId
+        - externalId
+        - ref
+        - mentioned
+    MessagesIdsChatIdDto:
+      type: object
+      properties:
+        messagesIds:
+          example:
+            - 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Messages ids
+          type: array
+          items:
+            type: string
+        chatId:
+          type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
+      required:
+        - messagesIds
+        - chatId
+    ChatIdDto:
+      type: object
+      properties:
+        chatId:
+          type: string
+          example: 76bfc2ff-207c-4b5a-8543-f7009b7f8872
+          description: Chat id
+      required:
+        - chatId
     ExternalLineCreateDto:
       type: object
-      properties: {}
+      properties:
+        name:
+          type: string
+          example: External line name
+          description: The name of the external line
+        icon:
+          type: string
+          example: https://external-line-icon.com/icon.png
+          description: The icon of the external line
+        phoneNumber:
+          type: string
+          example: '+1234567890'
+          description: The phone number of the external line
+        externalId:
+          type: string
+          example: external-line-external-id
+          description: The external id of the external line
+      required:
+        - name
+        - icon
+        - phoneNumber
+        - externalId
     ExternalLineUpdateDto:
       type: object
-      properties: {}
+      properties:
+        name:
+          type: string
+          example: External line name
+          description: The name of the external line
+        icon:
+          type: string
+          example: https://external-line-icon.com/icon.png
+          description: The icon of the external line
+        externalId:
+          type: string
+          example: external-line-external-id
+          description: The external id of the external line
+      required:
+        - name
+        - icon
+        - externalId
+    HangupButtonEventDataDto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Hangup button id
+          example: 1
+      required:
+        - id
+    HangupButtonEventDto:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Hangup button url
+          example: https://example.com/hangup
+        data:
+          description: Hangup button data
+          allOf:
+            - $ref: '#/components/schemas/HangupButtonEventDataDto'
+      required:
+        - url
+        - data
+    CallEventDto:
+      type: object
+      properties:
+        call_type:
+          type: string
+          description: Call type
+          example: incoming
+          enum:
+            - incoming
+            - outgoing
+        from:
+          type: string
+          description: Call from
+          example: '1234567890'
+        to:
+          type: string
+          description: Call to
+          example: '1234567890'
+        integration_code:
+          type: string
+          description: Integration code
+          example: '1234567890'
+        time:
+          type: string
+          description: Hangup button
+          example: '1234567890'
+        status:
+          type: string
+          description: Status
+          example: '1234567890'
+        note:
+          type: string
+          description: Note
+          example: '1234567890'
+        hangup_button:
+          description: Hangup button
+          allOf:
+            - $ref: '#/components/schemas/HangupButtonEventDto'
+      required:
+        - call_type
+        - from
+        - to
+        - integration_code
+        - time
+        - status
+        - note
+        - hangup_button
     SearchResponseDto:
       type: object
       properties:
@@ -967,6 +1494,3 @@ components:
         - messages
         - files
         - links
-
-    # messenger end
-
