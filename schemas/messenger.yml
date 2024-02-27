@@ -1446,6 +1446,14 @@ components:
           type: string
           description: Call to
           example: '1234567890'
+        call_event_id:
+          type: number
+          description: Call event id
+          example: 1
+        auth_user_id:
+          type: number
+          description: Auth user id
+          example: 1
         integration_code:
           type: string
           description: Integration code
@@ -1467,13 +1475,13 @@ components:
           allOf:
             - $ref: '#/components/schemas/HangupButtonEventDto'
       required:
-        - call_type
         - from
         - to
+        - call_event_id
+        - auth_user_id
         - integration_code
         - time
         - status
-        - note
         - hangup_button
     SearchResponseDto:
       type: object
