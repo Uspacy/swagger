@@ -1475,6 +1475,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/HangupButtonEventDto'
       required:
+        - call_type
         - from
         - to
         - call_event_id
