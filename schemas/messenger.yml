@@ -10,14 +10,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The chats list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChatResponseDto'
+                  $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -30,14 +30,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateChatDto'
+              $ref: "#/components/schemas/CreateChatDto"
       responses:
-        '200':
+        "200":
           description: Created chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -50,14 +50,49 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateChatDto'
+              $ref: "#/components/schemas/UpdateChatDto"
       responses:
-        '200':
+        "200":
           description: Updated chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
+      tags:
+        - chats
+      security:
+        - bearer: []
+  /messenger/v1/chats/findByMeta:
+    get:
+      operationId: ChatsController_handleFindByMeta
+      parameters:
+        - name: type
+          required: true
+          in: query
+          schema:
+            enum:
+              - phone
+              - widgetUser
+              - username
+              - facebook
+              - instagram
+              - telegram
+              - twitter
+              - viber
+              - whatsapp
+            type: string
+        - name: value
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Find chat by meta value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -72,12 +107,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Chat by id
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -91,12 +126,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Deleted chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -115,14 +150,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatMemebersDto'
+              $ref: "#/components/schemas/ChatMemebersDto"
       responses:
-        '200':
+        "200":
           description: Updated chat with new members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -140,14 +175,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatMemebersDto'
+              $ref: "#/components/schemas/ChatMemebersDto"
       responses:
-        '200':
+        "200":
           description: Updated chat with new members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -162,12 +197,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Updated chat with new members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -182,12 +217,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Updated chat with active value
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -202,7 +237,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Id of pinned chat
           content:
             application/json:
@@ -222,7 +257,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Id of unpinned chat
           content:
             application/json:
@@ -242,12 +277,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Chat settings
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatSettingsDto'
+                $ref: "#/components/schemas/ChatSettingsDto"
       tags:
         - chats
       security:
@@ -262,12 +297,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Chat settings
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatSettingsDto'
+                $ref: "#/components/schemas/ChatSettingsDto"
       tags:
         - chats
       security:
@@ -302,14 +337,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The messages list by chat
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -322,14 +357,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageDto'
+              $ref: "#/components/schemas/MessageDto"
       responses:
-        '200':
+        "200":
           description: The created message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -342,14 +377,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageDto'
+              $ref: "#/components/schemas/MessageDto"
       responses:
-        '200':
+        "200":
           description: The updated message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -363,16 +398,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessagesIdsChatIdDto'
+              $ref: "#/components/schemas/MessagesIdsChatIdDto"
       responses:
-        '200':
+        "200":
           description: The updated message
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessagesIdsChatIdDto'
+                  $ref: "#/components/schemas/MessagesIdsChatIdDto"
       tags:
         - messages
       security:
@@ -387,14 +422,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The messages before and after the message with the given id
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -408,16 +443,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessagesIdsChatIdDto'
+              $ref: "#/components/schemas/MessagesIdsChatIdDto"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -432,14 +467,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -454,12 +489,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -474,12 +509,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -497,14 +532,14 @@ paths:
               items:
                 type: string
       responses:
-        '200':
+        "200":
           description: The deleted messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -518,16 +553,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatIdDto'
+              $ref: "#/components/schemas/ChatIdDto"
       responses:
-        '200':
+        "200":
           description: The read messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChatIdDto'
+                  $ref: "#/components/schemas/ChatIdDto"
       tags:
         - messages
       security:
@@ -542,12 +577,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The deleted message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -557,14 +592,14 @@ paths:
       operationId: ExternalLinesController_getExternalLines
       parameters: []
       responses:
-        '200':
+        "200":
           description: The external lines items list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ExternalLineResponseDto'
+                  $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -577,14 +612,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalLineCreateDto'
+              $ref: "#/components/schemas/ExternalLineCreateDto"
       responses:
-        '200':
+        "200":
           description: The created external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -599,12 +634,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -618,12 +653,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The deleted external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -641,14 +676,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalLineUpdateDto'
+              $ref: "#/components/schemas/ExternalLineUpdateDto"
       responses:
-        '200':
+        "200":
           description: The updated external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -662,10 +697,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallEventDto'
+              $ref: "#/components/schemas/CallEventDto"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
       tags:
         - telephony
   /messenger/v1/telephony/call/end:
@@ -677,10 +712,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallEventDto'
+              $ref: "#/components/schemas/CallEventDto"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
       tags:
         - telephony
   /messenger/v1/search/messages:
@@ -703,14 +738,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - search
       security:
@@ -740,19 +775,19 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponseDto'
+                $ref: "#/components/schemas/SearchResponseDto"
       tags:
         - search
       security:
         - bearer: []
 info:
   title: Messenger service
-  description: ''
+  description: ""
   version: v1
   contact: {}
 tags: []
@@ -802,7 +837,7 @@ components:
         phoneNumber:
           type: string
           description: External line phone number
-          example: '+1234567890'
+          example: "+1234567890"
       required:
         - id
         - name
@@ -837,7 +872,7 @@ components:
         size:
           type: string
           description: Attached file size
-          example: '1024'
+          example: "1024"
         url:
           type: string
           description: Attached file url
@@ -955,29 +990,29 @@ components:
         externalLine:
           description: External line
           allOf:
-            - $ref: '#/components/schemas/ExternalLineResponseDto'
+            - $ref: "#/components/schemas/ExternalLineResponseDto"
         attachedFiles:
           description: Attached files
           type: array
           items:
-            $ref: '#/components/schemas/AttachedFile'
+            $ref: "#/components/schemas/AttachedFile"
         relations:
           description: Relations
           type: array
           items:
-            $ref: '#/components/schemas/MessageRelation'
+            $ref: "#/components/schemas/MessageRelation"
         externalAuthorId:
           type: string
           description: External author id
-          example: '123456'
+          example: "123456"
         externalId:
           type: string
           description: External id
-          example: '123456'
+          example: "123456"
         ref:
           description: Reference
           allOf:
-            - $ref: '#/components/schemas/Reference'
+            - $ref: "#/components/schemas/Reference"
       required:
         - id
         - timestamp
@@ -1010,7 +1045,7 @@ components:
           description: Meta type
         value:
           type: string
-          example: '1234567890'
+          example: "1234567890"
           description: Meta value
       required:
         - type
@@ -1083,13 +1118,13 @@ components:
           description: External lines
           type: array
           items:
-            $ref: '#/components/schemas/ExternalLineResponseDto'
+            $ref: "#/components/schemas/ExternalLineResponseDto"
         lastMessage:
-          $ref: '#/components/schemas/MessageResponseDto'
+          $ref: "#/components/schemas/MessageResponseDto"
         meta:
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
         active:
           type: boolean
           example: true
@@ -1109,7 +1144,7 @@ components:
         setting:
           description: Chat settings
           allOf:
-            - $ref: '#/components/schemas/ChatSettingsDto'
+            - $ref: "#/components/schemas/ChatSettingsDto"
       required:
         - id
         - members
@@ -1172,7 +1207,7 @@ components:
           description: Chat meta
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
       required:
         - members
         - type
@@ -1227,7 +1262,7 @@ components:
         meta:
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
       required:
         - id
     ChatMemebersDto:
@@ -1291,29 +1326,29 @@ components:
         externalLine:
           type: string
           description: External line
-          example: '123123123123123123'
+          example: "123123123123123123"
         attachedFiles:
           description: Attached files
           type: array
           items:
-            $ref: '#/components/schemas/AttachedFile'
+            $ref: "#/components/schemas/AttachedFile"
         relations:
           description: Relations
           type: array
           items:
-            $ref: '#/components/schemas/MessageRelation'
+            $ref: "#/components/schemas/MessageRelation"
         externalAuthorId:
           type: string
           description: External author id
-          example: '123456'
+          example: "123456"
         externalId:
           type: string
           description: External id
-          example: '123456'
+          example: "123456"
         ref:
           description: Reference
           allOf:
-            - $ref: '#/components/schemas/Reference'
+            - $ref: "#/components/schemas/Reference"
         mentioned:
           description: Mentioned users
           example:
@@ -1375,7 +1410,7 @@ components:
           description: The icon of the external line
         phoneNumber:
           type: string
-          example: '+1234567890'
+          example: "+1234567890"
           description: The phone number of the external line
         externalId:
           type: string
@@ -1424,7 +1459,7 @@ components:
         data:
           description: Hangup button data
           allOf:
-            - $ref: '#/components/schemas/HangupButtonEventDataDto'
+            - $ref: "#/components/schemas/HangupButtonEventDataDto"
       required:
         - url
         - data
@@ -1441,11 +1476,11 @@ components:
         from:
           type: string
           description: Call from
-          example: '1234567890'
+          example: "1234567890"
         to:
           type: string
           description: Call to
-          example: '1234567890'
+          example: "1234567890"
         call_event_id:
           type: number
           description: Call event id
@@ -1457,23 +1492,23 @@ components:
         integration_code:
           type: string
           description: Integration code
-          example: '1234567890'
+          example: "1234567890"
         time:
           type: string
           description: Hangup button
-          example: '1234567890'
+          example: "1234567890"
         status:
           type: string
           description: Status
-          example: '1234567890'
+          example: "1234567890"
         note:
           type: string
           description: Note
-          example: '1234567890'
+          example: "1234567890"
         hangup_button:
           description: Hangup button
           allOf:
-            - $ref: '#/components/schemas/HangupButtonEventDto'
+            - $ref: "#/components/schemas/HangupButtonEventDto"
       required:
         - call_type
         - from
@@ -1490,15 +1525,15 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
         files:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
         links:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
       required:
         - messages
         - files
