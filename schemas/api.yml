@@ -5346,8 +5346,6 @@ paths:
         - bearerAuth: [ ]
   # appService end
 
-
-
 components:
   securitySchemes:
     bearerAuth:
