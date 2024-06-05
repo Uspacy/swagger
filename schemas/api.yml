@@ -7205,25 +7205,26 @@ components:
           nullable: true
           properties:
             type:
-              required: true
               type: string
               example: "parent_type"
             data:
-              required: true
               type: string
               example: "parent_data"
             service:
-              required: true
               type: string
               example: "parent_service"
             title:
-              required: true
               type: string
               example: "parent_title"
             table_name:
-              nullable: true
               type: string
+              nullable: true
               example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
       required:
         - entity_type
         - entity_id
