@@ -7130,10 +7130,8 @@ components:
         date:
           $ref: '#/components/schemas/Date'
         mentioned:
-          nullable: true
           $ref: '#/components/schemas/MentionedDto'
         notify:
-          nullable: true
           $ref: '#/components/schemas/NotifyDto'
     CommentExtrasServiceDto:
       type: object
@@ -7152,7 +7150,6 @@ components:
           format: int64
           example: 1
           description: If NULL, this is the first comment if the (sub)thread
-
     ReactionServiceDto:
       type: object
       properties:
@@ -7169,7 +7166,6 @@ components:
           type: integer
           format: int64
           example: 1
-
     CreateCommentServiceDto:
       type: object
       properties:
@@ -7234,14 +7230,12 @@ components:
         - author_id
         - message
         - date
-
     UpdateCommentServiceDto:
       type: object
       properties:
         message:
           type: string
           example: Message post
-
     MentionedDto:
       type: object
       nullable: true
