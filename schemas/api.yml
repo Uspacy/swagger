@@ -3330,11 +3330,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '422':
-          description: 'Validation Error'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /crm/v1/entities/{entity}/fields/{field}:
