@@ -3329,6 +3329,12 @@ paths:
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          description: 'Validation Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /crm/v1/entities/{entity}/fields/{field}:
@@ -5383,11 +5389,24 @@ components:
     # search serivce
     SearchErrorMessage:
       description: Custom error
-
-
-
-
-
+    ValidationError:
+      description: Validation error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  field_name: [ "The field_name field is required." ]
+              status:
+                type: boolean
+                example: true
   parameters:
     userId:
       name: userId
