@@ -7201,10 +7201,8 @@ components:
             type: integer
           example: [ ]
         mentioned:
-          nullable: true
           $ref: '#/components/schemas/MentionedDto'
         notify:
-          nullable: true
           $ref: '#/components/schemas/NotifyDto'
         root_parent:
           type: object
@@ -7246,6 +7244,7 @@ components:
 
     MentionedDto:
       type: object
+      nullable: true
       properties:
         users:
           type: array
@@ -7264,6 +7263,7 @@ components:
           example: [ ]
     NotifyDto:
       type: object
+      nullable: true
       properties:
         users:
           type: array
