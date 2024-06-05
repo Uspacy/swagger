@@ -2763,7 +2763,7 @@ paths:
                       format: binary
                       description: The file to upload.
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -7333,9 +7333,9 @@ components:
           type: string
           example: group theme
         ownerId:
-          type: string
+          type: integer
           example: 1
-          description: "1"
+          description: 1
         moderatorsIds:
           type: array
           items:
@@ -7349,6 +7349,7 @@ components:
       required:
         - name
         - groupType
+        - ownerId
 
     Group:
       type: object
@@ -7363,7 +7364,7 @@ components:
           type: string
           example: private
         ownerId:
-          type: string
+          type: integer
           example: 1
         archival:
           type: boolean
