@@ -142,6 +142,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -161,6 +165,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -217,6 +225,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/reset_password:
     post:
       summary: Change password with token
@@ -232,6 +242,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
@@ -255,9 +267,11 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password:
+  /auth/v1/users/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -377,6 +391,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
@@ -2557,7 +2575,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCommentServiceDto'
       responses:
-        '200':
+        '201':
           description: Successful response
           content:
             application/json:
@@ -2565,6 +2583,8 @@ paths:
                 $ref: '#/components/schemas/CommentServiceDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -2701,8 +2721,8 @@ paths:
   # group begin
   /groups/v1/groups:
     get:
-      summary: Get posts list
-      description: Get posts list
+      summary: Get groups list
+      description: Get groups list
       tags:
         - groupService
       parameters:
@@ -5364,6 +5384,15 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     JoinRequestNotFound:
       description: Join request not found
       content:
@@ -5784,16 +5813,41 @@ components:
     Meta:
       type: object
       properties:
-        total:
-          type: number
-          example: 100
-        page:
+        currentPage:
           type: number
           example: 1
-        list:
+        from:
           type: number
-          example: 10
-
+          example: 1
+        lastPage:
+          type: number
+          example: 1
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                example: null
+              label:
+                type: string
+                example: "Previous"
+              active:
+                type: boolean
+                example: false
+        path:
+          type: string
+          example: "https://domain.uspacy.ua/groups/v1/groups"
+        perPage:
+          type: number
+          example: 20
+        to:
+          type: number
+          example: 2
+        total:
+          type: number
+          example: 2
     Roles:
       type: array
       items:
@@ -5984,6 +6038,10 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+        position:
+          type: string
         specialization:
           type: string
           example: Specialist
@@ -5993,9 +6051,6 @@ components:
         city:
           type: string
           example: Kiyv
-        avatar:
-          type: string
-          example: /storage/avatars/c4ca423/avatar.jpeg
         aboutMyself:
           type: string
           example: about me
@@ -6007,6 +6062,8 @@ components:
           type: boolean
           default: false
           example: true
+        active:
+          type: boolean
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
@@ -6183,7 +6240,7 @@ components:
           $ref: '#/components/schemas/Email'
         password:
           type: string
-          example: 12345678
+          example: myNewPassword
         token:
           type: string
           example: r6pvb5pllte
@@ -6203,7 +6260,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
@@ -7129,7 +7186,10 @@ components:
           example: 1
         date:
           $ref: '#/components/schemas/Date'
-
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
     CommentExtrasServiceDto:
       type: object
       properties:
@@ -7147,7 +7207,6 @@ components:
           format: int64
           example: 1
           description: If NULL, this is the first comment if the (sub)thread
-
     ReactionServiceDto:
       type: object
       properties:
@@ -7164,32 +7223,109 @@ components:
           type: integer
           format: int64
           example: 1
-
     CreateCommentServiceDto:
       type: object
       properties:
-        entityType:
+        entity_type:
           allOf:
             - $ref: '#/components/schemas/EntityTypes'
             - example: 'post'
-        entityId:
+        entity_id:
           type: integer
           format: int64
           example: 1
         message:
           type: string
           example: Message post
+        author_id:
+          type: integer
+          example: 1
+        date:
+          type: integer
+          example: 1627862400
+        upload_id:
+          type: string
+          example: null
+        file_ids:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
+        root_parent:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "parent_type"
+            data:
+              type: string
+              example: "parent_data"
+            service:
+              type: string
+              example: "parent_service"
+            title:
+              type: string
+              example: "parent_title"
+            table_name:
+              type: string
+              example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
       required:
-        - entityType
-        - entityId
-
+        - entity_type
+        - entity_id
+        - author_id
+        - message
+        - date
     UpdateCommentServiceDto:
       type: object
       properties:
         message:
           type: string
           example: Message post
-
+    MentionedDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+    NotifyDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
     # comments end
 
     # invite begin
@@ -7357,7 +7493,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         name:
           type: string
@@ -7368,7 +7504,7 @@ components:
         ownerId:
           type: integer
           example: 1
-        archival:
+        archived:
           type: boolean
         description:
           type: string
@@ -7379,6 +7515,19 @@ components:
         logo:
           type: string
           example: /8c/nsfkjnns486sd4f56.jpg
+        enableColorTheme:
+          type: boolean
+        themeSettings:
+          type: object
+          properties:
+            bgColor:
+              type: string
+            iconColor:
+              type: string
+            icon:
+              type: string
+            enablePattern:
+              type: boolean
         moderatorsIds:
           type: array
           items:
@@ -8116,12 +8265,12 @@ components:
             type: array
           companies:
             type: array
-            example: []
+            example: [ ]
             description: Having same format as contacts field. Or could be empty array
           employees:
             type: array
             description: Employees that have been dialed during the call. Could be omitted if don't have such information
-            example: [1, 2, 3]
+            example: [ 1, 2, 3 ]
           tasks:
             type: object
             description: The task data for provided task_id
@@ -8137,9 +8286,9 @@ components:
       type: object
       properties:
         integration_code:
-            type: string
-            example: unitalk_integration
-            description: It could be integration_code or unique code of source where data are imported from
+          type: string
+          example: unitalk_integration
+          description: It could be integration_code or unique code of source where data are imported from
         external_id:
           type: integer
           example: 1
@@ -8156,27 +8305,27 @@ components:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         company_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         lead_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         deal_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         entity_table:
           type: string
           description: The base entity the call event connected to could be provided or could be omitted in a case
-                       if just have usual call. In this the "empty" value will be automatically filled and
-                       the call event will be shown just in call logs history
+            if just have usual call. In this the "empty" value will be automatically filled and
+            the call event will be shown just in call logs history
           enum:
             - empty
             - leads,
@@ -8186,15 +8335,15 @@ components:
         employees:
           type: array
           description: Employees that have been dialed during the call. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         contacts:
           type: array
           description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         companies:
           type: array
           description: The companies that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         subject:
           type: string
           example: First call
@@ -8238,9 +8387,9 @@ components:
           type: string
           example: Fixed agenda
       required:
-        -  integration_code
-        -  call_type
-        -  from
+        - integration_code
+        - call_type
+        - from
 
 
     CallEventContacts:
