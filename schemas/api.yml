@@ -5798,11 +5798,10 @@ components:
             properties:
               url:
                 type: string
-                nullable: true
                 example: null
               label:
                 type: string
-                example: "&laquo; Previous"
+                example: "Previous"
               active:
                 type: boolean
                 example: false
@@ -7380,7 +7379,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         name:
           type: string
@@ -7389,9 +7388,9 @@ components:
           type: string
           example: private
         ownerId:
-          type: integer
+          type: string
           example: 1
-        archival:
+        archived:
           type: boolean
         description:
           type: string
@@ -7402,6 +7401,19 @@ components:
         logo:
           type: string
           example: /8c/nsfkjnns486sd4f56.jpg
+        enableColorTheme:
+          type: boolean
+        themeSettings:
+          type: object
+          properties:
+            bgColor:
+              type: string
+            iconColor:
+              type: string
+            icon:
+              type: string
+            enablePattern:
+              type: boolean
         moderatorsIds:
           type: array
           items:
