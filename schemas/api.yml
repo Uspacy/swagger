@@ -255,6 +255,8 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /auth/v1/users/me/change_password:
@@ -5362,6 +5364,15 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     JoinRequestNotFound:
       description: Join request not found
       content:
