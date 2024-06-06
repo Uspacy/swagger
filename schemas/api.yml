@@ -142,6 +142,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -161,6 +165,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -217,6 +225,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/reset_password:
     post:
       summary: Change password with token
@@ -232,6 +242,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
@@ -255,9 +267,11 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password:
+  /auth/v1/users/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -377,6 +391,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
@@ -5364,6 +5382,15 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     JoinRequestNotFound:
       description: Join request not found
       content:
@@ -5984,6 +6011,10 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+        position:
+          type: string
         specialization:
           type: string
           example: Specialist
@@ -5993,9 +6024,6 @@ components:
         city:
           type: string
           example: Kiyv
-        avatar:
-          type: string
-          example: /storage/avatars/c4ca423/avatar.jpeg
         aboutMyself:
           type: string
           example: about me
@@ -6007,6 +6035,8 @@ components:
           type: boolean
           default: false
           example: true
+        active:
+          type: boolean
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
@@ -6183,7 +6213,7 @@ components:
           $ref: '#/components/schemas/Email'
         password:
           type: string
-          example: 12345678
+          example: myNewPassword
         token:
           type: string
           example: r6pvb5pllte
@@ -6203,7 +6233,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
