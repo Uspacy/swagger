@@ -7218,11 +7218,9 @@ components:
           example: 1627862400
         upload_id:
           type: string
-          nullable: true
           example: null
         file_ids:
           type: array
-          nullable: true
           items:
             type: integer
           example: [ ]
@@ -7232,7 +7230,6 @@ components:
           $ref: '#/components/schemas/NotifyDto'
         root_parent:
           type: object
-          nullable: true
           properties:
             type:
               type: string
@@ -7269,7 +7266,6 @@ components:
           example: Message post
     MentionedDto:
       type: object
-      nullable: true
       properties:
         users:
           type: array
@@ -7288,7 +7284,6 @@ components:
           example: [ ]
     NotifyDto:
       type: object
-      nullable: true
       properties:
         users:
           type: array
