@@ -2721,8 +2721,8 @@ paths:
   # group begin
   /groups/v1/groups:
     get:
-      summary: Get posts list
-      description: Get posts list
+      summary: Get groups list
+      description: Get groups list
       tags:
         - groupService
       parameters:
@@ -5811,16 +5811,41 @@ components:
     Meta:
       type: object
       properties:
-        total:
-          type: number
-          example: 100
-        page:
+        currentPage:
           type: number
           example: 1
-        list:
+        from:
           type: number
-          example: 10
-
+          example: 1
+        lastPage:
+          type: number
+          example: 1
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                example: null
+              label:
+                type: string
+                example: "Previous"
+              active:
+                type: boolean
+                example: false
+        path:
+          type: string
+          example: "https://domain.uspacy.ua/groups/v1/groups"
+        perPage:
+          type: number
+          example: 20
+        to:
+          type: number
+          example: 2
+        total:
+          type: number
+          example: 2
     Roles:
       type: array
       items:
@@ -7465,7 +7490,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         name:
           type: string
@@ -7476,7 +7501,7 @@ components:
         ownerId:
           type: string
           example: 1
-        archival:
+        archived:
           type: boolean
         description:
           type: string
@@ -7487,6 +7512,19 @@ components:
         logo:
           type: string
           example: /8c/nsfkjnns486sd4f56.jpg
+        enableColorTheme:
+          type: boolean
+        themeSettings:
+          type: object
+          properties:
+            bgColor:
+              type: string
+            iconColor:
+              type: string
+            icon:
+              type: string
+            enablePattern:
+              type: boolean
         moderatorsIds:
           type: array
           items:
