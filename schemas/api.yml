@@ -6640,11 +6640,12 @@ components:
     TaskStatus:
       type: string
       enum:
-        - TO_DO
-        - IN_PROGRESS
-        - READY_FOR_REVIEW
-        - DONE
-        - BLOCKED
+        - notScheduled
+        - scheduled
+        - inWork
+        - stopped
+        - inControl
+        - ready
 
     CanbanStage:
       type: object
