@@ -7474,6 +7474,8 @@ components:
           type: integer
           example: 1
           description: 1
+        archived:
+          type: boolean
         moderatorsIds:
           type: array
           items:
