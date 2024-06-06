@@ -217,6 +217,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/reset_password:
     post:
       summary: Change password with token
