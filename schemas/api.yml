@@ -2130,15 +2130,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: ready
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/restart:
