@@ -142,6 +142,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -8128,12 +8132,12 @@ components:
             type: array
           companies:
             type: array
-            example: []
+            example: [ ]
             description: Having same format as contacts field. Or could be empty array
           employees:
             type: array
             description: Employees that have been dialed during the call. Could be omitted if don't have such information
-            example: [1, 2, 3]
+            example: [ 1, 2, 3 ]
           tasks:
             type: object
             description: The task data for provided task_id
@@ -8149,9 +8153,9 @@ components:
       type: object
       properties:
         integration_code:
-            type: string
-            example: unitalk_integration
-            description: It could be integration_code or unique code of source where data are imported from
+          type: string
+          example: unitalk_integration
+          description: It could be integration_code or unique code of source where data are imported from
         external_id:
           type: integer
           example: 1
@@ -8168,27 +8172,27 @@ components:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         company_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         lead_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         deal_id:
           type: integer
           example: null
           description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided
-                       the automatic binding with existing crm entities is passing away
+            the automatic binding with existing crm entities is passing away
         entity_table:
           type: string
           description: The base entity the call event connected to could be provided or could be omitted in a case
-                       if just have usual call. In this the "empty" value will be automatically filled and
-                       the call event will be shown just in call logs history
+            if just have usual call. In this the "empty" value will be automatically filled and
+            the call event will be shown just in call logs history
           enum:
             - empty
             - leads,
@@ -8198,15 +8202,15 @@ components:
         employees:
           type: array
           description: Employees that have been dialed during the call. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         contacts:
           type: array
           description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         companies:
           type: array
           description: The companies that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         subject:
           type: string
           example: First call
@@ -8250,9 +8254,9 @@ components:
           type: string
           example: Fixed agenda
       required:
-        -  integration_code
-        -  call_type
-        -  from
+        - integration_code
+        - call_type
+        - from
 
 
     CallEventContacts:
