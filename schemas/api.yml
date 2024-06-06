@@ -165,6 +165,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -6220,7 +6224,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
