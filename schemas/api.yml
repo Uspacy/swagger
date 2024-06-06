@@ -1470,7 +1470,6 @@ paths:
           name: deadline
           schema:
             $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
-
       responses:
         '200':
           description: OK
@@ -2181,8 +2180,7 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
