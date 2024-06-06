@@ -1482,7 +1482,7 @@ paths:
                   data:
                     type: array
                     items:
-                      - $ref: '#/components/schemas/DetailedTask'
+                      $ref: '#/components/schemas/DetailedTask'
                   meta:
                     $ref: '#/components/schemas/Meta'
         '401':
