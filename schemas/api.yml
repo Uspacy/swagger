@@ -232,6 +232,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
@@ -6192,7 +6194,7 @@ components:
           $ref: '#/components/schemas/Email'
         password:
           type: string
-          example: 12345678
+          example: myNewPassword
         token:
           type: string
           example: r6pvb5pllte
