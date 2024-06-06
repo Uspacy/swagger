@@ -142,6 +142,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -161,6 +165,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -217,6 +225,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/reset_password:
     post:
       summary: Change password with token
@@ -232,6 +242,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
@@ -255,9 +267,11 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password:
+  /auth/v1/users/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -377,6 +391,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
@@ -2557,7 +2575,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCommentServiceDto'
       responses:
-        '200':
+        '201':
           description: Successful response
           content:
             application/json:
@@ -2565,6 +2583,8 @@ paths:
                 $ref: '#/components/schemas/CommentServiceDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -5362,6 +5382,15 @@ components:
       description: Forbidden
     NoContent:
       description: No Content
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     JoinRequestNotFound:
       description: Join request not found
       content:
@@ -6007,6 +6036,10 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+        position:
+          type: string
         specialization:
           type: string
           example: Specialist
@@ -6016,9 +6049,6 @@ components:
         city:
           type: string
           example: Kiyv
-        avatar:
-          type: string
-          example: /storage/avatars/c4ca423/avatar.jpeg
         aboutMyself:
           type: string
           example: about me
@@ -6030,6 +6060,8 @@ components:
           type: boolean
           default: false
           example: true
+        active:
+          type: boolean
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
@@ -6206,7 +6238,7 @@ components:
           $ref: '#/components/schemas/Email'
         password:
           type: string
-          example: 12345678
+          example: myNewPassword
         token:
           type: string
           example: r6pvb5pllte
@@ -6226,7 +6258,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
@@ -7152,7 +7184,10 @@ components:
           example: 1
         date:
           $ref: '#/components/schemas/Date'
-
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
     CommentExtrasServiceDto:
       type: object
       properties:
@@ -7170,7 +7205,6 @@ components:
           format: int64
           example: 1
           description: If NULL, this is the first comment if the (sub)thread
-
     ReactionServiceDto:
       type: object
       properties:
@@ -7187,32 +7221,109 @@ components:
           type: integer
           format: int64
           example: 1
-
     CreateCommentServiceDto:
       type: object
       properties:
-        entityType:
+        entity_type:
           allOf:
             - $ref: '#/components/schemas/EntityTypes'
             - example: 'post'
-        entityId:
+        entity_id:
           type: integer
           format: int64
           example: 1
         message:
           type: string
           example: Message post
+        author_id:
+          type: integer
+          example: 1
+        date:
+          type: integer
+          example: 1627862400
+        upload_id:
+          type: string
+          example: null
+        file_ids:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
+        root_parent:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "parent_type"
+            data:
+              type: string
+              example: "parent_data"
+            service:
+              type: string
+              example: "parent_service"
+            title:
+              type: string
+              example: "parent_title"
+            table_name:
+              type: string
+              example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
       required:
-        - entityType
-        - entityId
-
+        - entity_type
+        - entity_id
+        - author_id
+        - message
+        - date
     UpdateCommentServiceDto:
       type: object
       properties:
         message:
           type: string
           example: Message post
-
+    MentionedDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+    NotifyDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
     # comments end
 
     # invite begin
