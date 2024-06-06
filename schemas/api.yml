@@ -6530,9 +6530,11 @@ components:
         priority:
           type: string
           enum:
-            - Low
-            - Average
-            - High
+            - low
+            - notHigh
+            - neutral
+            - high
+            - veryHigh
         acceptResult:
           type: boolean
           default: false
