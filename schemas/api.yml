@@ -161,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -6216,7 +6218,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
