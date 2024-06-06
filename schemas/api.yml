@@ -145,7 +145,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -1482,7 +1482,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Task'
+                      $ref: '#/components/schemas/DetailedTask'
                   meta:
                     $ref: '#/components/schemas/Meta'
         '401':
@@ -1521,27 +1521,13 @@ paths:
                       description: Defines the earlier uploaded file bundle that need to be bound to the post
                       type: string
                       format: uuid
-
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Task'
-                  - type: object
-                    properties:
-                      groupId:
-                        description: Group ID
-                        default: 'current group id'
-                        type: string
-                        example: 11
-                      comments:
-                        example: null
-                      reactions:
-                        example: null
-
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -2215,8 +2201,7 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
@@ -6484,6 +6469,21 @@ components:
     # news feed end
 
     # tasks begin
+    DetailedTask:
+      allOf:
+        - $ref: '#/components/schemas/Task'
+        - type: object
+          properties:
+            accomplicesIds:
+              type: array
+              items:
+                type: string
+              example: [ "2", "3" ]
+            auditorsIds:
+              type: array
+              items:
+                type: string
+              example: [ "4", "5" ]
     Task:
       type: object
       properties:
@@ -6512,16 +6512,6 @@ components:
           description: ID of responsible person
           type: string
           example: "1"
-        accomplicesIds:
-          type: array
-          items:
-            type: string
-          example: [ "2", "3" ]
-        auditorsIds:
-          type: array
-          items:
-            type: string
-          example: [ "4", "5" ]
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -6531,7 +6521,7 @@ components:
           type: string
           example: "2"
         priority:
-            $ref: '#/components/schemas/TaskPriority'
+          $ref: '#/components/schemas/TaskPriority'
         acceptResult:
           type: boolean
           default: false
@@ -6558,7 +6548,18 @@ components:
           type: boolean
         timeEstimate:
           $ref: '#/components/schemas/Date'
-
+        template:
+          type: boolean
+        templateId:
+          type: string
+          example: "2"
+        delegation:
+          type: integer
+        taskType:
+          type: string
+          example: 'task'
+        basicTask:
+          type: boolean
     CreateEditTaskDto:
       type: object
       properties:
