@@ -259,7 +259,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password:
+  /auth/v1/users/change_password:
     patch:
       summary: Update password
       description: Update self password
