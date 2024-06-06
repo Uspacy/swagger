@@ -2575,7 +2575,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCommentServiceDto'
       responses:
-        '200':
+        '201':
           description: Successful response
           content:
             application/json:
@@ -2583,6 +2583,8 @@ paths:
                 $ref: '#/components/schemas/CommentServiceDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -7157,7 +7159,10 @@ components:
           example: 1
         date:
           $ref: '#/components/schemas/Date'
-
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
     CommentExtrasServiceDto:
       type: object
       properties:
@@ -7175,7 +7180,6 @@ components:
           format: int64
           example: 1
           description: If NULL, this is the first comment if the (sub)thread
-
     ReactionServiceDto:
       type: object
       properties:
@@ -7192,32 +7196,109 @@ components:
           type: integer
           format: int64
           example: 1
-
     CreateCommentServiceDto:
       type: object
       properties:
-        entityType:
+        entity_type:
           allOf:
             - $ref: '#/components/schemas/EntityTypes'
             - example: 'post'
-        entityId:
+        entity_id:
           type: integer
           format: int64
           example: 1
         message:
           type: string
           example: Message post
+        author_id:
+          type: integer
+          example: 1
+        date:
+          type: integer
+          example: 1627862400
+        upload_id:
+          type: string
+          example: null
+        file_ids:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
+        root_parent:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "parent_type"
+            data:
+              type: string
+              example: "parent_data"
+            service:
+              type: string
+              example: "parent_service"
+            title:
+              type: string
+              example: "parent_title"
+            table_name:
+              type: string
+              example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
       required:
-        - entityType
-        - entityId
-
+        - entity_type
+        - entity_id
+        - author_id
+        - message
+        - date
     UpdateCommentServiceDto:
       type: object
       properties:
         message:
           type: string
           example: Message post
-
+    MentionedDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+    NotifyDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
     # comments end
 
     # invite begin
