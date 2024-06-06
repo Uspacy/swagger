@@ -2155,15 +2155,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: scheduled
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/watch:
@@ -2183,6 +2179,8 @@ paths:
                 $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/unwatch:
@@ -2202,6 +2200,8 @@ paths:
                 $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
 
