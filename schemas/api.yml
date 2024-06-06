@@ -391,6 +391,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
@@ -6005,6 +6009,10 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+        position:
+          type: string
         specialization:
           type: string
           example: Specialist
@@ -6014,9 +6022,6 @@ components:
         city:
           type: string
           example: Kiyv
-        avatar:
-          type: string
-          example: /storage/avatars/c4ca423/avatar.jpeg
         aboutMyself:
           type: string
           example: about me
@@ -6028,6 +6033,8 @@ components:
           type: boolean
           default: false
           example: true
+        active:
+          type: boolean
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
