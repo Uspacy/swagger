@@ -7245,7 +7245,6 @@ components:
               example: "parent_title"
             table_name:
               type: string
-              nullable: true
               example: "parent_table_name"
           required:
             - type
