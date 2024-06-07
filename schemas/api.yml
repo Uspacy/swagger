@@ -1498,28 +1498,34 @@ paths:
           application/json:
             schema:
               allOf:
+                - required:
+                    - title
+                    - created_by
+                    - setter_id
                 - $ref: '#/components/schemas/CreateEditTaskDto'
                 - type: object
                   properties:
-                    fixed:
-                      type: boolean
-                      default: false
-                      example: true
-                    groupId:
-                      description: Group ID
-                      default: 'current group id'
+                    created_by:
+                      type: integer
+                      description: ID of the user who created the task
+                    created_date:
+                      type: integer
+                      description: Created date timestamp
+                    upload_id:
                       type: string
-                      example: 11
-                    fileIds:
+                      description: Upload ID
+                    file_ids:
                       type: array
-                      description: Defines the array of fileIds uploaded earlier that need to be bound to the post
                       items:
                         type: integer
-                        format: int64
-                    uploadId:
-                      description: Defines the earlier uploaded file bundle that need to be bound to the post
+                      description: List of file IDs
+                    created_at:
+                      type: integer
+                      description: Created at timestamp
+                    task_type:
                       type: string
-                      format: uuid
+                      example: 'task'
+                      description: Type of the task
       responses:
         '200':
           description: OK
@@ -1529,6 +1535,8 @@ paths:
                 $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}:
@@ -1559,18 +1567,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/CreateEditTaskDto'
-                - type: object
-                  properties:
-                    archive:
-                      type: boolean
-                      default: false
-                      example: true
-                    fixed:
-                      type: boolean
-                      default: false
-                      example: true
+              $ref: '#/components/schemas/CreateEditTaskDto'
       responses:
         '200':
           description: OK
@@ -1580,7 +1577,9 @@ paths:
                 $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-      security:
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:te
         - bearerAuth: [ ]
     delete:
       summary: Delete task by id
@@ -6554,46 +6553,141 @@ components:
           example: 'task'
         basicTask:
           type: boolean
+    TaskScheduler:
+      type: object
+      required:
+        - period
+        - every
+      properties:
+        period:
+          type: string
+          enum: [ day, week, month, year ]
+          description: Scheduler period
+          example: 'day'
+        every:
+          type: integer
+          minimum: 0
+          description: Scheduler every interval
+          example: 1246
+        hour_start:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Scheduler start hour
+          example: 1246
+        deadline_hour:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Scheduler deadline hour
+          example: 1246
+        deadline_day:
+          type: integer
+          minimum: 0
+          description: Scheduler deadline day
+          example: 1246
+        active:
+          type: boolean
+          description: Scheduler active flag
+          example: false
+        day_of_week:
+          type: integer
+          minimum: 1
+          description: Scheduler day of the week
+          example: 1246
+        date_start:
+          type: string
+          format: date
+          description: Scheduler start date
+        date_stop:
+          type: integer
+          description: Scheduler stop date
+          example: 1246
+        iteration:
+          type: integer
+          minimum: 0
+          description: Scheduler iteration
+          example: 12
+        timezone_offset:
+          type: integer
+          description: Scheduler timezone offset
+          example: 1246
     CreateEditTaskDto:
       type: object
       properties:
-        parentId:
+        parent_id:
           type: integer
-          format: int64
+          description: Parent task ID
         title:
           type: string
-          example: Describe swagger api for tasksService
+          description: Title of the task
+        setter_id:
+          type: integer
+          description: ID of the user who set the task
+        responsible_id:
+          type: integer
+          description: ID of the user responsible for the task
         deadline:
-          $ref: '#/components/schemas/Date'
-        responsibleId:
-          description: ID of responsible person
-          type: string
-          example: 1
-        accomplicesIds:
-          type: array
-          items:
-            type: string
-          example: [ "2", "3" ]
-        auditorsIds:
-          type: array
-          items:
-            type: string
-          example: [ "4", "5" ]
+          type: integer
+          description: Deadline timestamp
         body:
           type: string
-          example: <b>need use swagger-ui@4.x</b>
+          description: Task description
+        status:
+          $ref: '#/components/schemas/TaskStatus'
         priority:
-          type: string
-          enum:
-            - LOW
-            - AVERAGE
-            - HIGH
-        departmentId:
+          $ref: '#/components/schemas/TaskPriority'
+        accomplices_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of task accomplices
+        auditors_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of task auditors
+        department_id:
+          type: integer
           description: Department ID
-          default: 'current department id'
+        group_id:
           type: string
-          example: 1
-
+          description: Group ID
+        accept_result:
+          type: boolean
+          description: Whether the task result is accepted
+        required_result:
+          type: boolean
+          description: Whether a result is required
+        time_estimate:
+          type: integer
+          description: Estimated time for the task
+        time_tracking:
+          type: boolean
+          description: Whether time tracking is enabled
+        crm_entity_list:
+          type: boolean
+          description: CRM entity list flag
+        scheduler:
+          $ref: '#/components/schemas/TaskScheduler'
+        crm_entities:
+          type: array
+          description: List of CRM entities
+        deadline_hour:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Deadline hour
+        deadline_day:
+          type: integer
+          minimum: 0
+          description: Deadline day
+        timezone_offset:
+          type: integer
+          description: Timezone offset
+        delegation:
+          type: boolean
+          description: Delegation flag
     TaskStatus:
       type: string
       enum:
@@ -6603,7 +6697,6 @@ components:
         - stopped
         - inControl
         - ready
-
     TaskPriority:
       type: string
       enum:
@@ -6612,7 +6705,6 @@ components:
         - neutral
         - high
         - veryHigh
-
     CanbanStage:
       type: object
       properties:
@@ -6629,7 +6721,6 @@ components:
           type: string
           description: The ID of the stage to add after.
           example: 0
-
     CreateEditCanbanStageDto:
       type: object
       properties:
