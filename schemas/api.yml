@@ -2074,13 +2074,7 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: inWork
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
