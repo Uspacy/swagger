@@ -1952,49 +1952,52 @@ paths:
                         description: checklist item id
                         example: 1
                   - $ref: '#/components/schemas/CheckListItem'
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/tasks/massEdit/complete:
+  /tasks/v1/tasks/mass_ready:
     post:
-      summary: Bulk editing tasks
-      description: Bulk editing tasks
+      summary: Bulk ready tasks
+      description: Bulk ready tasks
       tags:
         - tasksService
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassActionTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/archive:
+  /tasks/v1/tasks/mass_deletion:
     post:
-      summary: Bulk editing tasks
-      description: Bulk editing tasks
+      summary: Bulk deletion tasks
+      description: Bulk deletion tasks
       tags:
         - tasksService
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassActionTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/delete:
+  /tasks/v1/tasks/mass_edit:
     post:
       summary: Bulk editing tasks
       description: Bulk editing tasks
@@ -2004,12 +2007,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassEditTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/transferToUser:
@@ -6604,6 +6609,69 @@ components:
           type: integer
           description: Scheduler timezone offset
           example: 1246
+    MassActionTasksDto:
+      oneOf:
+        - type: object
+          required:
+            - all
+          properties:
+            all:
+              type: boolean
+              default: true
+        - type: object
+          required:
+            - task_ids
+          properties:
+            task_ids:
+              type: array
+              items:
+                type: integer
+    MassEditTasksDto:
+      allOf:
+        - $ref: '#/components/schemas/MassActionTasksDto'
+        - type: object
+          required:
+            - payload
+          properties:
+            payload:
+              type: object
+              properties:
+                title:
+                  type: string
+                parent_id:
+                  type: integer
+                setter_id:
+                  type: integer
+                deadline:
+                  type: integer
+                responsible_id:
+                  type: integer
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                body:
+                  type: string
+                accomplices_ids:
+                  type: array
+                  items:
+                    type: integer
+                auditors_ids:
+                  type: array
+                  items:
+                    type: integer
+                department_id:
+                  type: integer
+                group_id:
+                  type: integer
+                accept_result:
+                  type: boolean
+                required_result:
+                  type: boolean
+                time_estimate:
+                  type: integer
+                time_tracking:
+                  type: boolean
+                delegation:
+                  type: boolean
     CreateEditTaskDto:
       type: object
       properties:
@@ -6771,16 +6839,6 @@ components:
           example: 1
         deadline:
           $ref: '#/components/schemas/Date'
-
-    MassEditIds:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            type: string
-          example: [ "1", "2" ]
-
     TransferTask:
       type: object
       properties:
