@@ -1593,27 +1593,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/denial:
-    post:
-      summary: Abandon a task
-      description: Abandoning a task
-      tags:
-        - tasksService
-      parameters:
-        - $ref: '#/components/parameters/taskId'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDenial'
-      responses:
-        '200':
-          description: OK
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: [ ]
-
   /tasks/v1/stages:
     get:
       summary: Get kanban stages
@@ -6801,13 +6780,6 @@ components:
           type: string
           description: Task id
           example: 1
-
-    CreateDenial:
-      type: object
-      properties:
-        reason:
-          type: string
-          example: No time
 
     CreateUpdateCheckList:
       type: object
