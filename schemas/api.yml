@@ -1078,7 +1078,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RoleStore'
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -1089,6 +1089,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/roles/{roleId}:
@@ -7035,6 +7037,10 @@ components:
         code:
           type: string
           example: ADMIN
+        userList:
+          type: array
+        departmentList:
+          type: array
         permissions:
           $ref: '#/components/schemas/PermissionsAction'
 
@@ -7131,6 +7137,8 @@ components:
 
     RoleStore:
       type: object
+      required:
+        - title
       properties:
         title:
           type: string
