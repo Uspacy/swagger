@@ -673,6 +673,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatusDisabled'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
 
@@ -5357,6 +5359,21 @@ components:
       description: Access token is missing or invalid
     Forbidden:
       description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  text:
+                    type: array
+                    items:
+                      example: 'Forbidden message'
+              status:
+                type: boolean
+                example: true
     NoContent:
       description: No Content
     NotFound:
