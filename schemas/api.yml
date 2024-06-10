@@ -629,18 +629,12 @@ paths:
             schema:
               $ref: '#/components/schemas/TwoFactorEnable'
       responses:
-        '201':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TwoFactorGetQr'
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TwoFactorStatusEnabled'
+                $ref: '#/components/schemas/TwoFactorGetQr'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -660,6 +654,8 @@ paths:
                   status:
                     type: boolean
                     example: true
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me/twofa_disable:
@@ -5969,6 +5965,8 @@ components:
             - 1
     TwoFactorEnable:
       type: object
+      required:
+        - step
       properties:
         step:
           type: string
@@ -5976,8 +5974,8 @@ components:
             - get-qr-code
             - verify-secret
         code:
-          type: integer
-          example: 555406
+          type: string
+          example: '555406'
           description: Available on a second step (check-code)
     TwoFactorGetQr:
       type: object
