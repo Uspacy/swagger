@@ -1629,26 +1629,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+              $ref: '#/components/schemas/CreateCanbanStageDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CanbanStage'
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        example: 2
-                      afterId:
-                        type: string
-                        example: 1
-
+                $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}:
@@ -1681,26 +1675,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+              $ref: '#/components/schemas/EditCanbanStageDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CanbanStage'
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        example: 2
-                      afterId:
-                        type: string
-                        example: 1
-
+                $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
     delete:
@@ -6760,12 +6748,18 @@ components:
         color:
           type: string
           example: "#ff0000"
+        sort:
+          type: integer
+          example: 10
         afterId:
           type: string
           description: The ID of the stage to add after.
           example: 0
-    CreateEditCanbanStageDto:
+    CreateCanbanStageDto:
       type: object
+      required:
+        - title
+        - color
       properties:
         title:
           type: string
@@ -6777,6 +6771,24 @@ components:
           type: string
           description: The ID of the stage to add after.
           example: 1
+        sort:
+          type: integer
+          example: 6
+        group_id:
+          type: integer
+          example: 3
+    EditCanbanStageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: In progress
+        color:
+          type: string
+          example: "#ff0000"
+        sort:
+          type: integer
+          example: 6
     MoveTaskCanbanStageDto:
       type: object
       properties:
