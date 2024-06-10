@@ -718,18 +718,17 @@ paths:
         content:
           multipart/form-data:
             schema:
-              allOf:
-                - type: object
-                  required:
-                    - avatar
-                  properties:
-                    avatar:
-                      default: ''
-                      format: binary
-                    userId:
-                      type: string
-                      example: 2
-
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  example: avatar.png file
+                userId:
+                  type: string
+                  example: 2
       responses:
         '200':
           description: OK
