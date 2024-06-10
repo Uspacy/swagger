@@ -1662,6 +1662,8 @@ paths:
                 $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     patch:
@@ -1687,6 +1689,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
       security:
@@ -1701,9 +1705,12 @@ paths:
       responses:
         '204':
           description: No content
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/moveTask:
