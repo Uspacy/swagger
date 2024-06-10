@@ -1527,7 +1527,7 @@ paths:
                       example: 'task'
                       description: Type of the task
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -1535,6 +1535,8 @@ paths:
                 $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/ValidationError'
       security:
@@ -1577,6 +1579,8 @@ paths:
                 $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/ValidationError'
       security:
