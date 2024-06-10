@@ -560,6 +560,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_disable:
@@ -614,6 +616,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me/twofa_enable:
@@ -5976,10 +5980,7 @@ components:
       type: object
       properties:
         enabled:
-          type: integer
-          enum:
-            - 0
-            - 1
+          type: boolean
     TwoFactorEnable:
       type: object
       required:
