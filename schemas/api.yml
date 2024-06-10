@@ -801,8 +801,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update self password
-      description: Update self password
+      summary: Update self settings
+      description: Update self settings
       tags:
         - usersService
       requestBody:
