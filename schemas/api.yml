@@ -1227,12 +1227,27 @@ paths:
             schema:
               $ref: '#/components/schemas/InvitesStore'
       responses:
-        '204':
-          description: No content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 32
+                    email:
+                      type: string
+                      example: stark@gmail.com
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/invites/email/batch:
@@ -7449,6 +7464,8 @@ components:
 
     InviteExample:
       type: object
+      required:
+        - email
       properties:
         email:
           type: string
