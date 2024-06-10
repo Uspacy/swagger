@@ -1278,6 +1278,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/invites/email/{userId}:
