@@ -2871,8 +2871,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     post:
-      summary: Update group. Only available to group owner.
-      description: Update group. Only available to group owner.
+      summary: Upload group logo.
+      description: Upload group logo.
       tags:
         - groupService
       requestBody:
@@ -2896,6 +2896,10 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
