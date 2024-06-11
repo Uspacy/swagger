@@ -2871,8 +2871,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     post:
-      summary: Upload group logo.
-      description: Upload group logo.
+      summary: Upload group logo. Only available to group owner or moderator.
+      description: Upload group logo. Only available to group owner or moderator.
       tags:
         - groupService
       requestBody:
