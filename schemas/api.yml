@@ -573,6 +573,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
       security:
@@ -594,6 +596,10 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatusDisabled'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me:
