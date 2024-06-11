@@ -2909,11 +2909,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Adding a user to a group. Only available to group owner or moderator.
       description:
         Adding a user to a group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2923,6 +2923,8 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -5464,7 +5466,7 @@ components:
       description: User id
       required: true
       schema:
-        type: string
+        type: integer
     departmentId:
       name: departmentId
       in: path
@@ -5722,7 +5724,7 @@ components:
       description: Group id
       required: true
       schema:
-        type: string
+        type: integer
     app_id:
       name: app_id
       in: path
