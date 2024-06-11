@@ -821,6 +821,8 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   # users end
@@ -6081,6 +6083,14 @@ components:
           example:
             - '1'
             - '2'
+    SystemAvailableLangs:
+      type: string
+      enum:
+        - 'en-US'
+        - 'pt-BR'
+        - 'pl'
+        - 'es-ES'
+        - 'uk'
     personalSettings:
       type: object
       properties:
@@ -6088,8 +6098,7 @@ components:
           type: string
           example: first-last
         lang:
-          type: string
-          example: ua
+          $ref: '#/components/schemas/SystemAvailableLangs'
         timeFormat:
           type: string
           example: 24-hours
