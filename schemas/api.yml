@@ -5920,7 +5920,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         firstName:
           type: string
