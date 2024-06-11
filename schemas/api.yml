@@ -503,9 +503,10 @@ paths:
 
   /company/v1/users/{userId}/settings:
     get:
+      summary: Get user account settings by id.
+      description: Get user account settings by id.
       tags:
         - usersService
-      description: Get user account settings by id.
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
