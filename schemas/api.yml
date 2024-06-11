@@ -505,7 +505,7 @@ paths:
     get:
       tags:
         - usersService
-      description: Get persinal settings by id.
+      description: Get user account settings by id.
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
@@ -517,11 +517,13 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update personal settings by id.
-      description: Update personal settings by id.
+      summary: Update user account settings by id.
+      description: Update user account settings by id.
       tags:
         - usersService
       parameters:
@@ -541,6 +543,8 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_status:
