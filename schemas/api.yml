@@ -208,6 +208,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /auth/v1/users/forgot_password:
@@ -6164,6 +6166,10 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
     SignUpDto:
       type: object
+      required:
+        - email
+        - firstName
+        - password
       properties:
         email:
           type: string
