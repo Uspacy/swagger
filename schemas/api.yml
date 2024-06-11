@@ -129,6 +129,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /auth/v1/auth/refresh_token:
     post:
       summary: Refresh token
@@ -6225,6 +6229,9 @@ components:
           description: filled on second auth step if 2FA is eneabled
     ConfirmEmailDto:
       type: object
+      required:
+        - email
+        - token
       properties:
         email:
           $ref: '#/components/schemas/Email'
