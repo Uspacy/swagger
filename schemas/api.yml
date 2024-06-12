@@ -2962,11 +2962,11 @@ paths:
       - $ref: '#/components/parameters/groupId'
 
     patch:
+      summary: Adding the current user to the group.
       description:
         Adding the current user to the group. Available to open groups or by invitation.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2976,6 +2976,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
