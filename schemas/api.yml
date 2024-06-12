@@ -2986,13 +2986,12 @@ paths:
   /groups/v1/groups/{groupId}/leaveGroup:
     parameters:
       - $ref: '#/components/parameters/groupId'
-
     patch:
+      summary: Remove the current user from the group.
       description:
-        Remove the current user from the group..
+        Remove the current user from the group.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -3002,6 +3001,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
