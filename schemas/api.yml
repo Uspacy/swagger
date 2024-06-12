@@ -2909,7 +2909,7 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
-      summary: Adding a user to a group. Only available to group owner or moderator.
+      summary: Adding a user to a group.
       description:
         Adding a user to a group. Only available to group owner or moderator.
       tags:
@@ -2923,6 +2923,8 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
       security:
@@ -2934,11 +2936,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Remove user from group.
       description:
         Remove user from group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2948,6 +2950,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
