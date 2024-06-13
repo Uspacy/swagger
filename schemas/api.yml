@@ -2871,8 +2871,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     post:
-      summary: Update group. Only available to group owner.
-      description: Update group. Only available to group owner.
+      summary: Upload group logo. Only available to group owner or moderator.
+      description: Upload group logo. Only available to group owner or moderator.
       tags:
         - groupService
       requestBody:
@@ -2896,6 +2896,10 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -2905,11 +2909,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Adding a user to a group.
       description:
         Adding a user to a group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2919,6 +2923,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -2928,11 +2936,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Remove user from group.
       description:
         Remove user from group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2942,6 +2950,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -2950,11 +2962,11 @@ paths:
       - $ref: '#/components/parameters/groupId'
 
     patch:
+      summary: Adding the current user to the group.
       description:
         Adding the current user to the group. Available to open groups or by invitation.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2964,19 +2976,22 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/leaveGroup:
     parameters:
       - $ref: '#/components/parameters/groupId'
-
     patch:
+      summary: Remove the current user from the group.
       description:
-        Remove the current user from the group..
+        Remove the current user from the group.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2986,6 +3001,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -5460,7 +5479,7 @@ components:
       description: User id
       required: true
       schema:
-        type: string
+        type: integer
     departmentId:
       name: departmentId
       in: path
@@ -5718,7 +5737,7 @@ components:
       description: Group id
       required: true
       schema:
-        type: string
+        type: integer
     app_id:
       name: app_id
       in: path
