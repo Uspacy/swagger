@@ -3806,7 +3806,28 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-
+  /crm/v1/entities/leads/fields:
+    get:
+      summary: Get available leads fields list.
+      description: Get available leads fields list.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CrmEntityField'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/{itemId}:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -8169,7 +8190,109 @@ components:
         - id: 2
           title: 'Site'
           sort: 20
-
+    CrmEntityField:
+      type: object
+      required:
+        - name
+        - code
+        - entity_reference_id
+        - type
+        - required
+        - editable
+        - show
+        - hidden
+        - multiple
+        - system_field
+        - base_field
+        - sort
+        - default_value
+        - tooltip
+        - display_in_tabs
+      properties:
+        name:
+          type: string
+          example: 'Field name'
+        code:
+          type: string
+          example: 'field_name'
+        entity_reference_id:
+          type: string
+          example: '2'
+        type:
+          $ref: '#/components/schemas/CrmEntityFieldType'
+        required:
+          type: boolean
+        editable:
+          type: boolean
+        show:
+          type: boolean
+        hidden:
+          type: boolean
+        multiple:
+          type: boolean
+        system_field:
+          type: boolean
+        base_field:
+          type: boolean
+        sort:
+          type: string
+          example: ''
+        default_value:
+          type: string
+          example: ''
+        tooltip:
+          type: string
+          example: ''
+        display_in_tabs:
+          type: boolean
+        values:
+          type: array
+          items:
+            type: object
+            required:
+              - title
+              - value
+              - color
+              - sort
+              - selected
+            properties:
+              title:
+                type: string
+                example: 'Active customer'
+              value:
+                type: string
+                example: 'active_customer'
+              color:
+                type: string
+                example: '#008000'
+              sort:
+                type: string
+                example: ''
+              selected:
+                type: boolean
+    CrmEntityFieldType:
+      type: string
+      enum:
+        - string
+        - textarea
+        - integer
+        - list
+        - datetime
+        - money
+        - label
+        - phone
+        - email
+        - social
+        - link
+        - boolean
+        - user_id
+        - photo
+        - file
+        - address
+        - legal_details
+        - entity_reference
+        - utm
+        - float
     CrmEAdditionalFields:
       type: object
       properties:
