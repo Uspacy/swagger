@@ -2789,7 +2789,7 @@ paths:
                       format: binary
                       description: The file to upload.
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
