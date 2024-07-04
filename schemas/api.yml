@@ -6654,6 +6654,10 @@ components:
           example: 'task'
         basicTask:
           type: boolean
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
     TaskScheduler:
       type: object
       required:
@@ -6786,10 +6790,10 @@ components:
           type: string
           description: Title of the task
         setter_id:
-          type: integer
+          type: string
           description: ID of the user who set the task
         responsible_id:
-          type: integer
+          type: string
           description: ID of the user responsible for the task
         deadline:
           type: integer
@@ -6804,12 +6808,12 @@ components:
         accomplices_ids:
           type: array
           items:
-            type: integer
+            type: string
           description: IDs of task accomplices
         auditors_ids:
           type: array
           items:
-            type: integer
+            type: string
           description: IDs of task auditors
         department_id:
           type: integer
