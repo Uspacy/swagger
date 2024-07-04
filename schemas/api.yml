@@ -1620,7 +1620,7 @@ paths:
         - tasksService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/CreateEditTaskDto'
       responses:
