@@ -2798,6 +2798,8 @@ paths:
                   - $ref: '#/components/schemas/Group'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
@@ -3804,6 +3806,31 @@ paths:
                     $ref: '#/components/schemas/Meta'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Create lead.
+      description: Create lead.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeadDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadDto'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /crm/v1/entities/leads/fields:
@@ -7735,7 +7762,7 @@ components:
           example: private
         ownerId:
           type: string
-          example: 1
+          example: '1'
         archived:
           type: boolean
         description:
@@ -8293,6 +8320,44 @@ components:
         - entity_reference
         - utm
         - float
+    CreateLeadDto:
+      type: object
+      description: You can see the available fields for creation at /crm/v1/entities/leads/fields
+      properties:
+        additionalProperties: true
+    LeadDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        created_at:
+          $ref: '#/components/schemas/Date'
+        updated_at:
+          $ref: '#/components/schemas/Date'
+        converted:
+          type: boolean
+        utm_source:
+          type: string
+          example: ''
+        utm_medium:
+          type: string
+          example: ''
+        utm_campaign:
+          type: string
+          example: ''
+        utm_content:
+          type: string
+          example: ''
+        utm_term:
+          type: string
+          example: ''
+        external_channels:
+          type: string
+          example: ''
+        kanban_status:
+          type: string
+          example:
     CrmEAdditionalFields:
       type: object
       properties:
