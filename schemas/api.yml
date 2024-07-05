@@ -418,16 +418,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  allOf:
-                    - type: object
-                      properties:
-                        data:
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/Activity'
-                    - $ref: '#/components/schemas/Meta'
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Activity'
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: '#/components/schemas/Meta'
     post:
       tags:
         - activitiesService
