@@ -531,6 +531,25 @@ paths:
           $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
+  /activities/v1/activities/mass_deletion:
+    delete:
+      tags:
+        - activitiesService
+      summary: Bulk deletion activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassActionActivity'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   # activities end
 
   # users begin
@@ -6301,6 +6320,27 @@ components:
             type: integer
         crm_entities:
           $ref: '#/components/schemas/ActivityCrmEntities'
+    MassActionActivity:
+      oneOf:
+        - type: object
+          required:
+            - all
+          properties:
+            all:
+              type: boolean
+              default: true
+            except_ids:
+              type: array
+              items:
+                type: integer
+        - type: object
+          required:
+            - entity_ids
+          properties:
+            entity_ids:
+              type: array
+              items:
+                type: integer
     # activities end
 
     # users begin
