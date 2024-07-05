@@ -66,6 +66,7 @@ tags:
   - name: searchService
   - name: fileImport
   - name: appService
+  - name: activitiesService
 
 paths:
 
@@ -328,6 +329,141 @@ paths:
         - bearerAuth: [ ]
   # auth end
 
+  # activities begin
+  /activities/v1/activities:
+    get:
+      tags:
+        - activitiesService
+      summary: Get activities list
+      parameters:
+        - name: responsible_id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: title
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/page'
+        - name: params
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: integer
+          style: form
+          explode: true
+          example:
+            leads[]: 1
+            companies[]: 23
+            contacts[]: 41
+        - name: id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: start_time
+          in: query
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: integer
+        - name: type
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityType'
+        - name: priority
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityPriority'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ActivityStatus'
+        - name: boolean_operator
+          in: query
+          schema:
+            type: string
+            enum:
+              - AND
+              - OR
+        - name: old_filter
+          in: query
+          schema:
+            type: boolean
+        - name: sort_by
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+              enum:
+                - desc
+                - asc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allOf:
+                    - type: object
+                      properties:
+                        data:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Activity'
+                    - $ref: '#/components/schemas/Meta'
+    post:
+      tags:
+        - activitiesService
+      summary: Create activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - required:
+                    - title
+                    - start_time
+                    - end_time
+                - $ref: '#/components/schemas/CreateOrUpdateActivity'
+                - type: object
+                  properties:
+                    created_by:
+                      type: integer
+                    created_at:
+                      type: integer
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  # activities end
 
   # users begin
   /company/v1/users:
@@ -5973,6 +6109,124 @@ components:
         - path/to/image.jpg
         - path/to/image.png
     # common end
+
+    # activities begin
+    ActivityStatus:
+      type: string
+      enum:
+        - planned
+        - done
+        - cancelled
+    ActivityType:
+      type: string
+      enum:
+        - activity
+        - call
+        - meeting
+        - chat
+        - email
+    ActivityPriority:
+      type: string
+      enum:
+        - low
+        - notHigh
+        - neutral
+        - high
+        - veryHigh
+    ActivityCrmEntities:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - title
+            - owner
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            owner:
+              type: integer
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+        closed_by:
+          type:
+            - integer
+            - 'null'
+        first_closed_by:
+          type:
+            - integer
+            - 'null'
+        closed_at:
+          type:
+            - integer
+            - 'null'
+        first_closed_at:
+          type:
+            - integer
+            - 'null'
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    CreateOrUpdateActivity:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    # activities end
 
     # users begin
     User:
