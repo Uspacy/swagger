@@ -429,6 +429,10 @@ paths:
                     properties:
                       meta:
                         $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
     post:
       tags:
         - activitiesService
@@ -462,6 +466,69 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /activities/v1/activities/{activityId}:
+    parameters:
+      - $ref: '#/components/parameters/activityId'
+    get:
+      tags:
+        - activitiesService
+      summary: Show activity
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      tags:
+        - activitiesService
+      summary: Update activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateActivity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrUpdateActivity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - activitiesService
+      summary: Delete activity by id
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   # activities end
@@ -5809,6 +5876,13 @@ components:
       name: taskId
       in: path
       description: Task id
+      required: true
+      schema:
+        type: string
+    activityId:
+      name: activityId
+      in: path
+      description: Activity id
       required: true
       schema:
         type: string
