@@ -66,6 +66,7 @@ tags:
   - name: searchService
   - name: fileImport
   - name: appService
+  - name: history
 
 paths:
 
@@ -5415,6 +5416,189 @@ paths:
       security:
         - bearerAuth: [ ]
   # appService end
+
+  # history begin
+  /history/v1/{service}/{entity_table_name}/{id}:
+    get:
+      summary: Get history for a specific service and entity
+      description: Returns the history of changes for the given service and entity.
+      parameters:
+        - name: service
+          in: path
+          required: true
+          description: The name of the service
+          schema:
+            type: string
+        - name: entity_table_name
+          in: path
+          required: true
+          description: The name of the entity table
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          description: The ID of the entity
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page number for pagination
+          schema:
+            type: integer
+            default: 1
+        - name: list
+          in: query
+          required: false
+          description: Filter for listing items
+          schema:
+            type: string
+            default: all
+        - name: action
+          in: query
+          required: false
+          description: The type of action performed
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        changed_by:
+                          type: string
+                          example: "3"
+                        changed_at:
+                          type: string
+                          example: "1723721790"
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              field_id:
+                                type: string
+                                example: "comment"
+                              action:
+                                type: string
+                                example: "create"
+                              from:
+                                type: object
+                                properties:
+                                  value:
+                                    type: string
+                                    example: ""
+                                  display_value:
+                                    type: string
+                                    example: ""
+                              to:
+                                type: object
+                                properties:
+                                  value:
+                                    type: string
+                                    example: "1724778698"
+                                  display_value:
+                                    type: string
+                                    example: "New Value"
+              example:
+                data:
+                  - changed_by: "3"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "comment"
+                        action: "create"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: ""
+                          display_value: "Get feedback"
+                      - field_id: "parentId"
+                        action: "update"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: "25"
+                          display_value: "Test notification 2"
+                      - field_id: "status"
+                        action: "update"
+                        from:
+                          value: "inWork"
+                          display_value: ""
+                        to:
+                          value: "onControl"
+                          display_value: ""
+                      - field_id: "deadline"
+                        action: "update"
+                        from:
+                          value: "1724519498"
+                          display_value: ""
+                        to:
+                          value: "1724778698"
+                          display_value: ""
+                  - changed_by: "13"
+                    changed_at: "1723721800"
+                    items:
+                      - field_id: "comment"
+                        action: "create"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: ""
+                          display_value: "New comment"
+                  - changed_by: "22"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "parentId"
+                        action: "update"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: "25"
+                          display_value: "Test notification 2"
+                  - changed_by: "45"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "status"
+                        action: "update"
+                        from:
+                          value: "inWork"
+                          display_value: ""
+                        to:
+                          value: "onControl"
+                          display_value: ""
+                  - changed_by: "10"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "deadline"
+                        action: "update"
+                        from:
+                          value: "1724519498"
+                          display_value: ""
+                        to:
+                          value: "1724778698"
+                          display_value: ""
+        '400':
+          description: Invalid input parameters
+        '404':
+          description: Entity not found
+      tags:
+        - history
+      security:
+        - bearerAuth: [ ]          
+  # history end
 
 components:
   securitySchemes:
