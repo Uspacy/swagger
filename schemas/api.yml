@@ -330,6 +330,228 @@ paths:
         - bearerAuth: [ ]
   # auth end
 
+  # activities begin
+  /activities/v1/activities:
+    get:
+      tags:
+        - activitiesService
+      summary: Get activities list
+      parameters:
+        - name: responsible_id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: title
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/page'
+        - name: params
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: integer
+          style: form
+          explode: true
+          example:
+            leads[]: 1
+            companies[]: 23
+            contacts[]: 41
+        - name: id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: start_time
+          in: query
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: integer
+        - name: type
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityType'
+        - name: priority
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityPriority'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ActivityStatus'
+        - name: boolean_operator
+          in: query
+          schema:
+            type: string
+            enum:
+              - AND
+              - OR
+        - name: old_filter
+          in: query
+          schema:
+            type: boolean
+        - name: sort_by
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+              enum:
+                - desc
+                - asc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Activity'
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      tags:
+        - activitiesService
+      summary: Create activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - required:
+                    - title
+                    - start_time
+                    - end_time
+                - $ref: '#/components/schemas/CreateOrUpdateActivity'
+                - type: object
+                  properties:
+                    created_by:
+                      type: integer
+                    created_at:
+                      type: integer
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /activities/v1/activities/{activityId}:
+    parameters:
+      - $ref: '#/components/parameters/activityId'
+    get:
+      tags:
+        - activitiesService
+      summary: Show activity
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      tags:
+        - activitiesService
+      summary: Update activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateActivity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrUpdateActivity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - activitiesService
+      summary: Delete activity by id
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+  /activities/v1/activities/mass_deletion:
+    delete:
+      tags:
+        - activitiesService
+      summary: Bulk deletion activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassActionActivity'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+  # activities end
 
   # users begin
   /company/v1/users:
@@ -6018,6 +6240,14 @@ components:
       required: true
       schema:
         type: string
+    activityId:
+      in: path
+      name: activityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Activity ID
 
     filter_number_enum:
       name: filterNumberEnum
@@ -6158,6 +6388,145 @@ components:
         - path/to/image.jpg
         - path/to/image.png
     # common end
+
+    # activities begin
+    ActivityStatus:
+      type: string
+      enum:
+        - planned
+        - done
+        - cancelled
+    ActivityType:
+      type: string
+      enum:
+        - activity
+        - call
+        - meeting
+        - chat
+        - email
+    ActivityPriority:
+      type: string
+      enum:
+        - low
+        - notHigh
+        - neutral
+        - high
+        - veryHigh
+    ActivityCrmEntities:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - title
+            - owner
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            owner:
+              type: integer
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+        closed_by:
+          type:
+            - integer
+            - 'null'
+        first_closed_by:
+          type:
+            - integer
+            - 'null'
+        closed_at:
+          type:
+            - integer
+            - 'null'
+        first_closed_at:
+          type:
+            - integer
+            - 'null'
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    CreateOrUpdateActivity:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    MassActionActivity:
+      oneOf:
+        - type: object
+          required:
+            - all
+          properties:
+            all:
+              type: boolean
+              default: true
+            except_ids:
+              type: array
+              items:
+                type: integer
+        - type: object
+          required:
+            - entity_ids
+          properties:
+            entity_ids:
+              type: array
+              items:
+                type: integer
+    # activities end
 
     # users begin
     User:
