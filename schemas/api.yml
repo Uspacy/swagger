@@ -4704,6 +4704,55 @@ paths:
       description: Get call event data
       tags:
         - crmService
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+        - in: query
+          name: to
+          schema:
+            type: string
+        - in: query
+          name: external_id
+          schema:
+            type: string
+        - in: query
+          name: integration_code
+          schema:
+            type: string
+        - in: query
+          name: call_type
+          schema:
+            type: string
+            enum:
+              - incoming
+              - outgoing
+        - in: query
+          name: ended_call_status
+          schema:
+            type: string
+            enum:
+              - successed
+              - missed
+              - declined
+              - subscriber_unavailable
+              - number_not_exist
+              - call_failure
+              - cancelled_by_manager
+        - in: query
+          name: duration
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: begin_time
+          schema:
+            type: integer
+        - in: query
+          name: owner
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
