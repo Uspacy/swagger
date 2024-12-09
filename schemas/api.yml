@@ -4747,8 +4747,25 @@ paths:
             minimum: 0
         - in: query
           name: begin_time
+          style: deepObject
+          explode: true
           schema:
-            type: integer
+            type: array
+            items:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+              minItems: 2
+              maxItems: 2
+          description: >
+            Array of time ranges.
+            Each inner array must contain two integers:
+            - first number represents the start of the time range
+            - second number represents the end of the time range
+          examples:
+            - [ 1733478301, 1733479302 ]
+            - [ 1733580000, 1733590000 ]
         - in: query
           name: owner
           schema:
