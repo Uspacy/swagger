@@ -5768,11 +5768,12 @@ paths:
                 $ref: '#/components/schemas/Document'
       security:
         - bearerAuth: [ ]
-  /crm/v1/documents/{documentId}:
+  /crm/v1/documents/{document_id}:
     parameters:
       - description: Document id
         in: path
         name: document_id
+        required: true
         schema:
           type: integer
     patch:
@@ -5796,13 +5797,15 @@ paths:
           description: OK
       security:
         - bearerAuth: [ ]
-  /crm/v1/documents/{documentId}/fields:
+  /crm/v1/documents/{document_id}/fields:
     parameters:
       - description: Document id
         in: path
         name: document_id
+        required: true
         schema:
           type: integer
+
     get:
       description: Getting filled fields of document
       tags:
@@ -6155,8 +6158,6 @@ paths:
       security:
         - bearerAuth: [ ]
     delete:
-      parameters:
-        - $ref: '#/components/parameters/itemId'
       description: Delete list product.
       tags:
         - crmService
