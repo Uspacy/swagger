@@ -4763,7 +4763,7 @@ paths:
             Each inner array must contain two integers:
             - first number represents the start of the time range
             - second number represents the end of the time range
-          examples:
+          example:
             - [ 1733478301, 1733479302 ]
             - [ 1733580000, 1733590000 ]
         - in: query
