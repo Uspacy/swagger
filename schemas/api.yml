@@ -5857,7 +5857,7 @@ paths:
 
 
   # Requisites begin
-  /requisites/regions:
+  /crm/v1/requisites/regions:
     get:
       description: Get available regions for requisites
       tags:
@@ -5878,7 +5878,7 @@ paths:
                       type: string
       security:
         - bearerAuth: [ ]
-  /requisites/templates:
+  /crm/v1/requisites/templates:
     get:
       description: Get requisite templates
       tags:
@@ -5945,7 +5945,7 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
       security:
         - bearerAuth: [ ]
-  /requisites/templates/{requisite_id}:
+  /crm/v1/requisites/templates/{requisite_id}:
     parameters:
       - description: Requisite id
         in: path
@@ -6024,7 +6024,7 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
       security:
         - bearerAuth: [ ]
-  /requisites/{requisite_id}:
+  /crm/v1/requisites/{requisite_id}:
     get:
       description: Get requisite by id
       tags:
@@ -6077,7 +6077,7 @@ paths:
           description: OK
       security:
         - bearerAuth: [ ]
-  /requisites/{requisite_id}/bank_requisites:
+  /crm/v1/requisites/{requisite_id}/bank_requisites:
     parameters:
       - description: Requisite id
         in: path
@@ -6161,7 +6161,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /requisites/{requisite_id/bank_requisites}/{bank_requisite_id}:
+  /crm/v1/requisites/{requisite_id/bank_requisites}/{bank_requisite_id}:
     parameters:
       - description: Requisite id
         in: path
