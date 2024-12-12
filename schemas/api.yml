@@ -66,6 +66,8 @@ tags:
   - name: searchService
   - name: fileImport
   - name: appService
+  - name: history
+  - name: activitiesService
 
 paths:
 
@@ -129,6 +131,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /auth/v1/auth/refresh_token:
     post:
       summary: Refresh token
@@ -142,6 +148,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/auth/register:
     post:
       summary: New user registration by invitation
@@ -161,6 +171,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
   /auth/v1/users:
     post:
       summary: Sign up
@@ -200,6 +214,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /auth/v1/users/forgot_password:
@@ -217,6 +233,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/reset_password:
     post:
       summary: Change password with token
@@ -232,6 +250,8 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /auth/v1/users/{userId}/change_password:
     patch:
       summary: Update user password
@@ -255,9 +275,11 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
-  /auth/v1/users/me/change_password:
+  /auth/v1/users/change_password:
     patch:
       summary: Update password
       description: Update self password
@@ -308,6 +330,228 @@ paths:
         - bearerAuth: [ ]
   # auth end
 
+  # activities begin
+  /activities/v1/activities:
+    get:
+      tags:
+        - activitiesService
+      summary: Get activities list
+      parameters:
+        - name: responsible_id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: title
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/page'
+        - name: params
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: integer
+          style: form
+          explode: true
+          example:
+            leads[]: 1
+            companies[]: 23
+            contacts[]: 41
+        - name: id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: start_time
+          in: query
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: integer
+        - name: type
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityType'
+        - name: priority
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ActivityPriority'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ActivityStatus'
+        - name: boolean_operator
+          in: query
+          schema:
+            type: string
+            enum:
+              - AND
+              - OR
+        - name: old_filter
+          in: query
+          schema:
+            type: boolean
+        - name: sort_by
+          in: query
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+              enum:
+                - desc
+                - asc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Activity'
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      tags:
+        - activitiesService
+      summary: Create activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - required:
+                    - title
+                    - start_time
+                    - end_time
+                - $ref: '#/components/schemas/CreateOrUpdateActivity'
+                - type: object
+                  properties:
+                    created_by:
+                      type: integer
+                    created_at:
+                      type: integer
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /activities/v1/activities/{activityId}:
+    parameters:
+      - $ref: '#/components/parameters/activityId'
+    get:
+      tags:
+        - activitiesService
+      summary: Show activity
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      tags:
+        - activitiesService
+      summary: Update activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateActivity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrUpdateActivity'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - activitiesService
+      summary: Delete activity by id
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+  /activities/v1/activities/mass_deletion:
+    delete:
+      tags:
+        - activitiesService
+      summary: Bulk deletion activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassActionActivity'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+  # activities end
 
   # users begin
   /company/v1/users:
@@ -377,6 +621,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/deactivate:
@@ -485,9 +733,10 @@ paths:
 
   /company/v1/users/{userId}/settings:
     get:
+      summary: Get user account settings by id.
+      description: Get user account settings by id.
       tags:
         - usersService
-      description: Get persinal settings by id.
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
@@ -499,11 +748,13 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update personal settings by id.
-      description: Update personal settings by id.
+      summary: Update user account settings by id.
+      description: Update user account settings by id.
       tags:
         - usersService
       parameters:
@@ -523,6 +774,10 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_status:
@@ -542,6 +797,10 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/{userId}/twofa_disable:
@@ -561,6 +820,10 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatusDisabled'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me:
@@ -596,6 +859,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatus'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me/twofa_enable:
@@ -611,18 +876,12 @@ paths:
             schema:
               $ref: '#/components/schemas/TwoFactorEnable'
       responses:
-        '201':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TwoFactorGetQr'
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TwoFactorStatusEnabled'
+                $ref: '#/components/schemas/TwoFactorGetQr'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -642,6 +901,8 @@ paths:
                   status:
                     type: boolean
                     example: true
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/users/me/twofa_disable:
@@ -659,6 +920,8 @@ paths:
                 $ref: '#/components/schemas/TwoFactorStatusDisabled'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
 
@@ -700,18 +963,17 @@ paths:
         content:
           multipart/form-data:
             schema:
-              allOf:
-                - type: object
-                  required:
-                    - avatar
-                  properties:
-                    avatar:
-                      default: ''
-                      format: binary
-                    userId:
-                      type: string
-                      example: 2
-
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  example: avatar.png file
+                userId:
+                  type: string
+                  example: 2
       responses:
         '200':
           description: OK
@@ -731,6 +993,8 @@ paths:
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
 
@@ -783,8 +1047,8 @@ paths:
       security:
         - bearerAuth: [ ]
     patch:
-      summary: Update self password
-      description: Update self password
+      summary: Update self settings
+      description: Update self settings
       tags:
         - usersService
       requestBody:
@@ -802,6 +1066,8 @@ paths:
                 $ref: '#/components/schemas/personalSettings'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   # users end
@@ -846,7 +1112,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DepartmentPatch'
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -883,6 +1149,8 @@ paths:
                 $ref: '#/components/schemas/Department'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     patch:
@@ -907,6 +1175,8 @@ paths:
                 $ref: '#/components/schemas/Department'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     delete:
@@ -920,6 +1190,10 @@ paths:
           description: No content
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/departments/{departmentId}/updateRoles:
@@ -1060,7 +1334,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RoleStore'
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -1071,6 +1345,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/roles/{roleId}:
@@ -1209,12 +1485,27 @@ paths:
             schema:
               $ref: '#/components/schemas/InvitesStore'
       responses:
-        '204':
-          description: No content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 32
+                    email:
+                      type: string
+                      example: stark@gmail.com
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /company/v1/invites/email/batch:
@@ -1260,6 +1551,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /company/v1/invites/email/{userId}:
@@ -1452,7 +1747,6 @@ paths:
           name: deadline
           schema:
             $ref: '#/components/parameters/filter_array_of_time_ranges/schema'
-
       responses:
         '200':
           description: OK
@@ -1464,7 +1758,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Task'
+                      $ref: '#/components/schemas/DetailedTask'
                   meta:
                     $ref: '#/components/schemas/Meta'
         '401':
@@ -1481,51 +1775,47 @@ paths:
           application/json:
             schema:
               allOf:
+                - required:
+                    - title
+                    - created_by
+                    - setter_id
                 - $ref: '#/components/schemas/CreateEditTaskDto'
                 - type: object
                   properties:
-                    fixed:
-                      type: boolean
-                      default: false
-                      example: true
-                    groupId:
-                      description: Group ID
-                      default: 'current group id'
+                    created_by:
+                      type: integer
+                      description: ID of the user who created the task
+                    created_date:
+                      type: integer
+                      description: Created date timestamp
+                    upload_id:
                       type: string
-                      example: 11
-                    fileIds:
+                      description: Upload ID
+                    file_ids:
                       type: array
-                      description: Defines the array of fileIds uploaded earlier that need to be bound to the post
                       items:
                         type: integer
-                        format: int64
-                    uploadId:
-                      description: Defines the earlier uploaded file bundle that need to be bound to the post
+                      description: List of file IDs
+                    created_at:
+                      type: integer
+                      description: Created at timestamp
+                    task_type:
                       type: string
-                      format: uuid
-
+                      example: 'task'
+                      description: Type of the task
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Task'
-                  - type: object
-                    properties:
-                      groupId:
-                        description: Group ID
-                        default: 'current group id'
-                        type: string
-                        example: 11
-                      comments:
-                        example: null
-                      reactions:
-                        example: null
-
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}:
@@ -1554,20 +1844,9 @@ paths:
         - tasksService
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/CreateEditTaskDto'
-                - type: object
-                  properties:
-                    archive:
-                      type: boolean
-                      default: false
-                      example: true
-                    fixed:
-                      type: boolean
-                      default: false
-                      example: true
+              $ref: '#/components/schemas/CreateEditTaskDto'
       responses:
         '200':
           description: OK
@@ -1577,6 +1856,10 @@ paths:
                 $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
     delete:
@@ -1591,27 +1874,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/{taskId}/denial:
-    post:
-      summary: Abandon a task
-      description: Abandoning a task
-      tags:
-        - tasksService
-      parameters:
-        - $ref: '#/components/parameters/taskId'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDenial'
-      responses:
-        '200':
-          description: OK
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-      security:
-        - bearerAuth: [ ]
-
   /tasks/v1/stages:
     get:
       summary: Get kanban stages
@@ -1644,26 +1906,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+              $ref: '#/components/schemas/CreateCanbanStageDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CanbanStage'
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        example: 2
-                      afterId:
-                        type: string
-                        example: 1
-
+                $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}:
@@ -1683,6 +1939,8 @@ paths:
                 $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
     patch:
@@ -1696,26 +1954,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEditCanbanStageDto'
+              $ref: '#/components/schemas/EditCanbanStageDto'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CanbanStage'
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        example: 2
-                      afterId:
-                        type: string
-                        example: 1
-
+                $ref: '#/components/schemas/CanbanStage'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
     delete:
@@ -1728,9 +1982,12 @@ paths:
       responses:
         '204':
           description: No content
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
   /tasks/v1/stages/{stageId}/moveTask:
@@ -1950,49 +2207,52 @@ paths:
                         description: checklist item id
                         example: 1
                   - $ref: '#/components/schemas/CheckListItem'
-
         '401':
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
 
-  /tasks/v1/tasks/massEdit/complete:
+  /tasks/v1/tasks/mass_ready:
     post:
-      summary: Bulk editing tasks
-      description: Bulk editing tasks
+      summary: Bulk ready tasks
+      description: Bulk ready tasks
       tags:
         - tasksService
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassActionTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/archive:
+  /tasks/v1/tasks/mass_deletion:
     post:
-      summary: Bulk editing tasks
-      description: Bulk editing tasks
+      summary: Bulk deletion tasks
+      description: Bulk deletion tasks
       tags:
         - tasksService
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassActionTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
-  /tasks/v1/tasks/massEdit/delete:
+  /tasks/v1/tasks/mass_edit:
     post:
       summary: Bulk editing tasks
       description: Bulk editing tasks
@@ -2002,12 +2262,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MassEditIds'
+              $ref: '#/components/schemas/MassEditTasksDto'
       responses:
-        '200':
+        '201':
           description: OK
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/transferToUser:
@@ -2072,15 +2334,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: inWork
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/stop:
@@ -2097,15 +2355,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: stopped
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/ready:
@@ -2127,15 +2381,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: ready
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/restart:
@@ -2152,15 +2402,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
-                  - type: object
-                    properties:
-                      status:
-                        type: string
-                        example: scheduled
+                $ref: '#/components/schemas/DetailedTask'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/watch:
@@ -2177,10 +2423,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
   /tasks/v1/tasks/{taskId}/unwatch:
@@ -2197,10 +2444,11 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/CreateEditTaskDto'
+                $ref: '#/components/schemas/Task'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       security:
         - bearerAuth: [ ]
 
@@ -2557,7 +2805,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCommentServiceDto'
       responses:
-        '200':
+        '201':
           description: Successful response
           content:
             application/json:
@@ -2565,6 +2813,8 @@ paths:
                 $ref: '#/components/schemas/CommentServiceDto'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -2701,8 +2951,8 @@ paths:
   # group begin
   /groups/v1/groups:
     get:
-      summary: Get posts list
-      description: Get posts list
+      summary: Get groups list
+      description: Get groups list
       tags:
         - groupService
       parameters:
@@ -2763,7 +3013,7 @@ paths:
                       format: binary
                       description: The file to upload.
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -2774,6 +3024,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /groups/v1/groups/{groupId}:
@@ -2845,8 +3097,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/groupId'
     post:
-      summary: Update group. Only available to group owner.
-      description: Update group. Only available to group owner.
+      summary: Upload group logo. Only available to group owner or moderator.
+      description: Upload group logo. Only available to group owner or moderator.
       tags:
         - groupService
       requestBody:
@@ -2870,6 +3122,10 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
 
@@ -2879,11 +3135,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Adding a user to a group.
       description:
         Adding a user to a group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2893,6 +3149,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -2902,11 +3162,11 @@ paths:
       - $ref: '#/components/parameters/userId'
 
     patch:
+      summary: Remove user from group.
       description:
         Remove user from group. Only available to group owner or moderator.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2916,6 +3176,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -2924,11 +3188,11 @@ paths:
       - $ref: '#/components/parameters/groupId'
 
     patch:
+      summary: Adding the current user to the group.
       description:
         Adding the current user to the group. Available to open groups or by invitation.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2938,19 +3202,22 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
   /groups/v1/groups/{groupId}/leaveGroup:
     parameters:
       - $ref: '#/components/parameters/groupId'
-
     patch:
+      summary: Remove the current user from the group.
       description:
-        Remove the current user from the group..
+        Remove the current user from the group.
       tags:
         - groupService
-
       responses:
         '200':
           description: OK
@@ -2960,6 +3227,10 @@ paths:
                 $ref: '#/components/schemas/Success'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       security:
         - bearerAuth: [ ]
 
@@ -3329,6 +3600,8 @@ paths:
 
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
   /crm/v1/entities/{entity}/fields/{field}:
@@ -3759,7 +4032,28 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-
+  /crm/v1/entities/leads/fields:
+    get:
+      summary: Get available leads fields list.
+      description: Get available leads fields list.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CrmEntityField'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
   /crm/v1/entities/{entity}/{itemId}:
     parameters:
       - $ref: '#/components/parameters/entity'
@@ -4410,6 +4704,55 @@ paths:
       description: Get call event data
       tags:
         - crmService
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+        - in: query
+          name: to
+          schema:
+            type: string
+        - in: query
+          name: external_id
+          schema:
+            type: string
+        - in: query
+          name: integration_code
+          schema:
+            type: string
+        - in: query
+          name: call_type
+          schema:
+            type: string
+            enum:
+              - incoming
+              - outgoing
+        - in: query
+          name: ended_call_status
+          schema:
+            type: string
+            enum:
+              - successed
+              - missed
+              - declined
+              - subscriber_unavailable
+              - number_not_exist
+              - call_failure
+              - cancelled_by_manager
+        - in: query
+          name: duration
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: begin_time
+          schema:
+            type: integer
+        - in: query
+          name: owner
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
@@ -4439,6 +4782,8 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/EventCallList'
+      security:
+        - bearerAuth: [ ]
 
   /crm/v1/events/call/{call_event_id}:
     patch:
@@ -4460,6 +4805,8 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/EventCallList'
+      security:
+        - bearerAuth: [ ]
     delete:
       parameters:
         - $ref: '#/components/parameters/call_event_id'
@@ -6036,7 +6383,188 @@ paths:
         - bearerAuth: [ ]
   # appService end
 
-
+  # history begin
+  /history/v1/{service}/{entity_table_name}/{id}:
+    get:
+      summary: Get history for a specific service and entity
+      description: Returns the history of changes for the given service and entity.
+      parameters:
+        - name: service
+          in: path
+          required: true
+          description: The name of the service
+          schema:
+            type: string
+        - name: entity_table_name
+          in: path
+          required: true
+          description: The name of the entity table
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          description: The ID of the entity
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page number for pagination
+          schema:
+            type: integer
+            default: 1
+        - name: list
+          in: query
+          required: false
+          description: Filter for listing items
+          schema:
+            type: string
+            default: all
+        - name: action
+          in: query
+          required: false
+          description: The type of action performed
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        changed_by:
+                          type: string
+                          example: "3"
+                        changed_at:
+                          type: string
+                          example: "1723721790"
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              field_id:
+                                type: string
+                                example: "comment"
+                              action:
+                                type: string
+                                example: "create"
+                              from:
+                                type: object
+                                properties:
+                                  value:
+                                    type: string
+                                    example: ""
+                                  display_value:
+                                    type: string
+                                    example: ""
+                              to:
+                                type: object
+                                properties:
+                                  value:
+                                    type: string
+                                    example: "1724778698"
+                                  display_value:
+                                    type: string
+                                    example: "New Value"
+              example:
+                data:
+                  - changed_by: "3"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "comment"
+                        action: "create"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: ""
+                          display_value: "Get feedback"
+                      - field_id: "parentId"
+                        action: "update"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: "25"
+                          display_value: "Test notification 2"
+                      - field_id: "status"
+                        action: "update"
+                        from:
+                          value: "inWork"
+                          display_value: ""
+                        to:
+                          value: "onControl"
+                          display_value: ""
+                      - field_id: "deadline"
+                        action: "update"
+                        from:
+                          value: "1724519498"
+                          display_value: ""
+                        to:
+                          value: "1724778698"
+                          display_value: ""
+                  - changed_by: "13"
+                    changed_at: "1723721800"
+                    items:
+                      - field_id: "comment"
+                        action: "create"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: ""
+                          display_value: "New comment"
+                  - changed_by: "22"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "parentId"
+                        action: "update"
+                        from:
+                          value: ""
+                          display_value: ""
+                        to:
+                          value: "25"
+                          display_value: "Test notification 2"
+                  - changed_by: "45"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "status"
+                        action: "update"
+                        from:
+                          value: "inWork"
+                          display_value: ""
+                        to:
+                          value: "onControl"
+                          display_value: ""
+                  - changed_by: "10"
+                    changed_at: "1723721790"
+                    items:
+                      - field_id: "deadline"
+                        action: "update"
+                        from:
+                          value: "1724519498"
+                          display_value: ""
+                        to:
+                          value: "1724778698"
+                          display_value: ""
+        '400':
+          description: Invalid input parameters
+        '404':
+          description: Entity not found
+      tags:
+        - history
+      security:
+        - bearerAuth: [ ]
+  # history end
 
 components:
   securitySchemes:
@@ -6050,8 +6578,32 @@ components:
       description: Access token is missing or invalid
     Forbidden:
       description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  text:
+                    type: array
+                    items:
+                      example: 'Forbidden message'
+              status:
+                type: boolean
+                example: true
     NoContent:
       description: No Content
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     JoinRequestNotFound:
       description: Join request not found
       content:
@@ -6075,11 +6627,24 @@ components:
     # search serivce
     SearchErrorMessage:
       description: Custom error
-
-
-
-
-
+    ValidationError:
+      description: Validation error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  field_name: [ "The field_name field is required." ]
+              status:
+                type: boolean
+                example: true
   parameters:
     userId:
       name: userId
@@ -6087,7 +6652,7 @@ components:
       description: User id
       required: true
       schema:
-        type: string
+        type: integer
     departmentId:
       name: departmentId
       in: path
@@ -6345,7 +6910,7 @@ components:
       description: Group id
       required: true
       schema:
-        type: string
+        type: integer
     app_id:
       name: app_id
       in: path
@@ -6418,6 +6983,14 @@ components:
       required: true
       schema:
         type: string
+    activityId:
+      in: path
+      name: activityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Activity ID
 
     filter_number_enum:
       name: filterNumberEnum
@@ -6459,16 +7032,41 @@ components:
     Meta:
       type: object
       properties:
-        total:
-          type: number
-          example: 100
-        page:
+        currentPage:
           type: number
           example: 1
-        list:
+        from:
           type: number
-          example: 10
-
+          example: 1
+        lastPage:
+          type: number
+          example: 1
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                example: null
+              label:
+                type: string
+                example: "Previous"
+              active:
+                type: boolean
+                example: false
+        path:
+          type: string
+          example: "https://domain.uspacy.ua/groups/v1/groups"
+        perPage:
+          type: number
+          example: 20
+        to:
+          type: number
+          example: 2
+        total:
+          type: number
+          example: 2
     Roles:
       type: array
       items:
@@ -6534,12 +7132,151 @@ components:
         - path/to/image.png
     # common end
 
+    # activities begin
+    ActivityStatus:
+      type: string
+      enum:
+        - planned
+        - done
+        - cancelled
+    ActivityType:
+      type: string
+      enum:
+        - activity
+        - call
+        - meeting
+        - chat
+        - email
+    ActivityPriority:
+      type: string
+      enum:
+        - low
+        - notHigh
+        - neutral
+        - high
+        - veryHigh
+    ActivityCrmEntities:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - title
+            - owner
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            owner:
+              type: integer
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        created_at:
+          type: integer
+        updated_at:
+          type: integer
+        closed_by:
+          type:
+            - integer
+            - 'null'
+        first_closed_by:
+          type:
+            - integer
+            - 'null'
+        closed_at:
+          type:
+            - integer
+            - 'null'
+        first_closed_at:
+          type:
+            - integer
+            - 'null'
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    CreateOrUpdateActivity:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/ActivityType'
+        status:
+          $ref: '#/components/schemas/ActivityStatus'
+        priority:
+          $ref: '#/components/schemas/ActivityPriority'
+        description:
+          type: string
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+        responsible_id:
+          type: integer
+        company_id:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: integer
+        crm_entities:
+          $ref: '#/components/schemas/ActivityCrmEntities'
+    MassActionActivity:
+      oneOf:
+        - type: object
+          required:
+            - all
+          properties:
+            all:
+              type: boolean
+              default: true
+            except_ids:
+              type: array
+              items:
+                type: integer
+        - type: object
+          required:
+            - entity_ids
+          properties:
+            entity_ids:
+              type: array
+              items:
+                type: integer
+    # activities end
+
     # users begin
     User:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         firstName:
           type: string
@@ -6605,12 +7342,11 @@ components:
       type: object
       properties:
         enabled:
-          type: integer
-          enum:
-            - 0
-            - 1
+          type: boolean
     TwoFactorEnable:
       type: object
+      required:
+        - step
       properties:
         step:
           type: string
@@ -6618,8 +7354,8 @@ components:
             - get-qr-code
             - verify-secret
         code:
-          type: integer
-          example: 555406
+          type: string
+          example: '555406'
           description: Available on a second step (check-code)
     TwoFactorGetQr:
       type: object
@@ -6659,6 +7395,10 @@ components:
         lastName:
           type: string
           example: Raranetskyi
+        patronymic:
+          type: string
+        position:
+          type: string
         specialization:
           type: string
           example: Specialist
@@ -6668,9 +7408,6 @@ components:
         city:
           type: string
           example: Kiyv
-        avatar:
-          type: string
-          example: /storage/avatars/c4ca423/avatar.jpeg
         aboutMyself:
           type: string
           example: about me
@@ -6682,6 +7419,8 @@ components:
           type: boolean
           default: false
           example: true
+        active:
+          type: boolean
         socialMedia:
           $ref: '#/components/schemas/SocialMedia'
     UpdateRolesDto:
@@ -6704,6 +7443,14 @@ components:
           example:
             - '1'
             - '2'
+    SystemAvailableLangs:
+      type: string
+      enum:
+        - 'en-US'
+        - 'pt-BR'
+        - 'pl'
+        - 'es-ES'
+        - 'uk'
     personalSettings:
       type: object
       properties:
@@ -6711,8 +7458,7 @@ components:
           type: string
           example: first-last
         lang:
-          type: string
-          example: ua
+          $ref: '#/components/schemas/SystemAvailableLangs'
         timeFormat:
           type: string
           example: 24-hours
@@ -6769,6 +7515,10 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzEyMzEyMyIsImZpcnN0TmFtZSI6IlN0YXMiLCJsYXN0TmFtZSI6IlJhcmFuZXRza3lpIiwiZW1haWwiOiJyYXIuc3Rhc0BnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iLCJPV05FUiJdfQ.au16u5LHJqdvhiPrpXDhN4NZn8Cae09I6BEmed7mt8w
     SignUpDto:
       type: object
+      required:
+        - email
+        - firstName
+        - password
       properties:
         email:
           type: string
@@ -6824,6 +7574,9 @@ components:
           description: filled on second auth step if 2FA is eneabled
     ConfirmEmailDto:
       type: object
+      required:
+        - email
+        - token
       properties:
         email:
           $ref: '#/components/schemas/Email'
@@ -6858,7 +7611,7 @@ components:
           $ref: '#/components/schemas/Email'
         password:
           type: string
-          example: 12345678
+          example: myNewPassword
         token:
           type: string
           example: r6pvb5pllte
@@ -6878,7 +7631,7 @@ components:
           example: Stark
         domain:
           type: string
-          example: stark
+          example: domain.uspacy.ua
     CreatePortal:
       type: object
       properties:
@@ -6936,8 +7689,11 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
+        description:
+          type: string
+          example: Test department
         name:
           type: string
           example: Frontend department
@@ -7104,12 +7860,30 @@ components:
     # news feed end
 
     # tasks begin
+    DetailedTask:
+      allOf:
+        - $ref: '#/components/schemas/Task'
+        - type: object
+          properties:
+            accomplicesIds:
+              type: array
+              items:
+                type: string
+              example: [ "2", "3" ]
+            auditorsIds:
+              type: array
+              items:
+                type: string
+              example: [ "4", "5" ]
     Task:
       type: object
       properties:
         id:
           type: string
-          example: 5
+          example: "5"
+        parentId:
+          type: string
+          example: "2"
         title:
           type: string
           example: Describe swagger api for tasksService
@@ -7119,26 +7893,16 @@ components:
           $ref: '#/components/schemas/Date'
         createdBy:
           type: string
-          example: 1
+          example: "1"
         closedBy:
           type: string
-          example: 1
+          example: "1"
         createdDate:
           $ref: '#/components/schemas/Date'
         responsibleId:
           description: ID of responsible person
           type: string
-          example: 1
-        accomplicesIds:
-          type: array
-          items:
-            type: string
-          example: [ "2", "3" ]
-        auditorsIds:
-          type: array
-          items:
-            type: string
-          example: [ "4", "5" ]
+          example: "1"
         body:
           type: string
           example: <b>need use swagger-ui@4.x</b>
@@ -7146,13 +7910,9 @@ components:
           $ref: '#/components/schemas/TaskStatus'
         kanbanStageId:
           type: string
-          example: 2
+          example: "2"
         priority:
-          type: string
-          enum:
-            - Low
-            - Average
-            - High
+          $ref: '#/components/schemas/TaskPriority'
         acceptResult:
           type: boolean
           default: false
@@ -7163,109 +7923,253 @@ components:
           example: true
         resultCommentId:
           type: string
-          example: 1
-        fixed:
-          type: boolean
-          default: false
-          example: true
-        archive:
-          type: boolean
-          default: false
-          example: false
+          example: "1"
         departmentId:
           description: Department ID
           type: string
-          example: 1
+          example: "1"
         groupId:
           description: Group ID
           type: string
-          example: 1
+          example: "1"
+        setterId:
+          type: string
+          example: "1"
+        timeTracking:
+          type: boolean
+        timeEstimate:
+          $ref: '#/components/schemas/Date'
+        template:
+          type: boolean
+        templateId:
+          type: string
+          example: "2"
+        delegation:
+          type: integer
+        taskType:
+          type: string
+          example: 'task'
+        basicTask:
+          type: boolean
         files:
           type: array
           items:
             $ref: '#/components/schemas/FileInfoDto'
-          example:
-            - id: 7
-              entityType: "task"
-              entityId: 5
-              uploadId: "369c4620-adee-4526-a0d8-a1db20bcf5b2"
-              originalFilename: "sample.jpg"
-              lastModified: 1664629542
-              size: 123456
-              url: "https://aws.s3.amazonaws.com/my-bucket/61/dd/61ddc0045c05ba7537b63e63184b9203.jpg"
-        comments:
-          type: array
-          items:
-            allOf:
-              - $ref: '#/components/schemas/CommentServiceDto'
-              - $ref: '#/components/schemas/CommentExtrasServiceDto'
-            example:
-              id: 2
-              entityType: "task"
-              entityId: 5
-              message: "Message comment"
-              authorId: "1"
-              date: 1654180120
-              reactions:
-                - reaction: 128513
-                  amount: 23
-                  entityId: 2
-              nextId: 12
-              prevId: 5
-        reactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReactionServiceDto'
-
+    TaskScheduler:
+      type: object
+      required:
+        - period
+        - every
+      properties:
+        period:
+          type: string
+          enum: [ day, week, month, year ]
+          description: Scheduler period
+          example: 'day'
+        every:
+          type: integer
+          minimum: 0
+          description: Scheduler every interval
+          example: 1246
+        hour_start:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Scheduler start hour
+          example: 1246
+        deadline_hour:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Scheduler deadline hour
+          example: 1246
+        deadline_day:
+          type: integer
+          minimum: 0
+          description: Scheduler deadline day
+          example: 1246
+        active:
+          type: boolean
+          description: Scheduler active flag
+          example: false
+        day_of_week:
+          type: integer
+          minimum: 1
+          description: Scheduler day of the week
+          example: 1246
+        date_start:
+          type: string
+          format: date
+          description: Scheduler start date
+        date_stop:
+          type: integer
+          description: Scheduler stop date
+          example: 1246
+        iteration:
+          type: integer
+          minimum: 0
+          description: Scheduler iteration
+          example: 12
+        timezone_offset:
+          type: integer
+          description: Scheduler timezone offset
+          example: 1246
+    MassActionTasksDto:
+      oneOf:
+        - type: object
+          required:
+            - all
+          properties:
+            all:
+              type: boolean
+              default: true
+        - type: object
+          required:
+            - task_ids
+          properties:
+            task_ids:
+              type: array
+              items:
+                type: integer
+    MassEditTasksDto:
+      allOf:
+        - $ref: '#/components/schemas/MassActionTasksDto'
+        - type: object
+          required:
+            - payload
+          properties:
+            payload:
+              type: object
+              properties:
+                title:
+                  type: string
+                parent_id:
+                  type: integer
+                setter_id:
+                  type: integer
+                deadline:
+                  type: integer
+                responsible_id:
+                  type: integer
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                body:
+                  type: string
+                accomplices_ids:
+                  type: array
+                  items:
+                    type: integer
+                auditors_ids:
+                  type: array
+                  items:
+                    type: integer
+                department_id:
+                  type: integer
+                group_id:
+                  type: integer
+                accept_result:
+                  type: boolean
+                required_result:
+                  type: boolean
+                time_estimate:
+                  type: integer
+                time_tracking:
+                  type: boolean
+                delegation:
+                  type: boolean
     CreateEditTaskDto:
       type: object
       properties:
-        parentId:
+        parent_id:
           type: integer
-          format: int64
+          description: Parent task ID
         title:
           type: string
-          example: Describe swagger api for tasksService
-        deadline:
-          $ref: '#/components/schemas/Date'
-        responsibleId:
-          description: ID of responsible person
+          description: Title of the task
+        setter_id:
           type: string
-          example: 1
-        accomplicesIds:
-          type: array
-          items:
-            type: string
-          example: [ "2", "3" ]
-        auditorsIds:
-          type: array
-          items:
-            type: string
-          example: [ "4", "5" ]
+          description: ID of the user who set the task
+        responsible_id:
+          type: string
+          description: ID of the user responsible for the task
+        deadline:
+          type: integer
+          description: Deadline timestamp
         body:
           type: string
-          example: <b>need use swagger-ui@4.x</b>
+          description: Task description
+        status:
+          $ref: '#/components/schemas/TaskStatus'
         priority:
-          type: string
-          enum:
-            - LOW
-            - AVERAGE
-            - HIGH
-        departmentId:
+          $ref: '#/components/schemas/TaskPriority'
+        accomplices_ids:
+          type: array
+          items:
+            type: string
+          description: IDs of task accomplices
+        auditors_ids:
+          type: array
+          items:
+            type: string
+          description: IDs of task auditors
+        department_id:
+          type: integer
           description: Department ID
-          default: 'current department id'
+        group_id:
           type: string
-          example: 1
-
+          description: Group ID
+        accept_result:
+          type: boolean
+          description: Whether the task result is accepted
+        required_result:
+          type: boolean
+          description: Whether a result is required
+        time_estimate:
+          type: integer
+          description: Estimated time for the task
+        time_tracking:
+          type: boolean
+          description: Whether time tracking is enabled
+        crm_entity_list:
+          type: boolean
+          description: CRM entity list flag
+        scheduler:
+          $ref: '#/components/schemas/TaskScheduler'
+        crm_entities:
+          type: array
+          description: List of CRM entities
+        deadline_hour:
+          type: integer
+          minimum: 0
+          maximum: 86399
+          description: Deadline hour
+        deadline_day:
+          type: integer
+          minimum: 0
+          description: Deadline day
+        timezone_offset:
+          type: integer
+          description: Timezone offset
+        delegation:
+          type: boolean
+          description: Delegation flag
     TaskStatus:
       type: string
       enum:
-        - TO_DO
-        - IN_PROGRESS
-        - READY_FOR_REVIEW
-        - DONE
-        - BLOCKED
-
+        - notScheduled
+        - scheduled
+        - inWork
+        - stopped
+        - inControl
+        - ready
+    TaskPriority:
+      type: string
+      enum:
+        - low
+        - notHigh
+        - neutral
+        - high
+        - veryHigh
     CanbanStage:
       type: object
       properties:
@@ -7278,13 +8182,18 @@ components:
         color:
           type: string
           example: "#ff0000"
+        sort:
+          type: integer
+          example: 10
         afterId:
           type: string
           description: The ID of the stage to add after.
           example: 0
-
-    CreateEditCanbanStageDto:
+    CreateCanbanStageDto:
       type: object
+      required:
+        - title
+        - color
       properties:
         title:
           type: string
@@ -7296,6 +8205,24 @@ components:
           type: string
           description: The ID of the stage to add after.
           example: 1
+        sort:
+          type: integer
+          example: 6
+        group_id:
+          type: integer
+          example: 3
+    EditCanbanStageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: In progress
+        color:
+          type: string
+          example: "#ff0000"
+        sort:
+          type: integer
+          example: 6
     MoveTaskCanbanStageDto:
       type: object
       properties:
@@ -7303,13 +8230,6 @@ components:
           type: string
           description: Task id
           example: 1
-
-    CreateDenial:
-      type: object
-      properties:
-        reason:
-          type: string
-          example: No time
 
     CreateUpdateCheckList:
       type: object
@@ -7341,16 +8261,6 @@ components:
           example: 1
         deadline:
           $ref: '#/components/schemas/Date'
-
-    MassEditIds:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            type: string
-          example: [ "1", "2" ]
-
     TransferTask:
       type: object
       properties:
@@ -7533,6 +8443,10 @@ components:
         code:
           type: string
           example: ADMIN
+        userList:
+          type: array
+        departmentList:
+          type: array
         permissions:
           $ref: '#/components/schemas/PermissionsAction'
 
@@ -7629,6 +8543,8 @@ components:
 
     RoleStore:
       type: object
+      required:
+        - title
       properties:
         title:
           type: string
@@ -7804,7 +8720,10 @@ components:
           example: 1
         date:
           $ref: '#/components/schemas/Date'
-
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
     CommentExtrasServiceDto:
       type: object
       properties:
@@ -7822,7 +8741,6 @@ components:
           format: int64
           example: 1
           description: If NULL, this is the first comment if the (sub)thread
-
     ReactionServiceDto:
       type: object
       properties:
@@ -7839,32 +8757,109 @@ components:
           type: integer
           format: int64
           example: 1
-
     CreateCommentServiceDto:
       type: object
       properties:
-        entityType:
+        entity_type:
           allOf:
             - $ref: '#/components/schemas/EntityTypes'
             - example: 'post'
-        entityId:
+        entity_id:
           type: integer
           format: int64
           example: 1
         message:
           type: string
           example: Message post
+        author_id:
+          type: integer
+          example: 1
+        date:
+          type: integer
+          example: 1627862400
+        upload_id:
+          type: string
+          example: null
+        file_ids:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+        mentioned:
+          $ref: '#/components/schemas/MentionedDto'
+        notify:
+          $ref: '#/components/schemas/NotifyDto'
+        root_parent:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "parent_type"
+            data:
+              type: string
+              example: "parent_data"
+            service:
+              type: string
+              example: "parent_service"
+            title:
+              type: string
+              example: "parent_title"
+            table_name:
+              type: string
+              example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
       required:
-        - entityType
-        - entityId
-
+        - entity_type
+        - entity_id
+        - author_id
+        - message
+        - date
     UpdateCommentServiceDto:
       type: object
       properties:
         message:
           type: string
           example: Message post
-
+    MentionedDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
+    NotifyDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [ 32, 85 ]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [ 43, 12, 2 ]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: [ ]
     # comments end
 
     # invite begin
@@ -7883,6 +8878,8 @@ components:
 
     InviteExample:
       type: object
+      required:
+        - email
       properties:
         email:
           type: string
@@ -8031,7 +9028,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           example: 1
         name:
           type: string
@@ -8042,7 +9039,7 @@ components:
         ownerId:
           type: string
           example: 1
-        archival:
+        archived:
           type: boolean
         description:
           type: string
@@ -8053,6 +9050,19 @@ components:
         logo:
           type: string
           example: /8c/nsfkjnns486sd4f56.jpg
+        enableColorTheme:
+          type: boolean
+        themeSettings:
+          type: object
+          properties:
+            bgColor:
+              type: string
+            iconColor:
+              type: string
+            icon:
+              type: string
+            enablePattern:
+              type: boolean
         moderatorsIds:
           type: array
           items:
@@ -8483,7 +9493,109 @@ components:
         - id: 2
           title: 'Site'
           sort: 20
-
+    CrmEntityField:
+      type: object
+      required:
+        - name
+        - code
+        - entity_reference_id
+        - type
+        - required
+        - editable
+        - show
+        - hidden
+        - multiple
+        - system_field
+        - base_field
+        - sort
+        - default_value
+        - tooltip
+        - display_in_tabs
+      properties:
+        name:
+          type: string
+          example: 'Field name'
+        code:
+          type: string
+          example: 'field_name'
+        entity_reference_id:
+          type: string
+          example: '2'
+        type:
+          $ref: '#/components/schemas/CrmEntityFieldType'
+        required:
+          type: boolean
+        editable:
+          type: boolean
+        show:
+          type: boolean
+        hidden:
+          type: boolean
+        multiple:
+          type: boolean
+        system_field:
+          type: boolean
+        base_field:
+          type: boolean
+        sort:
+          type: string
+          example: ''
+        default_value:
+          type: string
+          example: ''
+        tooltip:
+          type: string
+          example: ''
+        display_in_tabs:
+          type: boolean
+        values:
+          type: array
+          items:
+            type: object
+            required:
+              - title
+              - value
+              - color
+              - sort
+              - selected
+            properties:
+              title:
+                type: string
+                example: 'Active customer'
+              value:
+                type: string
+                example: 'active_customer'
+              color:
+                type: string
+                example: '#008000'
+              sort:
+                type: string
+                example: ''
+              selected:
+                type: boolean
+    CrmEntityFieldType:
+      type: string
+      enum:
+        - string
+        - textarea
+        - integer
+        - list
+        - datetime
+        - money
+        - label
+        - phone
+        - email
+        - social
+        - link
+        - boolean
+        - user_id
+        - photo
+        - file
+        - address
+        - legal_details
+        - entity_reference
+        - utm
+        - float
     CrmEAdditionalFields:
       type: object
       properties:
@@ -8790,12 +9902,12 @@ components:
             type: array
           companies:
             type: array
-            example: []
+            example: [ ]
             description: Having same format as contacts field. Or could be empty array
           employees:
             type: array
             description: Employees that have been dialed during the call. Could be omitted if don't have such information
-            example: [1, 2, 3]
+            example: [ 1, 2, 3 ]
           tasks:
             type: object
             description: The task data for provided task_id
@@ -8860,15 +9972,15 @@ components:
         employees:
           type: array
           description: Employees that have been dialed during the call. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         contacts:
           type: array
           description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         companies:
           type: array
           description: The companies that have connection with particulat call event. Could be omitted if don't have such information
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         subject:
           type: string
           example: First call
@@ -8912,9 +10024,9 @@ components:
           type: string
           example: Fixed agenda
       required:
-        -  integration_code
-        -  call_type
-        -  from
+        - integration_code
+        - call_type
+        - from
 
 
     CallEventContacts:
