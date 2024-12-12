@@ -20,4 +20,4 @@ jobs:
       - name: Run `openapi` command 🚀
         uses: readmeio/rdme@v8
         with:
-          rdme: openapi schemas/api.yml --key=${{ secrets.README_API_KEY }} --id=65240a793272f000344c6b05
+          rdme: openapi schemas/api.yml --key=${{ secrets.README_API_KEY }} --id=652420c1e726c6001363e803
