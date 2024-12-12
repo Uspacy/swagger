@@ -13,4 +13,4 @@ jobs:
       - name: Run `openapi` command 🚀
         uses: readmeio/rdme@v9.0.3
         with:
-          rdme: openapi validate schemas/api.yml
+          rdme: openapi validate schemas/api.yml 

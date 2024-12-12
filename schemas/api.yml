@@ -6009,7 +6009,7 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /requisites:
+  /crm/v1/requisites:
     get:
       description: Get requisites
       tags:
