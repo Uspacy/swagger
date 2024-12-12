@@ -5552,9 +5552,13 @@ paths:
         - description: Search by name
           in: query
           name: search
+          schema:
+            type: string
         - description: Filter by active
           in: query
           name: is_active
+          schema:
+            type: boolean
         - description: Filter by date create, first element from date, second element to date
           in: query
           name: create_between
@@ -5952,6 +5956,7 @@ paths:
         schema:
           type: integer
         name: requisite_id
+        required: true
     patch:
       description: Update requisite template
       tags:
@@ -6044,6 +6049,7 @@ paths:
         schema:
           type: integer
         name: requisite_id
+        required: true
     patch:
       description: Update requisite by id
       tags:
@@ -6161,7 +6167,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - bearerAuth: [ ]
-  /crm/v1/requisites/{requisite_id/bank_requisites}/{bank_requisite_id}:
+  /crm/v1/requisites/{requisite_id}/bank_requisites/{bank_requisite_id}:
     parameters:
       - description: Requisite id
         in: path
