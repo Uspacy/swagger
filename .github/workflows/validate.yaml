@@ -1,0 +1,17 @@
+
+name: ReadMe GitHub Action Validate 🦉
+
+on:
+  pull_request:
+
+jobs:
+  rdme-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo 📚
+        uses: actions/checkout@v3
+
+      - name: Run `openapi` command 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi validate schemas/api.yml --key=${{ secrets.README_API_KEY }} --id=652420c1e726c6001363e803
