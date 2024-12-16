@@ -57,6 +57,8 @@ tags:
   - name: departments (usersService)
   - name: roles (usersService)
   - name: invite (usersService)
+  - name: incoming webhooks (usersService)
+  - name: outgoing webhooks (usersService)
   - name: newsFeedService
   - name: tasksService
   - name: filesService
@@ -1574,6 +1576,262 @@ paths:
       security:
         - bearerAuth: [ ]
   # invite begin
+
+  # incoming webhooks begin
+  /company/v1/incoming_webhooks:
+    get:
+      summary: Retrieve Incoming Webhooks List
+      description: Retrieves a list of incoming webhooks added by the user. Available only for admin users.
+      tags:
+        - incoming webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+        - $ref: '#/components/parameters/active'
+        - $ref: '#/components/parameters/createdAt'
+        - $ref: '#/components/parameters/filterUserId'
+        - $ref: '#/components/parameters/permissions'
+        - $ref: '#/components/parameters/name'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IncomingWebhook'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Create Incoming Webhook
+      description: Creates a new incoming webhook. Available only to portal owners or administrators.
+      tags:
+        - incoming webhooks (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - permissions
+              $ref: '#/components/schemas/IncomingWebhookDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Mass Delete Incoming Webhooks
+      description: Mass Delete Incoming Webhooks. Available only for admin users.
+      tags:
+        - incoming webhooks (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassDeleteIncomingWebhookDto'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: [ ]
+  /company/v1/incoming_webhooks/{incomingWebhookId}:
+    patch:
+      summary: Update Incoming Webhook
+      description: Updates an existing incoming webhook. Available only for admin users.
+      tags:
+        - incoming webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/incomingWebhookId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomingWebhookDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Delete Incoming Webhook
+      description: Delete Incoming Webhook. Available only for admin users.
+      tags:
+        - incoming webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/incomingWebhookId'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: [ ]
+  # incoming webhooks end
+
+  # outgoing webhooks begin
+  /company/v1/webhooks:
+    get:
+      summary: Retrieve Outgoing Webhooks List
+      description: Retrieves a list of outgoing webhooks added by the user. Available to portal owners or administrators.
+      tags:
+        - outgoing webhooks (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OutgoingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      summary: Create a New Outgoing Webhook
+      description: Creates a new outgoing webhook with specified details.
+      tags:
+        - outgoing webhooks (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOutgoingWebhookDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutgoingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: Delete Multiple Outgoing Webhooks
+      description: Deletes multiple outgoing webhooks by their IDs.
+      tags:
+        - outgoing webhooks (usersService)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassDeleteOutgoingWebhookDto'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /company/v1/webhooks/{webhookId}:
+    delete:
+      summary: Delete an Outgoing Webhook
+      description: Deletes an outgoing webhook by ID.
+      tags:
+        - outgoing webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/webhookId'
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /company/v1/webhooks/{webhookId}/toggle:
+    patch:
+      summary: Toggle Outgoing Webhook Status
+      description: Toggles the active status of an outgoing webhook.
+      tags:
+        - outgoing webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/webhookId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutgoingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /company/v1/webhooks/{webhookId}/repeat:
+    patch:
+      summary: Repeat Outgoing Webhook Action
+      description: Repeats the outgoing webhook action.
+      tags:
+        - outgoing webhooks (usersService)
+      parameters:
+        - $ref: '#/components/parameters/webhookId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutgoingWebhook'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  # outgoing webhooks end
 
   # newsfeed begin
   /newsfeed/v1/posts:
@@ -7049,7 +7307,71 @@ components:
       required: false
       schema:
         type: string
-
+    webhookId:
+      name: webhookId
+      in: path
+      description: Outgoing Webhook id
+      required: true
+      schema:
+        type: integer
+    incomingWebhookId:
+      name: incomingWebhookId
+      in: path
+      description: Incoming Webhook id
+      required: true
+      schema:
+        type: integer
+    active:
+      name: active
+      in: query
+      description: Active
+      required: false
+      schema:
+        type: boolean
+    createdAt:
+      name: created_at[][]
+      in: query
+      required: false
+      style: deepObject
+      explode: true
+      schema:
+        type: array
+        items:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: integer
+            minimum: 0
+    filterUserId:
+      name: userId
+      in: query
+      description: User id
+      required: false
+      schema:
+        type: integer
+    permissions:
+      name: permissions[]
+      in: query
+      description: Filter results by specified permissions. Multiple values can be provided.
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [crm, activities, tasks, comments, company, newsfeed, messenger, groups, files, email]
+      example:
+        - tasks
+        - crm
+    name:
+      name: name
+      in: query
+      description: Name
+      required: false
+      schema:
+        type: string
 
   schemas:
     # common begin
@@ -7759,6 +8081,173 @@ components:
         - '1'
         - '2'
     # Departments end
+
+    # Incoming webhooks begin
+    IncomingWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 14
+        name:
+          type: string
+          example: "CRM + Tasks"
+        active:
+          type: boolean
+          example: true
+          default: false
+        user_id:
+          type: integer
+          example: 1
+        created_at:
+          type: integer
+          example: 1732739313
+        updated_at:
+          type: integer
+          example: 1732739313
+        permissions:
+          type: array
+          description: List of permissions associated with the webhook.
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                enum: [crm, activities, tasks, comments, company, newsfeed, messenger, groups, files, email]
+                description: The service that the webhook has permission for.
+            required:
+              - service
+          example:
+            - service: "crm"
+            - service: "tasks"
+        webhook_url:
+          type: string
+          format: uri
+          example: "https://domain.uspacy.ua/company/v1/incoming_webhooks/run/biUPE8eDUqfZoguv03AqISYEWkSd6BZD"
+    IncomingWebhookDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "CRM + Tasks"
+        active:
+          type: boolean
+          example: true
+          default: false
+        permissions:
+          type: array
+          description: List of permissions associated with the webhook.
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                enum: [crm, activities, tasks, comments, company, newsfeed, messenger, groups, files, email]
+                description: The service that the webhook has permission for.
+            required:
+              - service
+          example:
+            - service: "crm"
+            - service: "tasks"
+    MassDeleteIncomingWebhookDto:
+      type: object
+      properties:
+        ids:
+          description: Array of Incoming Webhooks IDs
+          schema:
+            type: array
+            items:
+              type: integer
+          example: [1, 2, 3]
+    # Incoming webhooks end
+
+    # Outgoing webhooks begin
+    OutgoingWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 16
+        url:
+          type: string
+          format: uri
+          example: https://my-webhook-domain/?param=uspacy
+          description: Should be unique per portal
+        active:
+          type: boolean
+          example: true
+          default: false
+        user_id:
+          type: integer
+          example: 1
+        confirmed:
+          type: boolean
+          example: true
+          default: false
+        created_at:
+          type: integer
+          example: 1732739313
+        updated_at:
+          type: integer
+          example: 1732739313
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutgoingWebhookEvent'
+    CreateOutgoingWebhookDto:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://my-webhook-domain/?param=uspacy
+          description: Should be unique per portal
+        active:
+          type: boolean
+          example: true
+          default: false
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutgoingWebhookEvent'
+    MassDeleteOutgoingWebhookDto:
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+          example: [1, 2, 3]
+    OutgoingWebhookEvent:
+      type: object
+      required:
+        - service
+        - type
+        - actions
+      properties:
+        service:
+          type: string
+          enum: [crm, tasks, news_feed, comments]
+          example: crm
+        type:
+          type: string
+          enum: [post, comment, task, entity_crm]
+          example: entity_crm
+        table_name:
+          type: string
+          nullable: true
+          example: leads
+        actions:
+          type: array
+          items:
+            type: string
+            enum: [create, update, delete, update_stage]
+    # Outgoing webhooks end
 
     # news feed begin
     Post:
