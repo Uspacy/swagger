@@ -6871,6 +6871,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: []
     patch:
       summary: Update CRM integration settings for a specific email. Available only for mailbox owner or users with email role setter.
       description: Updates CRM integration settings for the given email ID.
@@ -6886,7 +6888,6 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/EmailCrmSetting'
-
       responses:
         '200':
           description: OK
@@ -6902,7 +6903,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+      security:
+        - bearerAuth: []
   /email/v1/folders:
     get:
       summary: Retrieve all email folders
@@ -6929,6 +6931,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
   /email/v1/folders/{emailId}:
       post:
         summary: Add a new folder to an email account
@@ -6937,12 +6941,6 @@ paths:
           - emailService
         parameters:
           - $ref: '#/components/parameters/emailId'
-        # requestBody:
-        #   content:
-        #     application/json:
-        #       schema:
-        #         allOf:
-        #           - $ref: '#/components/schemas/EmailFolderDto'
         requestBody:
           required: true
           content:
@@ -6954,7 +6952,6 @@ paths:
                     - delimitter
                 allOf:
                   - $ref: '#/components/schemas/EmailFolderDto'
-
         responses:
           '200':
             description: OK
@@ -6968,6 +6965,8 @@ paths:
             $ref: '#/components/responses/NotFound'
           '422':
             $ref: '#/components/responses/ValidationError'
+        security:
+          - bearerAuth: []
   /email/v1/folders/{folderId}:
     delete:
       summary: Delete an email folder
@@ -6985,6 +6984,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '403':
           $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
 
   /email/v1/signatures/:
     get:
@@ -7010,6 +7011,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
     post:
       summary: Create a New Signature
       description: Creates a new email signature for the authorized user.
@@ -7032,6 +7035,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
   /email/v1/signatures/{signatureId}:
     patch:
       summary: Update a Signature
@@ -7057,6 +7062,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
     delete:
       summary: Delete an email signature
       description: Deletes the email signature specified by signatureId.
@@ -7073,7 +7080,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '403':
           $ref: '#/components/responses/Forbidden'
-
+      security:
+        - bearerAuth: []
 
   /email/v1/letters/by_folder/{folderId}:
     get:
