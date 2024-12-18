@@ -68,6 +68,7 @@ tags:
   - name: searchService
   - name: fileImport
   - name: appService
+  - name: emailService
   - name: history
   - name: activitiesService
 
@@ -1614,7 +1615,7 @@ paths:
         - bearerAuth: [ ]
     post:
       summary: Create Incoming Webhook
-      description: Creates a new incoming webhook. Available only to portal owners or administrators.
+      description: Creates a new incoming webhook. Available only for admin users.
       tags:
         - incoming webhooks (usersService)
       requestBody:
@@ -1715,7 +1716,7 @@ paths:
   /company/v1/webhooks:
     get:
       summary: Retrieve Outgoing Webhooks List
-      description: Retrieves a list of outgoing webhooks added by the user. Available to portal owners or administrators.
+      description: Retrieves a list of outgoing webhooks added by the user. Available only for admin users.
       tags:
         - outgoing webhooks (usersService)
       responses:
@@ -6547,7 +6548,7 @@ paths:
         '413':
           description: StatusRequestEntityTooLarge
 
-        '400':
+        '422':
           description: StatusBadRequest
 
         '500':
@@ -6558,7 +6559,7 @@ paths:
         - bearerAuth: [ ]
   # fileimport end
 
-  # appService being
+  # appService begin
   /apps/v1/apps:
     get:
       summary: Get applications list.
@@ -6664,6 +6665,624 @@ paths:
       security:
         - bearerAuth: [ ]
   # appService end
+
+  # emailService begin
+  /email/v1/emails:
+    get:
+      summary: Retrieve Emails List
+      description: Retrieves a list of emails available to the user. Only accessible by authorized users.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailItem'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /email/v1/emails/{emailId}:
+    get:
+      summary: Retrieve Email by ID
+      description: Retrieves a specific email by its ID. Available only for mailbox owner or users with email role setter.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDetails'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+  /email/v1/emails/credentials:
+    post:
+      summary: Add Email Credentials
+      description: Adds new email credentials for IMAP and SMTP access. Only accessible by authorized users.
+      tags:
+        - emailService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailCredentialsDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailCredentialsItem'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflict. Email already exists.
+          content:
+            application/json:
+              example:
+                message: "The email has already been taken."
+      security:
+        - bearerAuth: []
+  /email/v1/emails/credentials/{emailId}:
+    patch:
+      summary: Update Email Credentials
+      description: Updates existing email credentials for IMAP and SMTP access. Only accessible by authorized users.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailCredentialsDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDetails'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+  /email/v1/emails/settings/{emailId}:
+    post:
+      summary: Add Email Settings
+      description: Adds settings for an email account, including folder configurations and access roles. Only accessible by authorized users.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreEmailSettings'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSettingsResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    patch:
+      summary: Update Email Settings
+      description: Updates settings for an email account, including folder configurations and access roles. Only accessible by authorized users.
+      tags:
+        - emailService
+      parameters:
+        - name: emailId
+          in: path
+          required: true
+          description: The ID of the email to update settings for.
+          schema:
+            type: integer
+            example: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSettingsResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+  /email/v1/emails/crm_settings/{emailId}:
+    get:
+      summary: Retrieve CRM integration settings for a specific email.
+      description: Retrieves CRM integration settings for the given email ID.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailCrmSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    patch:
+      summary: Update CRM integration settings for a specific email. Available only for mailbox owner or users with email role setter.
+      description: Updates CRM integration settings for the given email ID.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailCrmSetting'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/EmailCrmSettings'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /email/v1/folders:
+    get:
+      summary: Retrieve all email folders
+      description: Retrieves a list of email folders associated with the user.
+      tags:
+        - emailService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailFolders'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /email/v1/folders/{emailId}:
+      post:
+        summary: Add a new folder to an email account
+        description: Adds a new folder to the email account specified by emailId.
+        tags:
+          - emailService
+        parameters:
+          - $ref: '#/components/parameters/emailId'
+        # requestBody:
+        #   content:
+        #     application/json:
+        #       schema:
+        #         allOf:
+        #           - $ref: '#/components/schemas/EmailFolderDto'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                required:
+                    - folder_name
+                    - path
+                    - delimitter
+                allOf:
+                  - $ref: '#/components/schemas/EmailFolderDto'
+
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EmailFolder'
+          '401':
+            $ref: '#/components/responses/UnauthorizedError'
+          '404':
+            $ref: '#/components/responses/NotFound'
+          '422':
+            $ref: '#/components/responses/ValidationError'
+  /email/v1/folders/{folderId}:
+    delete:
+      summary: Delete an email folder
+      description: Deletes the email folder specified by emailFolderId.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /email/v1/signatures/:
+    get:
+      summary: Get Signatures List
+      description: Retrieves the list of signatures for the authorized user.
+      tags:
+        - emailService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailSignature'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a New Signature
+      description: Creates a new email signature for the authorized user.
+      tags:
+        - emailService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSignatureDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSignature'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /email/v1/signatures/{signatureId}:
+    patch:
+      summary: Update a Signature
+      description: Updates an existing email signature.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailSignatureId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSignatureDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSignature'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an email signature
+      description: Deletes the email signature specified by signatureId.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailSignatureId'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+
+  /email/v1/letters/by_folder/{folderId}:
+    get:
+      summary: Retrieve Letters by Folder
+      description: Retrieves a list of letters from the specified folder. Supports pagination.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/list'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Letter'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    post:
+      summary: Add Letter to Send Queue
+      description: Adds a letter to the specified folder's send queue. The `emailFolderId` parameter must reference a folder with the `is_pending` flag set to `true`. In the request body, the `destination_folder_id` must reference a folder with the `is_sent` flag set to `true`.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - destination_folder_id
+                - contacts
+              $ref: '#/components/schemas/LetterSendDto'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterDetails'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: []
+  /email/v1/letters:
+    get:
+      summary: Retrieve Letters by IDs
+      description: Retrieves letters by the specified list of IDs.
+      tags:
+        - emailService
+      parameters:
+        - name: id[]
+          in: query
+          description: List of letter IDs
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LetterWithFolders'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Delete Letters
+      description: Deletes letters based on their IDs or thread filters.
+      tags:
+        - emailService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LettersDeleteDto'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /email/v1/letters/{letterId}:
+    patch:
+      summary: Update Letter CRM Entities
+      description: Updates the CRM entities associated with a letter.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailLetterId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LetterUpdateDto'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterDetails'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+  /email/v1/letters/move/{folderId}:
+    patch:
+      summary: Move Letters to Folder
+      description: Moves letters to the specified folder.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LettersMoveDto'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /email/v1/letters/read/{folderId}:
+    patch:
+      summary: Mark Letters as Read
+      description: Changes the `is_read` flag for letters to `true`.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LettersReadUnreadDto'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  /email/v1/letters/unread/{folderId}:
+    patch:
+      summary: Mark Letters as Unread
+      description: Changes the `is_read` flag for letters to `false`.
+      tags:
+        - emailService
+      parameters:
+        - $ref: '#/components/parameters/emailFolderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LettersReadUnreadDto'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+        - bearerAuth: []
+  # emailService end
 
   # history begin
   /history/v1/{service}/{entity_table_name}/{id}:
@@ -6838,7 +7457,7 @@ paths:
                         to:
                           value: "1724778698"
                           display_value: ""
-        '400':
+        '422':
           description: Invalid input parameters
         '404':
           description: Entity not found
@@ -7372,6 +7991,39 @@ components:
       required: false
       schema:
         type: string
+    emailId:
+      name: emailId
+      in: path
+      description: The ID of the email
+      required: true
+      schema:
+        type: integer
+        example: 10
+    emailLetterId:
+      name: letterId
+      in: path
+      description: The ID of the leter
+      required: true
+      schema:
+        type: integer
+        example: 22
+
+    emailFolderId:
+      name: folderId
+      in: path
+      description: The ID of the email folder
+      required: true
+      schema:
+        type: integer
+        example: 61
+    emailSignatureId:
+      name: signatureId
+      in: path
+      description: The ID of the email signature
+      required: true
+      schema:
+        type: integer
+        example: 2
 
   schemas:
     # common begin
@@ -11352,3 +12004,946 @@ components:
           type: string
           example: https://blue-oyster.org
     # apps end
+
+    # emailService begin
+    EmailItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        added_by:
+          type: integer
+          example: 1
+        auth_user_id:
+          type: integer
+          example: 557
+        imap_host:
+          type: string
+          example: "imap.gmail.com"
+        imap_port:
+          type: integer
+          example: 993
+        smtp_host:
+          type: string
+          nullable: true
+          example: "smtp.gmail.com"
+        smtp_port:
+          type: integer
+          nullable: true
+          example: 587
+        email:
+          type: string
+          example: "stark@gmail.com"
+        name:
+          type: string
+          example: "Uspacy"
+        sender_name:
+          type: string
+          example: "Sender Name"
+        access_level:
+          type: string
+          enum: [shared, personal]
+          example: "shared"
+        status:
+          type: string
+          enum: [pending_settings, first_sync, connected, auth_fail]
+          example: "connected"
+        created_at:
+          type: integer
+          example: 1711385960
+        updated_at:
+          type: integer
+          example: 1729099182
+        oauth_provider:
+          type: string
+          nullable: true
+          example: null
+        crm_integration_enabled:
+          type: boolean
+          example: false
+
+    EmailCredentialsItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        added_by:
+          type: integer
+          example: 1
+        auth_user_id:
+          type: integer
+          example: 557
+        imap_host:
+          type: string
+          example: "imap.gmail.com"
+        imap_port:
+          type: integer
+          example: 993
+        smtp_host:
+          type: string
+          nullable: true
+          example: "smtp.gmail.com"
+        smtp_port:
+          type: integer
+          nullable: true
+          example: 587
+        email:
+          type: string
+          example: "stark@gmail.com"
+        status:
+          type: string
+          enum: [pending_settings, first_sync, connected, auth_fail]
+          example: "pending_settings"
+        created_at:
+          type: integer
+          example: 1711385960
+        updated_at:
+          type: integer
+          example: 1729099182
+        sync_folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailSyncFolders'
+
+    EmailDetails:
+      allOf:
+        - $ref: '#/components/schemas/EmailItem'
+        - type: object
+          properties:
+            sync_folders:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailSyncFolders'
+            folders:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailFolders'
+            access_roles:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailAccessRole'
+
+    EmailFolder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 61
+        email_id:
+          type: integer
+          example: 10
+        parent_id:
+          type: integer
+          nullable: true
+          example: null
+        folder_name:
+          type: string
+          example: "INBOX"
+        path:
+          type: string
+          example: "INBOX"
+        delimitter:
+          type: string
+          example: "/"
+        is_trash:
+          type: boolean
+          example: false
+        is_spam:
+          type: boolean
+          example: false
+        is_draft:
+          type: boolean
+          example: false
+        is_junk:
+          type: boolean
+          example: false
+        is_sent:
+          type: boolean
+          example: false
+        is_inbox:
+          type: boolean
+          example: true
+        is_pending:
+          type: boolean
+          example: false
+        has_children:
+          type: boolean
+          example: false
+        is_root:
+          type: boolean
+          example: true
+        is_deleted:
+          type: boolean
+          example: false
+        message_count:
+          type: integer
+          example: 4998
+        unread_message_count:
+          type: integer
+          example: 43
+
+    EmailFolders:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailFolder'
+      example:
+        - id: 61
+          email_id: 10
+          parent_id: null
+          folder_name: "INBOX"
+          path: "INBOX"
+          delimitter: "/"
+          is_trash: false
+          is_spam: false
+          is_draft: false
+          is_junk: false
+          is_sent: false
+          is_inbox: true
+          is_pending: false
+          has_children: false
+          is_root: true
+          is_deleted: false
+          message_count: 4998
+          unread_message_count: 43
+        - id: 64
+          email_id: 10
+          parent_id: null
+          folder_name: "Sent Mail"
+          path: "[Gmail]/Sent Mail"
+          delimitter: "/"
+          is_trash: false
+          is_spam: false
+          is_draft: false
+          is_junk: false
+          is_sent: true
+          is_inbox: false
+          is_pending: false
+          has_children: false
+          is_root: false
+          is_deleted: false
+          message_count: 248
+          unread_message_count: 0
+        - id: 63
+          email_id: 10
+          parent_id: null
+          folder_name: "Drafts"
+          path: "[Gmail]/Drafts"
+          delimitter: "/"
+          is_trash: false
+          is_spam: false
+          is_draft: true
+          is_junk: false
+          is_sent: false
+          is_inbox: false
+          is_pending: false
+          has_children: false
+          is_root: false
+          is_deleted: false
+          message_count: 73
+          unread_message_count: 0
+        - id: 66
+          email_id: 10
+          parent_id: null
+          folder_name: "Trash"
+          path: "[Gmail]/Trash"
+          delimitter: "/"
+          is_trash: true
+          is_spam: false
+          is_draft: false
+          is_junk: false
+          is_sent: false
+          is_inbox: false
+          is_pending: false
+          has_children: false
+          is_root: false
+          is_deleted: false
+          message_count: 7612
+          unread_message_count: 0
+
+    EmailFolderDto:
+      type: object
+      properties:
+        folder_name:
+          type: string
+          example: "INBOX"
+        path:
+          type: string
+          example: "INBOX"
+        delimitter:
+          type: string
+          example: "/"
+        is_trash:
+          type: boolean
+          example: false
+        is_spam:
+          type: boolean
+          example: false
+        is_draft:
+          type: boolean
+          example: false
+        is_junk:
+          type: boolean
+          example: false
+        is_sent:
+          type: boolean
+          example: false
+        is_inbox:
+          type: boolean
+          example: true
+        is_pending:
+          type: boolean
+          example: false
+        has_children:
+          type: boolean
+          example: false
+        is_root:
+          type: boolean
+          example: true
+      example:
+        folder_name: "INBOX"
+        path: "INBOX"
+        delimitter: "/"
+        is_inbox: true
+        is_root: true
+
+    EmailFoldersDto:
+      type: array
+      items:
+        $ref: '#/components/schemas/EmailFolderDto'
+      example:
+        - folder_name: "INBOX"
+          path: "INBOX"
+          delimitter: "/"
+          is_inbox: true
+          is_root: true
+        - folder_name: "Sent Mail"
+          path: "[Gmail]/Sent Mail"
+          delimitter: "/"
+          is_sent: true
+        - folder_name: "Drafts"
+          path: "[Gmail]/Drafts"
+          delimitter: "/"
+          is_draft: true
+        - folder_name: "Trash"
+          path: "[Gmail]/Trash"
+          delimitter: "/"
+          is_trash: true
+
+    EmailAccessRole:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          example: 5
+        name:
+          type: string
+          enum: [viewer, destroyer, setter]
+          example: "viewer"
+
+    EmailCredentialsDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          example: "securepassword123"
+        imap_host:
+          type: string
+          nullable: true
+          example: "imap.gmail.com"
+        imap_port:
+          type: integer
+          nullable: true
+          example: 993
+        smtp_host:
+          type: string
+          nullable: true
+          example: "smtp.gmail.com"
+        smtp_port:
+          type: integer
+          nullable: true
+          example: 587
+
+    UpdateEmailCredentialsDto:
+      type: object
+      properties:
+        password:
+          type: string
+          example: "newsecurepassword123"
+        imap_host:
+          type: string
+          example: "imap.gmail.com"
+        imap_port:
+          type: integer
+          example: 993
+        smtp_host:
+          type: string
+          nullable: true
+          example: "smtp.gmail.com"
+        smtp_port:
+          type: integer
+          nullable: true
+          example: 587
+
+    StoreEmailSettings:
+      type: object
+      required:
+        - name
+        - sender_name
+        - access_level
+      properties:
+        name:
+          type: string
+          example: "Name"
+        sender_name:
+          type: string
+          example: "Sender Name"
+        access_level:
+          type: string
+          enum: [personal, shared]
+          example: "shared"
+        access_roles:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                example: 5
+              name:
+                type: string
+                enum: [viewer, editor, admin]
+                example: "viewer"
+        sync_from:
+          type: object
+          properties:
+            period:
+              type: string
+              example: "1 year"
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailFoldersDto'
+        crm_integration_enabled:
+          type: boolean
+          example: true
+
+    UpdateEmailSettings:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Updated Name"
+        sender_name:
+          type: string
+          example: "Updated Sender Name"
+        access_level:
+          type: string
+          enum: [personal, shared]
+          example: "shared"
+        access_roles:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                example: 5
+              name:
+                type: string
+                enum: [viewer, editor, admin]
+                example: "viewer"
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailFolderDto'
+        folders_remove:
+          type: array
+          items:
+            type: integer
+            example: 15
+        crm_integration_enabled:
+          type: boolean
+          example: false
+
+    EmailSettingsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        name:
+          type: string
+          example: "Name"
+        sender_name:
+          type: string
+          example: "Sender Name"
+        access_level:
+          type: string
+          example: "shared"
+        access_roles:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                example: 5
+              name:
+                type: string
+                example: "viewer"
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailFolders'
+        crm_integration_enabled:
+          type: boolean
+          example: true
+
+    EmailSyncFolders:
+      type: array
+      items:
+        type: object
+        properties:
+          folder_name:
+            type: string
+            example: "INBOX"
+          path:
+            type: string
+            example: "INBOX"
+          delimitter:
+            type: string
+            example: "/"
+          has_children:
+            type: boolean
+            example: false
+          is_root:
+            type: boolean
+            example: true
+          is_inbox:
+            type: boolean
+            example: true
+          is_draft:
+            type: boolean
+            example: false
+          is_sent:
+            type: boolean
+            example: false
+          is_junk:
+            type: boolean
+            example: false
+          is_trash:
+            type: boolean
+            example: false
+        required:
+          - folder_name
+          - path
+          - delimitter
+          - has_children
+          - is_root
+      example:
+        - folder_name: "INBOX"
+          path: "INBOX"
+          delimitter: "/"
+          has_children: false
+          is_root: true
+          is_inbox: true
+        - folder_name: "Notes"
+          path: "Notes"
+          delimitter: "/"
+          has_children: false
+          is_root: true
+        - folder_name: "Drafts"
+          path: "[Gmail]/Drafts"
+          delimitter: "/"
+          has_children: false
+          is_root: false
+          is_draft: true
+        - folder_name: "Sent Mail"
+          path: "[Gmail]/Sent Mail"
+          delimitter: "/"
+          has_children: false
+          is_root: false
+          is_sent: true
+        - folder_name: "Spam"
+          path: "[Gmail]/Spam"
+          delimitter: "/"
+          has_children: false
+          is_root: false
+          is_junk: true
+        - folder_name: "Trash"
+          path: "[Gmail]/Trash"
+          delimitter: "/"
+          has_children: false
+          is_root: false
+          is_trash: true
+
+    EmailCrmSetting:
+      type: object
+      properties:
+        setting_name:
+          type: string
+          example: "incoming_new_address"
+        setting_value:
+          oneOf:
+            - type: string
+            - type: number
+          example: "create_lead"
+      required:
+        - setting_name
+        - setting_value
+
+    EmailCrmSettings:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailCrmSetting'
+      example:
+        data:
+          - setting_name: "incoming_new_address"
+            setting_value: "create_lead"
+          - setting_name: "incoming_new_address_responsible"
+            setting_value: 1
+          - setting_name: "incoming_new_address_responsible_title"
+            setting_value: "sender"
+          - setting_name: "outgoing_new_address"
+            setting_value: "create_contact"
+          - setting_name: "outgoing_new_address_source"
+            setting_value: "user_defined"
+          - setting_name: "outgoing_new_address_responsible"
+            setting_value: 2
+          - setting_name: "outgoing_new_address_responsible_title"
+            setting_value: "base_entity"
+          - setting_name: "incoming_existing_address"
+            setting_value: "create_deal"
+          - setting_name: "incoming_existing_address_source"
+            setting_value: "system_default"
+          - setting_name: "incoming_existing_address_responsible"
+            setting_value: 3
+          - setting_name: "incoming_existing_address_responsible_title"
+            setting_value: "none"
+
+    EmailSignature:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "My default signature"
+        signature:
+          type: string
+          example: "Best regards..."
+        added_by:
+          type: integer
+          example: 1
+        is_default:
+          type: boolean
+          example: true
+        created_at:
+          type: integer
+          example: 1734529110
+        updated_at:
+          type: integer
+          example: 1734529110
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailSignatureAssociation'
+
+    EmailSignatureAssociation:
+      type: object
+      properties:
+        email_id:
+          type: integer
+          example: 10
+        is_default:
+          type: boolean
+          example: true
+
+    EmailSignatureDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My Default sign 2"
+        signature:
+          type: string
+          example: "Best regards"
+        is_default:
+          type: boolean
+          example: true
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailSignatureAssociation'
+        is_all_emails:
+          type: boolean
+          example: false
+
+
+    Letter:
+      type: object
+      properties:
+        id:
+          type: integer
+        email_id:
+          type: integer
+        signature_id:
+          type: integer
+        subject:
+          type: string
+        body:
+          type: string
+        body_html:
+          type: string
+        date:
+          type: integer
+        is_read:
+          type: boolean
+        status:
+          type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/LetterContact'
+      example:
+        destination_folder_id: null
+        subject: "Pitch deck"
+        body: "Pitch deck description"
+        body_html: "<div dir=\"ltr\">Pitch deck description</div>\r\n"
+        parent_message_id: "imap_parent_message_id"
+        main_message_id: "imap_main_message_id"
+        is_read: true
+        contacts:
+          - id: 1
+            email: "to@gmail.com"
+            name: "To"
+            pivot:
+              - contact_type: "to"
+          - id: 2
+            email: "from@gmail.com"
+            name: "From"
+            pivot:
+              - contact_type: "from"
+          - id: 3
+            email: "cc@gmail.com"
+            name: "CC"
+            pivot:
+              - contact_type: "cc"
+
+    LetterDetails:
+      allOf:
+        - $ref: '#/components/schemas/Letter'
+        - type: object
+          properties:
+            crm_entities:
+              $ref: '#/components/schemas/LetterCrmEntities'
+      example:
+        destination_folder_id: null
+        subject: "Pitch deck"
+        body: "Pitch deck description"
+        body_html: "<div dir=\"ltr\">Pitch deck description</div>\r\n"
+        parent_message_id: "imap_parent_message_id"
+        main_message_id: "imap_main_message_id"
+        is_read: true
+        contacts:
+          - email: "to@gmail.com"
+            name: "To"
+            contact_type: "to"
+          - email: "from@gmail.com"
+            name: "From"
+            contact_type: "from"
+          - email: "cc@gmail.com"
+            name: "CC"
+            contact_type: "cc"
+        crm_entities:
+          leads:
+            - table_id: 3
+              title: "Lead title"
+          deals:
+            - table_id: 3
+              title: "Deal title"
+          companies:
+            - table_id: 3
+              title: "Deal title"
+          contatcs:
+            - table_id: 3
+              title: "Contact title"
+
+    LetterWithFolders:
+      allOf:
+        - $ref: '#/components/schemas/Letter'
+        - type: object
+          properties:
+            folders:
+              $ref: '#/components/schemas/EmailFolders'
+
+    LetterContact:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+
+    LettersDeleteDto:
+      type: object
+      properties:
+        threads:
+          type: object
+          properties:
+            email_id:
+              type: integer
+            filter:
+              type: array
+              items:
+                type: string
+        ids:
+          type: array
+          items:
+            type: integer
+      example:
+        ids: [1, 2, 3]
+        threads:
+          email_id: 10
+          filter: ["main_message_id_1", "main_message_id_2"]
+
+    LettersReadUnreadDto:
+      $ref: '#/components/schemas/LettersDeleteDto'
+
+    LettersMoveDto:
+      $ref: '#/components/schemas/LettersDeleteDto'
+
+    LetterUpdateDto:
+      type: object
+      properties:
+        crm_entities:
+          type: object
+          properties:
+            deals:
+              type: array
+              items:
+                type: string
+            leads:
+              type: array
+              items:
+                type: string
+            contacts:
+              type: array
+              items:
+                type: string
+            companies:
+              type: array
+              items:
+                type: string
+      example:
+        crm_entities:
+          leads:
+            - table_id: 3
+              title: "Lead title"
+          deals:
+            - table_id: 3
+              title: "Deal title"
+          companies:
+            - table_id: 3
+              title: "Deal title"
+          contatcs:
+            - table_id: 3
+              title: "Contact title"
+
+    LetterSendDto:
+      type: object
+      properties:
+        destination_folder_id:
+          type: integer
+        signature_id:
+          type: integer
+          required: false
+        subject:
+          type: string
+        body:
+          type: string
+        body_html:
+          type: string
+        parent_message_id:
+          type: string
+        main_message_id:
+          type: string
+        is_read:
+          type: boolean
+        contacts:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+              contact_type:
+                type: string
+        crm_entities:
+          $ref: '#/components/schemas/LetterCrmEntities'
+      example:
+        destination_folder_id: 12
+        signature_id: 1
+        subject: "Pitch deck"
+        body: "Pitch deck description"
+        body_html: "<div dir=\"ltr\">Pitch deck description</div>\r\n"
+        parent_message_id: "imap_parent_message_id"
+        main_message_id: "imap_main_message_id"
+        is_read: true
+        contacts:
+          - email: "to@gmail.com"
+            name: "To"
+            contact_type: "to"
+          - email: "from@gmail.com"
+            name: "From"
+            contact_type: "from"
+          - email: "cc@gmail.com"
+            name: "CC"
+            contact_type: "cc"
+        crm_entities:
+          leads:
+            - table_id: 3
+              title: "Lead title"
+          deals:
+            - table_id: 3
+              title: "Deal title"
+          companies:
+            - table_id: 3
+              title: "Deal title"
+          contatcs:
+            - table_id: 3
+              title: "Contact title"
+
+    LetterCrmEntities:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: object
+          required:
+            - table_id
+            - title
+          properties:
+            table_id:
+              type: integer
+            title:
+              type: string
+
+    # emailService end
