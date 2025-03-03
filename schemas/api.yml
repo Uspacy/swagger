@@ -57,6 +57,7 @@ tags:
   - name: departments (usersService)
   - name: roles (usersService)
   - name: invite (usersService)
+  - name: custom fields (usersService)
   - name: incoming webhooks (usersService)
   - name: outgoing webhooks (usersService)
   - name: newsFeedService
@@ -1073,6 +1074,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
       security:
         - bearerAuth: [ ]
+
   # users end
 
   # departments begin
@@ -1577,6 +1579,239 @@ paths:
       security:
         - bearerAuth: [ ]
   # invite begin
+
+  # users custom fields begin
+  /company/v1/custom_fields/users/fields:
+    get:
+      summary: Get available fields list.
+      description: Get available fields list.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Field'
+                        - type: object
+                          properties:
+                            code:
+                              type: string
+                              example: source
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Create field.
+      description: Create field.
+      tags:
+        - custom fields (usersService)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Field'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      security:
+        - bearerAuth: [ ]
+  /company/v1/custom_fields/users/fields/{field}:
+    parameters:
+      - $ref: '#/components/parameters/field'
+    get:
+      summary: Get field by code.
+      description: Get field by code.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    patch:
+      summary: Edit field by code.
+      description: Edit field by code.
+      tags:
+        - custom fields (usersService)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Field'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Field'
+                  - type: object
+                    properties:
+                      id:
+                        description: Entity ID
+                        type: integer
+                        example: 11
+                      code:
+                        type: string
+                        example: source
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      summary: Delete field by code.
+      description: Delete field by code.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /company/v1/custom_fields/users/lists/{field}:
+    parameters:
+      - $ref: '#/components/parameters/field'
+    get:
+      summary: Get list elements. Available  for all users.
+      description: Get list elements. Available  for all users.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SourceList'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Creating or editing list items.
+      description: Creating or editing list items.
+      tags:
+        - custom fields (usersService)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SourceList'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SourceList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  /company/v1/custom_fields/users/lists/{field}/{value}:
+    parameters:
+      - $ref: '#/components/parameters/field'
+      - $ref: '#/components/parameters/value'
+    delete:
+      summary: Deleting a list item.
+      description: Deleting a list item.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /company/v1/custom_fields/users/lists/field_section:
+    get:
+      summary: Get field sections list.
+      description: Get field sections list.
+      tags:
+        - custom fields (usersService)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/FieldSection'
+                        - type: object
+                          properties:
+                            code:
+                              type: string
+                              example: source
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+  # users custom fields end
+
 
   # incoming webhooks begin
   /company/v1/incoming_webhooks:
@@ -10424,6 +10659,25 @@ components:
         sort:
           type: integer
           example: 90
+
+    FieldSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: contacts
+        entity_table:
+          type: string
+          example: users
+        hidden:
+          type: boolean
+          example: false
+        sort:
+          type: integer
+          example: 10
 
     CreateCrmEntity:
       type: object
