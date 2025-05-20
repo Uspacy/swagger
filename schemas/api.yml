@@ -142,7 +142,9 @@ paths:
   /auth/v1/auth/refresh_token:
     post:
       summary: Refresh token
-      description: refreshToken exprired token. Returns new token, refreshToken
+      description: >
+        Refresh expired token. Returns new access and refresh tokens.
+        You need to provide the refresh token (not access token) in the Authorization header
       tags:
         - authService
       responses:
