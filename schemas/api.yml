@@ -6026,6 +6026,90 @@ paths:
       security:
         - bearerAuth: [ ]
 
+  /crm/v1/static/product-price-types:
+    get:
+      summary: Get product price types
+      description: Get product price types.
+      tags:
+        - crmService
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductPriceType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Create product price types
+      description: Create product price types.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductPriceType'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductPriceType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+  /crm/v1/static/product-price-types/{itemId}:
+    patch:
+      summary: Update product price type
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Update product price type.
+      tags:
+        - crmService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductPriceType'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductPriceType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+    delete:
+      summary: Delete product price type
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      description: Delete product price type.
+      tags:
+        - crmService
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - bearerAuth: [ ]
+
+
 
 
   # documents module begin
@@ -12011,6 +12095,24 @@ components:
             $ref: '#/components/schemas/ProductPrice'
         files:
           $ref: '#/components/schemas/Files'
+
+    ProductPriceType:
+      properties:
+        title:
+          type: string
+          example: base
+        entity_code:
+          type: string
+          example: leads
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: true
+        sort:
+          type: number
+          example: 10
 
     Tax:
       properties:
