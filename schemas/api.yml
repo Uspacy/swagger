@@ -6096,6 +6096,8 @@ paths:
         - bearerAuth: [ ]
     delete:
       summary: Delete product price type
+      parameters:
+        - $ref: '#/components/parameters/itemId'
       description: Delete product price type.
       tags:
         - crmService
