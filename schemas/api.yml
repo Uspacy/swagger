@@ -10285,19 +10285,25 @@ components:
           $ref: '#/components/schemas/NotifyDto'
         root_parent:
           type: object
+          description: "Optional parameter for notification of comment creation"
           properties:
             type:
               type: string
               example: "parent_type"
             data:
-              type: string
-              example: "parent_data"
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 732
+                  description: "Parent entity id"
+                title:
+                  type: string
+                  example: "Entity title"
+                  description: "Parent entity title"
             service:
               type: string
               example: "parent_service"
-            title:
-              type: string
-              example: "parent_title"
             table_name:
               type: string
               example: "parent_table_name"
