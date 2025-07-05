@@ -362,8 +362,6 @@ paths:
         Lists the comments related to some entity.
         `nextId` and `prevId` fields in response help to do pagination.
         For more information see the description of `nextId` and `prevId` fields in the response.
-      tags:
-        - commentsService
       parameters:
         - name: entity_type
           in: query
@@ -407,8 +405,6 @@ paths:
     post:
       summary: Create a comment
       description: Creates new comment
-      tags:
-        - commentsService
       requestBody:
         required: true
         content:
@@ -436,8 +432,6 @@ paths:
         Lists the comments related to the list of entities.
         `nextId` and `prevId` fields in response help to do pagination.
         For more information see the description of `nextId` and `prevId` fields in the response.
-      tags:
-        - commentsService
       parameters:
         - name: entity_type
           in: query
@@ -486,8 +480,6 @@ paths:
     patch:
       summary: Update comment by id
       description: Updates the comment
-      tags:
-        - commentsService
       parameters:
         - in: path
           name: commentId
@@ -516,8 +508,6 @@ paths:
     delete:
       summary: Delete comment by id
       description: Removes the comment
-      tags:
-        - commentsService
       parameters:
         - in: path
           name: commentId
@@ -540,8 +530,6 @@ paths:
       description: >
         Removes the multiple comments bound to the entity
         At the moment this is used internally to sync of comments removal with posts
-      tags:
-        - commentsService
       parameters:
         - $ref: "#/components/parameters/entityType"
         - $ref: "#/components/parameters/entityId"
