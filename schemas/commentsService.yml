@@ -1,0 +1,555 @@
+# commentsService OpenAPI paths and definitions
+# This file was separated from api.yml for modularity.
+
+openapi: 3.0.0
+components:
+  schemas:
+    errorMessage:
+      type: object
+      properties:
+        message:
+          type: string
+    Data:
+      type: object
+      properties:
+        encoding:
+          type: string
+        delimiter:
+          type: string
+        entityType:
+          type: integer
+        columns:
+          type: object
+          additionalProperties:
+            type: string
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+    Date:
+      type: number
+      description: timestamp in seconds
+      default: 0
+      example: 1654180120
+    Files:
+      type: array
+      items:
+        type: string
+      example:
+        - path/to/image.jpg
+        - path/to/image.png
+    EntityTypes:
+      oneOf:
+        - type: string
+          enum:
+            - comment
+            - post
+            - task
+        - type: string
+          pattern: '^[a-zA-Z0-9_\-]+$'
+      description: |
+        Entity type name. You can use one of the predefined values (comment, post, task) or provide any custom string value matching the pattern.
+    CommentServiceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        entityType:
+          allOf:
+            - $ref: "#/components/schemas/EntityTypes"
+            - example: "post"
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+        message:
+          type: string
+          example: Message comment
+        authorId:
+          type: string
+          example: 1
+        date:
+          $ref: "#/components/schemas/Date"
+        mentioned:
+          $ref: "#/components/schemas/MentionedDto"
+        notify:
+          $ref: "#/components/schemas/NotifyDto"
+    CommentExtrasServiceDto:
+      type: object
+      properties:
+        reactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReactionServiceDto"
+        nextId:
+          type: integer
+          format: int64
+          example: 3
+          description: If NULL, this is the last comment if the (sub)thread
+        prevId:
+          type: integer
+          format: int64
+          example: 1
+          description: If NULL, this is the first comment if the (sub)thread
+    ReactionServiceDto:
+      type: object
+      properties:
+        reaction:
+          type: integer
+          format: int64
+          example: 128513
+          description: Represents the UNICODE symbol such as 0x0001F601
+        amount:
+          type: integer
+          format: int32
+          example: 53
+        entityId:
+          type: integer
+          format: int64
+          example: 1
+    CreateCommentServiceDto:
+      type: object
+      properties:
+        entity_type:
+          allOf:
+            - $ref: "#/components/schemas/EntityTypes"
+            - example: "post"
+        entity_id:
+          type: integer
+          format: int64
+          example: 1
+        message:
+          type: string
+          example: Message post
+        author_id:
+          type: integer
+          example: 1
+        date:
+          type: integer
+          example: 1627862400
+        upload_id:
+          type: string
+          example: null
+        file_ids:
+          type: array
+          items:
+            type: integer
+          example: []
+        mentioned:
+          $ref: "#/components/schemas/MentionedDto"
+        notify:
+          $ref: "#/components/schemas/NotifyDto"
+        root_parent:
+          type: object
+          description: "Optional parameter for notification of comment creation"
+          properties:
+            type:
+              type: string
+              example: "parent_type"
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 732
+                  description: "Parent entity id"
+                title:
+                  type: string
+                  example: "Entity title"
+                  description: "Parent entity title"
+            service:
+              type: string
+              example: "parent_service"
+            table_name:
+              type: string
+              example: "parent_table_name"
+          required:
+            - type
+            - data
+            - service
+            - title
+      required:
+        - entity_type
+        - entity_id
+        - author_id
+        - message
+        - date
+    UpdateCommentServiceDto:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Message post
+    MentionedDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [32, 85]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [43, 12, 2]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: []
+    NotifyDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+          example: [32, 85]
+        groups:
+          type: array
+          items:
+            type: integer
+          example: [43, 12, 2]
+        departments:
+          type: array
+          items:
+            type: integer
+          example: []
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorMessage"
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorMessage"
+
+  parameters:
+    entityIds:
+      in: query
+      name: entityIds
+      description: >
+        Use this parameter instead of `entityId` to list files for multiple entities at once. The response differs in this case.
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      required: true
+    entityType:
+      in: query
+      name: entityType
+      schema:
+        type: string
+        description: |
+          Entity type name. You can use one of the predefined values or provide any custom string value.
+        example: customType
+        x-enum-varnames:
+          - post
+          - comment
+          - task
+        pattern: '^[a-zA-Z0-9_\-]+$'
+      description: Entity type name
+    entityId:
+      in: query
+      name: entityId
+      schema:
+        type: integer
+        format: int64
+      required: true
+      description: Entity ID
+    childList:
+      name: childList
+      in: query
+      description: >
+        Use this to define the number of child comments to retrieve.
+        Retrieve all if missing or retrieve the rest if `lastId` is present.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 2
+      example: 2
+    nextId:
+      name: nextId
+      in: query
+      description: >
+        The top level comments are being paginated starting from the last page but in the ascending order.
+        This parameter used to point the topmost comment on the previous page. For example: to get the
+        previous page in the sample below `nextId` must be 22.
+
+        * comment-22
+
+        * comment-23
+
+        * comment-24
+
+
+        and the entire query should look like the following:
+
+
+        ```
+        ?entityType=post&entityId=123&list=3&childList=2&nextId=22
+        ```
+
+
+        This means: to get the previous 3 comments of the entity `post-123` along with the possible
+        child comments (no more then 2 child comments per parent) relating to the `comment-22`
+      required: false
+      schema:
+        type: integer
+        format: int64
+    lastId:
+      name: lastId
+      in: query
+      description: >
+        This parameter used to point the bottom child comment on the previous page. For example: to get the
+        next page if the child comments in the sample below, `lastId` must be 27, `entityType` must be "comment"
+        and `entityId` must be 25.
+
+          * comment-23
+
+          * comment-24
+
+          * comment-25
+
+          * child-comment-26-of-parent-25
+
+          * child-comment-27-of-parent-25
+
+
+          and the entire query should look like the following:
+
+
+
+          ```
+          ?entityType=post&entityId=123&childList=2&entityType=comment&entityId=25&lastId=27
+          ```
+
+
+          This means: to get the next 2 child comments of parent `comment-25` of the entity `post-123` relating to the `child-comment-27`
+      required: false
+      schema:
+        type: integer
+        format: int64
+    list:
+      name: list
+      in: query
+      description: how many items should be per page
+      required: false
+      schema:
+        type: number
+        default: 20
+      example: 10
+info:
+  title: Comments service
+  version: 1.0.0
+paths:
+  # comments begin
+
+  /comments/v1/comments:
+    get:
+      summary: Get comments list
+      description: >
+        Lists the comments related to some entity.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
+      tags:
+        - commentsService
+      parameters:
+        - name: entity_type
+          in: query
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: "#/components/parameters/entityType/schema"
+        - $ref: "#/components/parameters/entityId"
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: "#/components/parameters/list/schema"
+          example: 3
+        - $ref: "#/components/parameters/childList"
+        - $ref: "#/components/parameters/nextId"
+        - $ref: "#/components/parameters/lastId"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/CommentServiceDto"
+                        - $ref: "#/components/schemas/CommentExtrasServiceDto"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      summary: Create a comment
+      description: Creates new comment
+      tags:
+        - commentsService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentServiceDto"
+      responses:
+        "201":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentServiceDto"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments?entityIds[]:
+    get:
+      summary: Get comments list by array of entity ids
+      description: >
+        Lists the comments related to the list of entities.
+        `nextId` and `prevId` fields in response help to do pagination.
+        For more information see the description of `nextId` and `prevId` fields in the response.
+      tags:
+        - commentsService
+      parameters:
+        - name: entity_type
+          in: query
+          description: >
+            Entity type name.
+            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
+            And only the child comments are being sent in this case.
+            Use along with `childList` and `lastId` to paginate the child comments.
+          schema:
+            $ref: "#/components/parameters/entityType/schema"
+        - $ref: "#/components/parameters/entityIds"
+        - name: list
+          in: query
+          description: >
+            Use this to define the number of top level comments to retrieve.
+            Retrieve all if missing or retrieve the rest if `nextId` is present.
+          schema:
+            $ref: "#/components/parameters/list/schema"
+          example: 3
+        - $ref: "#/components/parameters/childList"
+        - $ref: "#/components/parameters/nextId"
+        - $ref: "#/components/parameters/lastId"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      entityId:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/CommentServiceDto"
+                            - $ref: "#/components/schemas/CommentExtrasServiceDto"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments/{commentId}:
+    patch:
+      summary: Update comment by id
+      description: Updates the comment
+      tags:
+        - commentsService
+      parameters:
+        - in: path
+          name: commentId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Numeric ID of the comment to show
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommentServiceDto"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentServiceDto"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Delete comment by id
+      description: Removes the comment
+      tags:
+        - commentsService
+      parameters:
+        - in: path
+          name: commentId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Numeric ID of the comment to delete
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+
+  /comments/v1/comments?entityType&entityId:
+    delete:
+      summary: Delete comments to entity
+      description: >
+        Removes the multiple comments bound to the entity
+        At the moment this is used internally to sync of comments removal with posts
+      tags:
+        - commentsService
+      parameters:
+        - $ref: "#/components/parameters/entityType"
+        - $ref: "#/components/parameters/entityId"
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  # comments end
