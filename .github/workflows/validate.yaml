@@ -10,7 +10,22 @@ jobs:
       - name: Check out repo 📚
         uses: actions/checkout@v3
 
-      - name: Run `openapi` command 🚀
+      - name: Validate api.yml 🚀
         uses: readmeio/rdme@v9.0.3
         with:
-          rdme: openapi validate schemas/api.yml 
+          rdme: openapi validate schemas/api.yml
+
+      - name: Validate commentsService.yml 🚀
+        uses: readmeio/rdme@v9.0.3
+        with:
+          rdme: openapi validate schemas/commentsService.yml
+
+      - name: Validate newsFeedService.yml 🚀
+        uses: readmeio/rdme@v9.0.3
+        with:
+          rdme: openapi validate schemas/newsFeedService.yml
+
+      - name: Validate messenger.yml 🚀
+        uses: readmeio/rdme@v9.0.3
+        with:
+          rdme: openapi validate schemas/messenger.yml

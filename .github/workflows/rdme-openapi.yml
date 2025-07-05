@@ -21,8 +21,18 @@ jobs:
         uses: readmeio/rdme@v8
         with:
           rdme: openapi schemas/api.yml --key=${{ secrets.README_API_KEY }} --id=652420c1e726c6001363e803
-          
+
       - name: Run `openapi` command on commentsService.yml 🚀
         uses: readmeio/rdme@v8
         with:
           rdme: openapi schemas/commentsService.yml --key=${{ secrets.README_API_KEY }} --id=6868f4b1da6852001220494e
+
+      - name: Run `openapi` command on NewsFeedService.yml 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi schemas/newsFeedService.yml --key=${{ secrets.README_API_KEY }} --id=6868f6e41185bd006374df2f
+
+      - name: Run `openapi` command on messenger.yml 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi schemas/messenger.yml --key=${{ secrets.README_API_KEY }} --id=65bb75e4c7253000782471b1
