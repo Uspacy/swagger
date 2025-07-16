@@ -1454,6 +1454,15 @@ components:
           description: MessageMeta
           allOf:
             - $ref: '#/components/schemas/MessageMeta'
+        status:
+          type: string
+          enum:
+            - sent
+            - delivered
+            - read
+            - error
+        statusText:
+          type: string
       required:
         - message
         - chatId
