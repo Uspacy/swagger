@@ -4760,8 +4760,8 @@ paths:
     parameters:
       - $ref: "#/components/parameters/funnelId"
     get:
-      summary: Get funnels.
-      description: Get funnels.
+      summary: Get reasons for failures in funnels
+      description: Get reasons for failures in funnels
       tags:
         - crmService
       responses:
@@ -4778,8 +4778,8 @@ paths:
       security:
         - bearerAuth: []
     post:
-      summary: Funnel creating.
-      description: Funnel creating.
+      summary: Reason creating
+      description: Reason creating
       tags:
         - crmService
       requestBody:
@@ -4792,7 +4792,8 @@ paths:
                   properties:
                     type:
                       type: string
-                      example: "SUCCESS"
+                      enum: ["FAIL"]
+                      example: "FAIL"
       responses:
         "200":
           description: OK
@@ -4814,8 +4815,8 @@ paths:
     parameters:
       - $ref: "#/components/parameters/reasonId"
     patch:
-      summary: Funnel editing.
-      description: Funnel editing.
+      summary: Reason editing
+      description: Reason editing
       tags:
         - crmService
       requestBody:
@@ -4842,8 +4843,8 @@ paths:
       security:
         - bearerAuth: []
     delete:
-      summary: Funnel deleting.
-      description: Funnel deleting.
+      summary: Reason deleting.
+      description: Reason deleting.
       tags:
         - crmService
       responses:
@@ -10938,7 +10939,7 @@ components:
       properties:
         title:
           type: string
-          example: "Won"
+          example: "Failed to contact"
         sort:
           type: integer
           example: 10
