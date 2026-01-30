@@ -3,61 +3,80 @@ paths:
   /messenger/v1/chats:
     get:
       operationId: ChatsController_handleGetChats
+      summary: Get all chats
+      description: Retrieves a list of all chats available to the authenticated user. Optionally filter by chat type.
       parameters:
         - name: type
           required: false
           in: query
+          description: Filter chats by type (e.g., PRIVATE, PUBLIC, GROUP, DIRECT, EXTERNAL)
           schema:
             type: string
+          example: GROUP
       responses:
-        '200':
+        "200":
           description: The chats list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChatResponseDto'
+                  $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
         - bearer: []
     post:
       operationId: ChatsController_handleCreateChat
+      summary: Create a new chat
+      description: Creates a new chat with the specified members, type, and settings. Supports private, public, group, direct, and external chat types.
       parameters: []
       requestBody:
         required: true
+        description: Chat creation details including members, type, and optional settings
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateChatDto'
+              $ref: "#/components/schemas/CreateChatDto"
+            example:
+              members: [1, 2, 3]
+              type: GROUP
+              name: "Project Discussion"
+              ownerId: 1
       responses:
-        '200':
+        "200":
           description: Created chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
         - bearer: []
     patch:
       operationId: ChatsController_handleUpdateChat
+      summary: Update a chat
+      description: Updates an existing chat's properties such as name, picture, members, or settings.
       parameters: []
       requestBody:
         required: true
+        description: Chat update details
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateChatDto'
+              $ref: "#/components/schemas/UpdateChatDto"
+            example:
+              id: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
+              name: "Updated Chat Name"
+              pictureUrl: "https://example.com/new-picture.jpg"
       responses:
-        '200':
+        "200":
           description: Updated chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -65,10 +84,13 @@ paths:
   /messenger/v1/chats/findByMeta:
     get:
       operationId: ChatsController_handleFindByMeta
+      summary: Find chat by meta value
+      description: Searches for a single chat by its metadata type and value. Useful for finding chats linked to external platforms or identifiers.
       parameters:
         - name: type
           required: true
           in: query
+          description: The type of metadata to search by
           schema:
             enum:
               - phone
@@ -81,18 +103,21 @@ paths:
               - viber
               - whatsapp
             type: string
+          example: telegram
         - name: value
           required: true
           in: query
+          description: The metadata value to search for
           schema:
             type: string
+          example: "@username"
       responses:
-        '200':
+        "200":
           description: Find chat by meta value
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -100,10 +125,13 @@ paths:
   /messenger/v1/chats/findAllByMeta:
     get:
       operationId: ChatsController_handleFindAllByMeta
+      summary: Find all chats by meta value
+      description: Searches for all chats matching the specified metadata type and value. Returns multiple results if found.
       parameters:
         - name: type
           required: true
           in: query
+          description: The type of metadata to search by
           schema:
             enum:
               - phone
@@ -116,20 +144,23 @@ paths:
               - viber
               - whatsapp
             type: string
+          example: phone
         - name: value
           required: true
           in: query
+          description: The metadata value to search for
           schema:
             type: string
+          example: "+1234567890"
       responses:
-        '200':
+        "200":
           description: Find chats by meta value
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChatResponseDto'
+                  $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -137,38 +168,46 @@ paths:
   /messenger/v1/chats/{id}:
     get:
       operationId: ChatsController_handleGetChat
+      summary: Get chat by ID
+      description: Retrieves detailed information about a specific chat by its unique identifier.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Chat by id
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
         - bearer: []
     delete:
       operationId: ChatsController_handleDeleteChat
+      summary: Delete a chat
+      description: Permanently deletes a chat and all its associated messages. This action cannot be undone.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to delete
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Deleted chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -176,50 +215,64 @@ paths:
   /messenger/v1/chats/{id}/members:
     post:
       operationId: ChatsController_handleAddMembers
+      summary: Add members to chat
+      description: Adds one or more users to an existing chat. Only available for group and public chats.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       requestBody:
         required: true
+        description: List of member IDs to add to the chat
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatMemebersDto'
+              $ref: "#/components/schemas/ChatMembersDto"
+            example:
+              members: [5, 6, 7]
       responses:
-        '200':
+        "200":
           description: Updated chat with new members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
         - bearer: []
     delete:
       operationId: ChatsController_handleDeleteMembers
+      summary: Remove members from chat
+      description: Removes one or more users from an existing chat. Only available for group and public chats.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       requestBody:
         required: true
+        description: List of member IDs to remove from the chat
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatMemebersDto'
+              $ref: "#/components/schemas/ChatMembersDto"
+            example:
+              members: [5, 6]
       responses:
-        '200':
+        "200":
           description: Updated chat with new members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -227,19 +280,23 @@ paths:
   /messenger/v1/chats/{id}/leave:
     post:
       operationId: ChatsController_handleLeaveChat
+      summary: Leave a chat
+      description: Allows the authenticated user to leave a group chat. The user will no longer receive messages from this chat.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to leave
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
-          description: Updated chat with new members
+        "200":
+          description: User successfully left the chat
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -247,19 +304,23 @@ paths:
   /messenger/v1/chats/{id}/setActiveValue:
     post:
       operationId: ChatsController_handleSetActiveValue
+      summary: Set chat active status
+      description: Updates the active status of a chat. Can be used to archive or reactivate a chat.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Updated chat with active value
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponseDto'
+                $ref: "#/components/schemas/ChatResponseDto"
       tags:
         - chats
       security:
@@ -267,14 +328,18 @@ paths:
   /messenger/v1/chats/{id}/pin:
     post:
       operationId: ChatsController_handlePinChat
+      summary: Pin a chat
+      description: Pins a chat to the top of the chat list for easy access. Pinned chats appear before unpinned ones.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to pin
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Id of pinned chat
           content:
             application/json:
@@ -287,14 +352,18 @@ paths:
   /messenger/v1/chats/{id}/unpin:
     post:
       operationId: ChatsController_handleUnpinChat
+      summary: Unpin a chat
+      description: Removes the pinned status from a chat, returning it to its normal position in the chat list.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to unpin
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Id of unpinned chat
           content:
             application/json:
@@ -306,40 +375,48 @@ paths:
         - bearer: []
   /messenger/v1/chats/{id}/mute:
     post:
-      operationId: ChatsController_handleMuteChatChat
+      operationId: ChatsController_handleMuteChat
+      summary: Mute chat notifications
+      description: Mutes notifications for a specific chat. The user will no longer receive push notifications for new messages in this chat.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to mute
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Chat settings
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatSettingsDto'
+                $ref: "#/components/schemas/ChatSettingsDto"
       tags:
         - chats
       security:
         - bearer: []
   /messenger/v1/chats/{id}/unmute:
     post:
-      operationId: ChatsController_handleUnmuteChatChat
+      operationId: ChatsController_handleUnmuteChat
+      summary: Unmute chat notifications
+      description: Re-enables notifications for a previously muted chat. The user will start receiving push notifications for new messages again.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the chat to unmute
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: Chat settings
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatSettingsDto'
+                $ref: "#/components/schemas/ChatSettingsDto"
       tags:
         - chats
       security:
@@ -347,86 +424,107 @@ paths:
   /messenger/v1/messages:
     get:
       operationId: MessagesController_handleGetMessages
+      summary: Get messages from a chat
+      description: Retrieves a paginated list of messages from a specific chat. Supports filtering by timestamp and limiting results.
       parameters:
         - name: chatId
           required: true
           in: query
-          description: Chat id
+          description: The unique identifier of the chat to retrieve messages from
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
         - name: lastTimestamp
           required: false
           in: query
-          description: Last message timestamp
+          description: Retrieve messages older than this timestamp (for pagination)
           schema:
             type: string
+          example: "1709043064088"
         - name: firstTimestamp
           required: false
           in: query
-          description: First message timestamp
+          description: Retrieve messages newer than this timestamp
           schema:
             type: string
+          example: "1709043000000"
         - name: limit
           required: false
           in: query
-          description: Messages limit
+          description: Maximum number of messages to return
           schema:
             type: string
+          example: "50"
         - name: unreadFirst
           required: false
           in: query
-          description: Show unread messages first
+          description: When set to 'true', returns unread messages first
           schema:
             type: string
+          example: "true"
       responses:
-        '200':
+        "200":
           description: The messages list by chat
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
         - bearer: []
     post:
       operationId: MessagesController_handleCreateMessage
+      summary: Send a new message
+      description: Creates and sends a new message to a chat. Supports text messages, attachments, replies, and mentions.
       parameters: []
       requestBody:
         required: true
+        description: Message content and metadata
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageDto'
+              $ref: "#/components/schemas/MessageDto"
+            example:
+              chatId: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
+              message: "Hello, world!"
+              type: MESSAGE
       responses:
-        '200':
+        "200":
           description: The created message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
         - bearer: []
     patch:
       operationId: MessagesController_handleUpdateMessage
+      summary: Edit a message
+      description: Updates the content of an existing message. Only the message author can edit their messages.
       parameters: []
       requestBody:
         required: true
+        description: Updated message content
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageDto'
+              $ref: "#/components/schemas/MessageDto"
+            example:
+              id: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
+              chatId: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
+              message: "Updated message text"
       responses:
-        '200':
+        "200":
           description: The updated message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -434,22 +532,28 @@ paths:
   /messenger/v1/messages/readMessages:
     post:
       operationId: MessagesController_handleReadMessages
+      summary: Mark messages as read
+      description: Marks specific messages as read by the authenticated user. Updates the read status and read receipts.
       parameters: []
       requestBody:
         required: true
+        description: List of message IDs to mark as read
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessagesIdsChatIdDto'
+              $ref: "#/components/schemas/MessagesIdsChatIdDto"
+            example:
+              chatId: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
+              messagesIds: ["msg-id-1", "msg-id-2"]
       responses:
-        '200':
-          description: The updated message
+        "200":
+          description: Confirmation of messages marked as read
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessagesIdsChatIdDto'
+                  $ref: "#/components/schemas/MessagesIdsChatIdDto"
       tags:
         - messages
       security:
@@ -457,27 +561,32 @@ paths:
   /messenger/v1/messages/{id}/goToMessage:
     get:
       operationId: MessagesController_handleGoToMessage
+      summary: Navigate to a specific message
+      description: Retrieves messages surrounding a specific message, useful for jumping to a message in context (e.g., from search results or replies).
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the target message
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
         - name: limit
           required: false
           in: query
-          description: Messages limit
+          description: Number of messages to return before and after the target message
           schema:
             type: number
+          example: 20
       responses:
-        '200':
+        "200":
           description: The messages before and after the message with the given id
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -485,22 +594,28 @@ paths:
   /messenger/v1/messages/forwardMessages:
     post:
       operationId: MessagesController_handleForwardMessages
+      summary: Forward messages
+      description: Forwards one or more messages to another chat. The forwarded messages will include a reference to the original sender.
       parameters: []
       requestBody:
         required: true
+        description: Messages to forward and destination chat
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessagesIdsChatIdDto'
+              $ref: "#/components/schemas/MessagesIdsChatIdDto"
+            example:
+              chatId: "destination-chat-id"
+              messagesIds: ["msg-id-1", "msg-id-2"]
       responses:
-        '200':
-          description: ''
+        "200":
+          description: The forwarded messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -508,21 +623,25 @@ paths:
   /messenger/v1/messages/getPinnedMessages:
     get:
       operationId: MessagesController_handleGetPinnedMessages
+      summary: Get pinned messages
+      description: Retrieves all messages that have been pinned in a specific chat. Pinned messages are important messages highlighted for easy reference.
       parameters:
         - name: chatId
           required: true
           in: query
+          description: The unique identifier of the chat
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: List of pinned messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -530,19 +649,23 @@ paths:
   /messenger/v1/messages/{id}/pin:
     post:
       operationId: MessagesController_handlePinMessage
+      summary: Pin a message
+      description: Pins a message in the chat for easy reference. Pinned messages are highlighted and can be quickly accessed by all chat members.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the message to pin
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: The pinned message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -550,19 +673,23 @@ paths:
   /messenger/v1/messages/{id}/unpin:
     post:
       operationId: MessagesController_handleUnpinMessage
+      summary: Unpin a message
+      description: Removes the pinned status from a message. The message will remain in the chat but will no longer be highlighted.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the message to unpin
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: The unpinned message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -570,24 +697,28 @@ paths:
   /messenger/v1/messages/deleteMessages:
     delete:
       operationId: MessagesController_handleDeleteMessages
+      summary: Delete multiple messages
+      description: Deletes multiple messages at once. Only message authors or chat administrators can delete messages.
       parameters: []
       requestBody:
         required: true
+        description: Array of message IDs to delete
         content:
           application/json:
             schema:
               type: array
               items:
                 type: string
+            example: ["msg-id-1", "msg-id-2", "msg-id-3"]
       responses:
-        '200':
+        "200":
           description: The deleted messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -595,22 +726,27 @@ paths:
   /messenger/v1/messages/readAll:
     post:
       operationId: MessagesController_handleReadAll
+      summary: Mark all messages as read
+      description: Marks all unread messages in a chat as read. Useful for quickly clearing unread message counts.
       parameters: []
       requestBody:
         required: true
+        description: The chat to mark as fully read
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatIdDto'
+              $ref: "#/components/schemas/ChatIdDto"
+            example:
+              chatId: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
-          description: The read messages
+        "200":
+          description: Confirmation that all messages in the chat have been marked as read
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChatIdDto'
+                  $ref: "#/components/schemas/ChatIdDto"
       tags:
         - messages
       security:
@@ -618,19 +754,23 @@ paths:
   /messenger/v1/messages/{id}:
     delete:
       operationId: MessagesController_handleDeleteMessage
+      summary: Delete a message
+      description: Deletes a single message from a chat. Only the message author or chat administrators can delete messages.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the message to delete
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
       responses:
-        '200':
+        "200":
           description: The deleted message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponseDto'
+                $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - messages
       security:
@@ -638,36 +778,46 @@ paths:
   /messenger/v1/external-lines:
     get:
       operationId: ExternalLinesController_getExternalLines
+      summary: Get all external lines
+      description: Retrieves a list of all configured external communication lines (e.g., phone numbers, social media integrations).
       parameters: []
       responses:
-        '200':
+        "200":
           description: The external lines items list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ExternalLineResponseDto'
+                  $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
         - bearer: []
     post:
       operationId: ExternalLinesController_createExternalLine
+      summary: Create an external line
+      description: Creates a new external communication line for integrating with external messaging platforms or phone systems.
       parameters: []
       requestBody:
         required: true
+        description: External line configuration details
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalLineCreateDto'
+              $ref: "#/components/schemas/ExternalLineCreateDto"
+            example:
+              name: "Support Line"
+              icon: "https://example.com/phone-icon.png"
+              phoneNumber: "+1234567890"
+              externalId: "support-line-001"
       responses:
-        '200':
+        "200":
           description: The created external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -675,63 +825,80 @@ paths:
   /messenger/v1/external-lines/{id}:
     get:
       operationId: ExternalLinesController_getExternalLineById
+      summary: Get external line by ID
+      description: Retrieves detailed information about a specific external communication line.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the external line
           schema:
             type: string
+          example: "659ff121fd62e43063340f2f"
       responses:
-        '200':
+        "200":
           description: The external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
         - bearer: []
     delete:
       operationId: ExternalLinesController_deleteExternalLineById
+      summary: Delete an external line
+      description: Permanently deletes an external communication line. This will disconnect the integration.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the external line to delete
           schema:
             type: string
+          example: "659ff121fd62e43063340f2f"
       responses:
-        '200':
+        "200":
           description: The deleted external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
         - bearer: []
     patch:
       operationId: ExternalLinesController_updateExternalLine
+      summary: Update an external line
+      description: Updates the configuration of an existing external communication line.
       parameters:
         - name: id
           required: true
           in: path
+          description: The unique identifier of the external line to update
           schema:
             type: string
+          example: "659ff121fd62e43063340f2f"
       requestBody:
         required: true
+        description: Updated external line configuration
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalLineUpdateDto'
+              $ref: "#/components/schemas/ExternalLineUpdateDto"
+            example:
+              name: "Updated Support Line"
+              icon: "https://example.com/new-icon.png"
+              externalId: "support-line-001"
       responses:
-        '200':
+        "200":
           description: The updated external line
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalLineResponseDto'
+                $ref: "#/components/schemas/ExternalLineResponseDto"
       tags:
         - external-lines
       security:
@@ -739,16 +906,28 @@ paths:
   /messenger/v1/telephony/call/start:
     post:
       operationId: TelephonyController_handleCallStart
+      summary: Start a phone call
+      description: Initiates a new phone call event. Used to track and manage telephony integration calls.
       parameters: []
       requestBody:
         required: true
+        description: Call initiation details
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallEventDto'
+              $ref: "#/components/schemas/CallEventDto"
+            example:
+              call_type: "outgoing"
+              from: "+1234567890"
+              to: "+0987654321"
+              call_event_id: 1
+              auth_user_id: 1
+              integration_code: "telephony-001"
+              time: "2024-01-30T10:00:00Z"
+              status: "started"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: Call started successfully
       tags:
         - telephony
       security:
@@ -756,16 +935,28 @@ paths:
   /messenger/v1/telephony/call/end:
     post:
       operationId: TelephonyController_handleCallEnd
+      summary: End a phone call
+      description: Records the end of a phone call event. Used to update call records with duration and status.
       parameters: []
       requestBody:
         required: true
+        description: Call termination details
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallEventDto'
+              $ref: "#/components/schemas/CallEventDto"
+            example:
+              call_type: "outgoing"
+              from: "+1234567890"
+              to: "+0987654321"
+              call_event_id: 1
+              auth_user_id: 1
+              integration_code: "telephony-001"
+              time: "2024-01-30T10:05:00Z"
+              status: "completed"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: Call ended successfully
       tags:
         - telephony
       security:
@@ -773,31 +964,39 @@ paths:
   /messenger/v1/search/messages:
     get:
       operationId: SearchController_handleSearchMessages
+      summary: Search messages globally
+      description: Searches for messages across all chats accessible to the authenticated user. Supports filtering by date and limiting results.
       parameters:
         - name: query
           required: true
           in: query
+          description: The search query string to match against message content
           schema:
             type: string
+          example: "meeting tomorrow"
         - name: limit
           required: true
           in: query
+          description: Maximum number of results to return
           schema:
             type: string
+          example: "20"
         - name: date
           required: true
           in: query
+          description: Filter messages by date (ISO 8601 format)
           schema:
             type: string
+          example: "2024-01-30"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: List of matching messages
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageResponseDto'
+                  $ref: "#/components/schemas/MessageResponseDto"
       tags:
         - search
       security:
@@ -805,41 +1004,51 @@ paths:
   /messenger/v1/search/{chatId}:
     get:
       operationId: SearchController_handleSearchAll
+      summary: Search within a specific chat
+      description: Searches for messages, files, and links within a specific chat. Returns categorized results for easy filtering.
       parameters:
         - name: query
           required: true
           in: query
+          description: The search query string to match against chat content
           schema:
             type: string
+          example: "project update"
         - name: chatId
           required: true
           in: path
+          description: The unique identifier of the chat to search within
           schema:
             type: string
+          example: "76bfc2ff-207c-4b5a-8543-f7009b7f8872"
         - name: limit
           required: true
           in: query
+          description: Maximum number of results to return per category
           schema:
             type: number
+          example: 20
         - name: date
           required: true
           in: query
+          description: Filter results by date (ISO 8601 format)
           schema:
             type: string
+          example: "2024-01-30"
       responses:
-        '200':
-          description: ''
+        "200":
+          description: Search results categorized by messages, files, and links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponseDto'
+                $ref: "#/components/schemas/SearchResponseDto"
       tags:
         - search
       security:
         - bearer: []
 info:
   title: Messenger service
-  description: ''
+  description: "API for managing chats, messages, and other messenger-related functionalities."
   version: v1
   contact: {}
 tags: []
@@ -889,7 +1098,7 @@ components:
         phoneNumber:
           type: string
           description: External line phone number
-          example: '+1234567890'
+          example: "+1234567890"
       required:
         - id
         - name
@@ -924,7 +1133,7 @@ components:
         size:
           type: string
           description: Attached file size
-          example: '1024'
+          example: "1024"
         url:
           type: string
           description: Attached file url
@@ -1040,7 +1249,7 @@ components:
           description: Body entity
           type: array
           items:
-            $ref: '#/components/schemas/MetaBody'
+            $ref: "#/components/schemas/MetaBody"
       required:
         - entity
         - type
@@ -1089,33 +1298,33 @@ components:
         externalLine:
           description: External line
           allOf:
-            - $ref: '#/components/schemas/ExternalLineResponseDto'
+            - $ref: "#/components/schemas/ExternalLineResponseDto"
         attachedFiles:
           description: Attached files
           type: array
           items:
-            $ref: '#/components/schemas/AttachedFile'
+            $ref: "#/components/schemas/AttachedFile"
         relations:
           description: Relations
           type: array
           items:
-            $ref: '#/components/schemas/MessageRelation'
+            $ref: "#/components/schemas/MessageRelation"
         externalAuthorId:
           type: string
           description: External author id
-          example: '123456'
+          example: "123456"
         externalId:
           type: string
           description: External id
-          example: '123456'
+          example: "123456"
         ref:
           description: Reference
           allOf:
-            - $ref: '#/components/schemas/Reference'
+            - $ref: "#/components/schemas/Reference"
         meta:
           description: MessageMeta
           allOf:
-            - $ref: '#/components/schemas/MessageMeta'
+            - $ref: "#/components/schemas/MessageMeta"
       required:
         - message
         - chatId
@@ -1139,7 +1348,7 @@ components:
           description: Meta type
         value:
           type: string
-          example: '1234567890'
+          example: "1234567890"
           description: Meta value
       required:
         - type
@@ -1212,13 +1421,13 @@ components:
           description: External lines
           type: array
           items:
-            $ref: '#/components/schemas/ExternalLineResponseDto'
+            $ref: "#/components/schemas/ExternalLineResponseDto"
         lastMessage:
-          $ref: '#/components/schemas/MessageResponseDto'
+          $ref: "#/components/schemas/MessageResponseDto"
         meta:
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
         active:
           type: boolean
           example: true
@@ -1238,7 +1447,7 @@ components:
         setting:
           description: Chat settings
           allOf:
-            - $ref: '#/components/schemas/ChatSettingsDto'
+            - $ref: "#/components/schemas/ChatSettingsDto"
       required:
         - id
         - members
@@ -1301,7 +1510,7 @@ components:
           description: Chat meta
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
       required:
         - members
         - type
@@ -1356,10 +1565,10 @@ components:
         meta:
           type: array
           items:
-            $ref: '#/components/schemas/ChatMeta'
+            $ref: "#/components/schemas/ChatMeta"
       required:
         - id
-    ChatMemebersDto:
+    ChatMembersDto:
       type: object
       properties:
         members:
@@ -1420,29 +1629,29 @@ components:
         externalLine:
           type: string
           description: External line
-          example: '123123123123123123'
+          example: "123123123123123123"
         attachedFiles:
           description: Attached files
           type: array
           items:
-            $ref: '#/components/schemas/AttachedFile'
+            $ref: "#/components/schemas/AttachedFile"
         relations:
           description: Relations
           type: array
           items:
-            $ref: '#/components/schemas/MessageRelation'
+            $ref: "#/components/schemas/MessageRelation"
         externalAuthorId:
           type: string
           description: External author id
-          example: '123456'
+          example: "123456"
         externalId:
           type: string
           description: External id
-          example: '123456'
+          example: "123456"
         ref:
           description: Reference
           allOf:
-            - $ref: '#/components/schemas/Reference'
+            - $ref: "#/components/schemas/Reference"
         mentioned:
           description: Mentioned users
           example:
@@ -1453,7 +1662,7 @@ components:
         meta:
           description: MessageMeta
           allOf:
-            - $ref: '#/components/schemas/MessageMeta'
+            - $ref: "#/components/schemas/MessageMeta"
         status:
           type: string
           enum:
@@ -1505,7 +1714,7 @@ components:
           description: The icon of the external line
         phoneNumber:
           type: string
-          example: '+1234567890'
+          example: "+1234567890"
           description: The phone number of the external line
         externalId:
           type: string
@@ -1554,7 +1763,7 @@ components:
         data:
           description: Hangup button data
           allOf:
-            - $ref: '#/components/schemas/HangupButtonEventDataDto'
+            - $ref: "#/components/schemas/HangupButtonEventDataDto"
       required:
         - url
         - data
@@ -1571,11 +1780,11 @@ components:
         from:
           type: string
           description: Call from
-          example: '1234567890'
+          example: "1234567890"
         to:
           type: string
           description: Call to
-          example: '1234567890'
+          example: "1234567890"
         call_event_id:
           type: number
           description: Call event id
@@ -1587,23 +1796,23 @@ components:
         integration_code:
           type: string
           description: Integration code
-          example: '1234567890'
+          example: "1234567890"
         time:
           type: string
           description: Hangup button
-          example: '1234567890'
+          example: "1234567890"
         status:
           type: string
           description: Status
-          example: '1234567890'
+          example: "1234567890"
         note:
           type: string
           description: Note
-          example: '1234567890'
+          example: "1234567890"
         hangup_button:
           description: Hangup button
           allOf:
-            - $ref: '#/components/schemas/HangupButtonEventDto'
+            - $ref: "#/components/schemas/HangupButtonEventDto"
       required:
         - call_type
         - from
@@ -1620,15 +1829,15 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
         files:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
         links:
           type: array
           items:
-            $ref: '#/components/schemas/MessageResponseDto'
+            $ref: "#/components/schemas/MessageResponseDto"
       required:
         - messages
         - files
