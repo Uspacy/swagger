@@ -112,18 +112,18 @@ components:
     CreateCommentServiceDto:
       type: object
       properties:
-        entity_type:
+        entityType:
           allOf:
             - $ref: "#/components/schemas/EntityTypes"
             - example: "post"
-        entity_id:
+        entityId:
           type: integer
           format: int64
           example: 1
         message:
           type: string
           example: Message post
-        author_id:
+        authorId:
           type: integer
           example: 1
         date:
@@ -141,41 +141,47 @@ components:
           $ref: "#/components/schemas/MentionedDto"
         notify:
           $ref: "#/components/schemas/NotifyDto"
+        rootParent:
+          $ref: "#/components/schemas/RootParentDto"
         root_parent:
-          type: object
-          description: "Optional parameter for notification of comment creation"
-          properties:
-            type:
-              type: string
-              example: "parent_type"
-            data:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  example: 732
-                  description: "Parent entity id"
-                title:
-                  type: string
-                  example: "Entity title"
-                  description: "Parent entity title"
-            service:
-              type: string
-              example: "parent_service"
-            table_name:
-              type: string
-              example: "parent_table_name"
-          required:
-            - type
-            - data
-            - service
-            - title
+          $ref: "#/components/schemas/RootParentDto"
       required:
-        - entity_type
-        - entity_id
-        - author_id
+        - entityType
+        - entityId
         - message
-        - date
+    RootParentDto:
+      type: object
+      description: "Optional parameter for notification of comment creation. Can be sent as 'rootParent' (camelCase) or 'root_parent' (snake_case)."
+      properties:
+        type:
+          type: string
+          description: "Type of parent entity"
+          example: "post"
+        data:
+          type: object
+          properties:
+            id:
+              oneOf:
+                - type: string
+                - type: integer
+              description: "Parent entity id (can be string or integer)"
+              example: 732
+            title:
+              type: string
+              example: "Entity title"
+              description: "Parent entity title"
+        service:
+          type: string
+          description: "Service name (e.g., 'news_feed', 'crm')"
+          example: "news_feed"
+        table_name:
+          type: string
+          description: "Table name for CRM entities (e.g., 'leads', 'deals')"
+          example: "leads"
+      required:
+        - type
+        - data
+        - service
     UpdateCommentServiceDto:
       type: object
       properties:
@@ -351,33 +357,48 @@ components:
       example: 10
 info:
   title: Comments service
+  description: "API for managing comments on various entities such as posts, tasks, and other content types. Supports threaded comments, mentions, reactions, and notifications."
   version: 1.0.0
+tags:
+  - name: comments
+    description: Operations for managing comments on entities
+servers:
+  - url: https://{domain}.uspacy.ua
+    description: Ukrainian server
+  - url: https://{domain}.uspacy.eu
+    description: EU server
+  - url: https://{domain}.uspacy.com.br
+    description: Brazilian server
+  - url: https://{domain}.uspacy.com
+    description: International server
 paths:
   # comments begin
 
   /comments/v1/comments:
     get:
+      operationId: CommentsController_getComments
       summary: Get comments list
       description: >
-        Lists the comments related to some entity.
-        `nextId` and `prevId` fields in response help to do pagination.
-        For more information see the description of `nextId` and `prevId` fields in the response.
+        Retrieves a paginated list of comments related to a specific entity (post, task, or custom entity type).
+        Supports nested/threaded comments where child comments can be retrieved separately.
+        The `nextId` and `prevId` fields in the response help with pagination - comments are paginated
+        starting from the last page in ascending order.
       parameters:
         - name: entity_type
           in: query
           description: >
-            Entity type name.
-            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-            And only the child comments are being sent in this case.
-            Use along with `childList` and `lastId` to paginate the child comments.
+            Entity type name (e.g., 'post', 'task', or custom type).
+            If set to 'comment', the request retrieves child comments where `entityId` represents the parent comment ID.
+            Use along with `childList` and `lastId` to paginate child comments.
           schema:
             $ref: "#/components/parameters/entityType/schema"
+          example: post
         - $ref: "#/components/parameters/entityId"
         - name: list
           in: query
           description: >
-            Use this to define the number of top level comments to retrieve.
-            Retrieve all if missing or retrieve the rest if `nextId` is present.
+            Number of top-level comments to retrieve per page.
+            If omitted, retrieves all comments. Use with `nextId` for pagination.
           schema:
             $ref: "#/components/parameters/list/schema"
           example: 3
@@ -386,7 +407,7 @@ paths:
         - $ref: "#/components/parameters/lastId"
       responses:
         "200":
-          description: Successful response
+          description: List of comments with pagination info and reactions
           content:
             application/json:
               schema:
@@ -398,22 +419,57 @@ paths:
                       allOf:
                         - $ref: "#/components/schemas/CommentServiceDto"
                         - $ref: "#/components/schemas/CommentExtrasServiceDto"
+              example:
+                data:
+                  - id: 45
+                    entityType: post
+                    entityId: 123
+                    message: "This is a great post!"
+                    authorId: "7"
+                    date: 1654180120
+                    reactions:
+                      - reaction: 128077
+                        amount: 5
+                        entityId: 45
+                    nextId: 46
+                    prevId: 44
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
     post:
+      operationId: CommentsController_createComment
       summary: Create a comment
-      description: Creates new comment
+      description: >
+        Creates a new comment on an entity. Supports mentions of users, groups, and departments,
+        as well as file attachments. Optionally, you can specify notification recipients and
+        provide parent entity information for enhanced notification context.
       requestBody:
         required: true
+        description: Comment data including the target entity, message content, and optional mentions
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateCommentServiceDto"
+            example:
+              entityType: post
+              entityId: 123
+              message: "Great work on this! @John please review."
+              authorId: 7
+              date: 1654180120
+              mentioned:
+                users: [32, 85]
+                groups: []
+                departments: []
+              notify:
+                users: [32]
+                groups: []
+                departments: []
       responses:
         "201":
-          description: Successful response
+          description: Comment created successfully
           content:
             application/json:
               schema:
@@ -422,32 +478,34 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "422":
           $ref: "#/components/responses/ValidationError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
 
   /comments/v1/comments?entityIds[]:
     get:
-      summary: Get comments list by array of entity ids
+      operationId: CommentsController_getCommentsByEntityIds
+      summary: Get comments for multiple entities
       description: >
-        Lists the comments related to the list of entities.
-        `nextId` and `prevId` fields in response help to do pagination.
-        For more information see the description of `nextId` and `prevId` fields in the response.
+        Retrieves comments for multiple entities at once. The response is grouped by entity ID,
+        making it efficient for batch operations like loading comments for a list of posts.
+        Supports the same pagination options as the single-entity endpoint.
       parameters:
         - name: entity_type
           in: query
           description: >
-            Entity type name.
-            If it's `comment`, record represents the child comment and `entityId` represents the parent comment ID.
-            And only the child comments are being sent in this case.
-            Use along with `childList` and `lastId` to paginate the child comments.
+            Entity type name (e.g., 'post', 'task', or custom type).
+            If set to 'comment', retrieves child comments where each entityId represents a parent comment ID.
           schema:
             $ref: "#/components/parameters/entityType/schema"
+          example: post
         - $ref: "#/components/parameters/entityIds"
         - name: list
           in: query
           description: >
-            Use this to define the number of top level comments to retrieve.
-            Retrieve all if missing or retrieve the rest if `nextId` is present.
+            Number of top-level comments to retrieve per entity.
+            If omitted, retrieves all comments for each entity.
           schema:
             $ref: "#/components/parameters/list/schema"
           example: 3
@@ -456,7 +514,7 @@ paths:
         - $ref: "#/components/parameters/lastId"
       responses:
         "200":
-          description: Successful response
+          description: Comments grouped by entity ID
           content:
             application/json:
               schema:
@@ -471,15 +529,36 @@ paths:
                           allOf:
                             - $ref: "#/components/schemas/CommentServiceDto"
                             - $ref: "#/components/schemas/CommentExtrasServiceDto"
+              example:
+                data:
+                  "123":
+                    - id: 45
+                      entityType: post
+                      entityId: 123
+                      message: "First comment on post 123"
+                      authorId: "7"
+                      date: 1654180120
+                  "456":
+                    - id: 67
+                      entityType: post
+                      entityId: 456
+                      message: "Comment on post 456"
+                      authorId: "12"
+                      date: 1654180220
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
 
   /comments/v1/comments/{commentId}:
     patch:
-      summary: Update comment by id
-      description: Updates the comment
+      operationId: CommentsController_updateComment
+      summary: Update a comment
+      description: >
+        Updates the message content of an existing comment. Only the comment author
+        or users with appropriate permissions can update a comment.
       parameters:
         - in: path
           name: commentId
@@ -487,27 +566,36 @@ paths:
             type: integer
             format: int64
           required: true
-          description: Numeric ID of the comment to show
+          description: The unique identifier of the comment to update
+          example: 45
       requestBody:
         required: true
+        description: Updated comment content
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateCommentServiceDto"
+            example:
+              message: "Updated comment text with corrections."
       responses:
         "200":
-          description: Successful response
+          description: Comment updated successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CommentServiceDto"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
     delete:
-      summary: Delete comment by id
-      description: Removes the comment
+      operationId: CommentsController_deleteComment
+      summary: Delete a comment
+      description: >
+        Permanently removes a comment by its ID. This also removes all child comments (replies)
+        associated with this comment. Only the comment author or users with appropriate permissions can delete a comment.
       parameters:
         - in: path
           name: commentId
@@ -515,29 +603,36 @@ paths:
             type: integer
             format: int64
           required: true
-          description: Numeric ID of the comment to delete
+          description: The unique identifier of the comment to delete
+          example: 45
       responses:
         "204":
-          description: No content
+          description: Comment deleted successfully
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
 
   /comments/v1/comments?entityType&entityId:
     delete:
-      summary: Delete comments to entity
+      operationId: CommentsController_deleteCommentsByEntity
+      summary: Delete all comments for an entity
       description: >
-        Removes the multiple comments bound to the entity
-        At the moment this is used internally to sync of comments removal with posts
+        Removes all comments associated with a specific entity. This is typically used
+        for cleanup when the parent entity (e.g., a post or task) is deleted.
+        This operation is often triggered internally to maintain data consistency.
       parameters:
         - $ref: "#/components/parameters/entityType"
         - $ref: "#/components/parameters/entityId"
       responses:
         "204":
-          description: No content
+          description: All comments for the entity deleted successfully
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+      tags:
+        - comments
       security:
         - bearerAuth: []
   # comments end
