@@ -139,7 +139,7 @@ paths:
                       type: integer
       responses:
         "201":
-          description: OK
+          description: Created
           content:
             application/json:
               schema:
@@ -189,7 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateOrUpdateActivity"
+                $ref: "#/components/schemas/Activity"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -313,7 +313,7 @@ components:
       description: how many items should be per page
       required: false
       schema:
-        type: number
+        type: integer
         default: 20
       example: 10
   schemas:
@@ -321,13 +321,13 @@ components:
       type: object
       properties:
         currentPage:
-          type: number
+          type: integer
           example: 1
         from:
-          type: number
+          type: integer
           example: 1
         lastPage:
-          type: number
+          type: integer
           example: 1
         links:
           type: array
@@ -347,13 +347,13 @@ components:
           type: string
           example: "https://domain.uspacy.ua/groups/v1/groups"
         perPage:
-          type: number
+          type: integer
           example: 20
         to:
-          type: number
+          type: integer
           example: 2
         total:
-          type: number
+          type: integer
           example: 2
     ActivityStatus:
       type: string
