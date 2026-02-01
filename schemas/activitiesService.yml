@@ -1,6 +1,6 @@
 openapi: "3.1.0"
 info:
-  title: Uspacy Activities Service API
+  title: Activities service
   version: v1
 servers:
   - url: https://{domain}.uspacy.ua
@@ -12,12 +12,12 @@ servers:
   - url: https://{domain}.uspacy.com
     description: International server
 tags:
-  - name: activitiesService
+  - name: activities
 paths:
   /activities/v1/activities:
     get:
       tags:
-        - activitiesService
+        - activities
       summary: Get activities list
       parameters:
         - name: responsible_id
@@ -119,7 +119,7 @@ paths:
         - bearerAuth: []
     post:
       tags:
-        - activitiesService
+        - activities
       summary: Create activity
       requestBody:
         content:
@@ -157,7 +157,7 @@ paths:
       - $ref: "#/components/parameters/activityId"
     get:
       tags:
-        - activitiesService
+        - activities
       summary: Show activity
       responses:
         "200":
@@ -176,7 +176,7 @@ paths:
         - bearerAuth: []
     patch:
       tags:
-        - activitiesService
+        - activities
       summary: Update activity
       requestBody:
         content:
@@ -202,7 +202,7 @@ paths:
         - bearerAuth: []
     delete:
       tags:
-        - activitiesService
+        - activities
       summary: Delete activity by id
       responses:
         "204":
@@ -218,7 +218,7 @@ paths:
   /activities/v1/activities/mass_deletion:
     delete:
       tags:
-        - activitiesService
+        - activities
       summary: Bulk deletion activities
       requestBody:
         content:
