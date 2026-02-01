@@ -36,3 +36,8 @@ jobs:
         uses: readmeio/rdme@v8
         with:
           rdme: openapi schemas/messenger.yml --key=${{ secrets.README_API_KEY }} --id=65bb75e4c7253000782471b1
+
+      - name: Run `openapi` command on activitiesService.yml 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi schemas/activitiesService.yml --key=${{ secrets.README_API_KEY }} --id=697f0ab2d52da0dac0439132
