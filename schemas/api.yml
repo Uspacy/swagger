@@ -4966,6 +4966,66 @@ components:
       example:
         - path/to/image.jpg
         - path/to/image.png
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Source
+        code:
+          type: string
+          example: source
+        required:
+          type: boolean
+          example: false
+        editable:
+          type: boolean
+          example: true
+        show:
+          type: boolean
+          example: true
+        hidden:
+          type: boolean
+          example: false
+        multiple:
+          type: boolean
+          example: false
+        fieldSectionId:
+          type: integer
+          example: 11
+        default_value:
+          type: string
+          example: value
+        tooltip:
+          type: string
+          example: example
+        type:
+          type: string
+          example: entity_reference
+        entity_reference_id:
+          type: integer
+          example: 123
+        sort:
+          type: integer
+          example: 90
+    FieldSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: contacts
+        entity_table:
+          type: string
+          example: users
+        hidden:
+          type: boolean
+          example: false
+        sort:
+          type: integer
+          example: 10
     # common end
 
     # users begin
