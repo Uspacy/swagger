@@ -5026,6 +5026,34 @@ components:
         sort:
           type: integer
           example: 10
+    SourceList:
+      properties:
+        title:
+          type: string
+          example: "Shop"
+        value:
+          type: string
+          example: shop
+        color:
+          type: string
+          example: "#6AD01F"
+        sort:
+          type: integer
+          example: 20
+        selected:
+          type: boolean
+          example: true
+      example:
+        - title: "Shop"
+          value: shop
+          color: ""
+          sort: 10
+          selected: true
+        - title: "Site"
+          value: site
+          color: ""
+          sort: 20
+          selected: false
     # common end
 
     # users begin

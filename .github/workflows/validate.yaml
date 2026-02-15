@@ -29,3 +29,13 @@ jobs:
         uses: readmeio/rdme@v9.0.3
         with:
           rdme: openapi validate schemas/messenger.yml
+
+      - name: Validate activitiesService.yml 🚀
+        uses: readmeio/rdme@v9.0.3
+        with:
+          rdme: openapi validate schemas/activitiesService.yml
+
+      - name: Validate crmService.yml 🚀
+        uses: readmeio/rdme@v9.0.3
+        with:
+          rdme: openapi validate schemas/crmService.yml
