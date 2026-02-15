@@ -1,0 +1,6222 @@
+openapi: "3.1.0"
+info:
+  title: CRM service
+  version: v1
+servers:
+  - url: https://{domain}.uspacy.ua
+    description: Ukrainian server
+  - url: https://{domain}.uspacy.eu
+    description: EU server
+  - url: https://{domain}.uspacy.com.br
+    description: Brazilian server
+  - url: https://{domain}.uspacy.com
+    description: International server
+tags:
+  - name: entities
+    description: Entity configuration and management
+  - name: fields
+    description: Fields, field types, list values, and field dependencies
+  - name: items
+    description: CRM entity items (leads, deals, contacts, companies)
+  - name: pipeline
+    description: Funnels, kanban stages, and reasons
+  - name: activities
+    description: CRM activities and tasks
+  - name: call events
+    description: Call event tracking and telephony integration
+  - name: letters
+    description: CRM letter management
+  - name: customer contacts
+    description: Customer contact lookup and matching
+  - name: products
+    description: Product catalog, categories, pricing, and taxes
+  - name: documents
+    description: Document templates and generated documents
+  - name: requisites
+    description: Requisites, bank requisites, and templates
+  - name: permissions
+    description: CRM access permissions
+  - name: trash
+    description: Recycle bin for deleted CRM items
+  - name: transfers
+    description: User data transfers between CRM users
+paths:
+  /crm/v1/entity:
+    get:
+      tags:
+        - entities
+      summary: Get available entities list
+      description: Returns a list of all available CRM entities (leads, deals, contacts, companies, and custom entities).
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Entity"
+              example:
+                - title: Leads
+                  tableName: leads
+                  type: leads
+                  sort: 1
+                - title: Deals
+                  tableName: deals
+                  type: deals
+                  sort: 2
+                - title: Contacts
+                  tableName: contacts
+                  type: contacts
+                  sort: 3
+                - title: Companies
+                  tableName: companies
+                  type: companies
+                  sort: 4
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - entities
+      summary: Create entity
+      description: Creates a new custom CRM entity type.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+            example:
+              title: Partners
+              tableName: partners
+              type: partners
+              sort: 5
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+              example:
+                title: Partners
+                tableName: partners
+                type: partners
+                sort: 5
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entity/{entityItem}:
+    parameters:
+      - $ref: "#/components/parameters/entityItem"
+    patch:
+      tags:
+        - entities
+      summary: Update entity
+      description: Updates an existing CRM entity configuration.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+            example:
+              title: Updated Partners
+              sort: 6
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+              example:
+                title: Updated Partners
+                tableName: partners
+                type: partners
+                sort: 6
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - entities
+      summary: Delete entity
+      description: Deletes a custom CRM entity type. Built-in entities (leads, deals, contacts, companies) cannot be deleted.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/field_types:
+    get:
+      tags:
+        - fields
+      summary: Get available field types list
+      description: Returns all available field types that can be used when creating custom fields for CRM entities.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Field_Types_List"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/fields:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - fields
+      summary: Get available fields list
+      description: Returns all fields configured for a specific CRM entity type.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Field"
+              example:
+                - name: Title
+                  code: title
+                  required: true
+                  editable: true
+                  show: true
+                  hidden: false
+                  multiple: false
+                  fieldSectionId: 1
+                  default_value: ""
+                  tooltip: ""
+                  type: string
+                  sort: 10
+                - name: Source
+                  code: source
+                  required: false
+                  editable: true
+                  show: true
+                  hidden: false
+                  multiple: false
+                  fieldSectionId: 1
+                  default_value: ""
+                  tooltip: "Lead source channel"
+                  type: list
+                  sort: 20
+                - name: Phone
+                  code: phone
+                  required: false
+                  editable: true
+                  show: true
+                  hidden: false
+                  multiple: true
+                  fieldSectionId: 2
+                  default_value: ""
+                  tooltip: ""
+                  type: phone
+                  sort: 30
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - fields
+      summary: Create field
+      description: Creates a new custom field for a CRM entity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Field"
+            example:
+              name: Priority
+              code: priority
+              required: false
+              editable: true
+              show: true
+              hidden: false
+              multiple: false
+              fieldSectionId: 1
+              default_value: ""
+              tooltip: "Lead priority level"
+              type: list
+              sort: 100
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Field"
+              example:
+                name: Priority
+                code: priority
+                required: false
+                editable: true
+                show: true
+                hidden: false
+                multiple: false
+                fieldSectionId: 1
+                default_value: ""
+                tooltip: "Lead priority level"
+                type: list
+                sort: 100
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/fields/{field}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/field"
+    get:
+      tags:
+        - fields
+      summary: Get field by code
+      description: Returns a single field definition by its code for a specific entity.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Field"
+              example:
+                name: Source
+                code: source
+                required: false
+                editable: true
+                show: true
+                hidden: false
+                multiple: false
+                fieldSectionId: 1
+                default_value: ""
+                tooltip: "Lead source channel"
+                type: list
+                sort: 20
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - fields
+      summary: Edit field by code
+      description: Updates a field configuration. Only provided fields are updated.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Field"
+            example:
+              name: Lead Source
+              required: true
+              tooltip: "Updated tooltip for lead source"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Field"
+              example:
+                name: Lead Source
+                code: source
+                required: true
+                editable: true
+                show: true
+                hidden: false
+                multiple: false
+                fieldSectionId: 1
+                default_value: ""
+                tooltip: "Updated tooltip for lead source"
+                type: list
+                sort: 20
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - fields
+      summary: Delete field by code
+      description: Removes a custom field from the entity. System fields cannot be deleted.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/lists/dependencies:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - fields
+      summary: List field dependencies
+      description: Returns all field dependencies configured for the entity. Dependencies define relationships between list field values.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example:
+                - id: 1
+                  parent_field: source
+                  parent_value: website
+                  child_field: sub_source
+                  child_values:
+                    - landing_page
+                    - contact_form
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - fields
+      summary: Create field dependency
+      description: Creates a dependency between two list fields, so that child field values are filtered based on the selected parent value.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              parent_field: source
+              parent_value: website
+              child_field: sub_source
+              child_values:
+                - landing_page
+                - contact_form
+      responses:
+        "201":
+          description: Created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/lists/dependencies/{dependency_id}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - name: dependency_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    delete:
+      tags:
+        - fields
+      summary: Delete field dependency
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/lists/{field}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/field"
+    get:
+      tags:
+        - fields
+      summary: Get list elements
+      description: Returns all values for a list-type field (e.g., source, status options).
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SourceList"
+              example:
+                - title: Shop
+                  value: shop
+                  color: "#6AD01F"
+                  sort: 10
+                  selected: true
+                - title: Website
+                  value: website
+                  color: "#2196F3"
+                  sort: 20
+                  selected: false
+                - title: Referral
+                  value: referral
+                  color: "#FF9800"
+                  sort: 30
+                  selected: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - fields
+      summary: Create or edit list items
+      description: Creates or updates list values for a field. Send the full list of items to replace existing values.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SourceList"
+            example:
+              - title: Shop
+                value: shop
+                color: "#6AD01F"
+                sort: 10
+                selected: true
+              - title: Website
+                value: website
+                color: "#2196F3"
+                sort: 20
+                selected: false
+              - title: Social Media
+                value: social_media
+                color: "#E91E63"
+                sort: 30
+                selected: false
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/lists/{field}/{value}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/field"
+      - $ref: "#/components/parameters/value"
+    delete:
+      tags:
+        - fields
+      summary: Delete list item
+      description: Removes a single value from a list-type field. Example path - `DELETE /crm/v1/entities/leads/lists/source/referral`.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - items
+      summary: Get CRM entity items list
+      description: |
+        Returns a paginated list of CRM entity items with metadata.
+        Supports pagination via `page` and `list` query parameters.
+        Example: `GET /crm/v1/entities/leads?page=1&list=20`
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/CrmEntity"
+                            - $ref: "#/components/schemas/CrmEAdditionalFields"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+              example:
+                data:
+                  - id: 12
+                    title: Lead example
+                    owner: 1
+                    source: shop
+                    email:
+                      - id: ""
+                        type: main
+                        value: stark@gmail.com
+                        main: true
+                    phone:
+                      - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+                        type: WORK
+                        value: "+380123456789"
+                        code: "+380"
+                    messengers: []
+                    created_by: 1
+                    changed_by: 1
+                    created_at: 1674950100
+                    updated_at: 1674951000
+                  - id: 13
+                    title: Another lead
+                    owner: 2
+                    source: website
+                    email: []
+                    phone: []
+                    messengers: []
+                    created_by: 2
+                    changed_by: 2
+                    created_at: 1674960100
+                    updated_at: 1674961000
+                meta:
+                  currentPage: 1
+                  from: 1
+                  lastPage: 1
+                  perPage: 20
+                  to: 2
+                  total: 2
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - items
+      summary: Create CRM entity item
+      description: |
+        Creates a new CRM entity item (lead, deal, contact, or company).
+        Example: `POST /crm/v1/entities/leads`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCrmEntity"
+            example:
+              title: New lead from website
+              owner: 1
+              source: website
+              funnel_id: 5
+              email:
+                - id: ""
+                  type: main
+                  value: john.doe@example.com
+                  main: true
+              phone:
+                - id: ""
+                  type: MOBILE
+                  value: "+380501234567"
+                  code: "+380"
+              messengers:
+                - id: ""
+                  type: telegram
+                  link: "https://t.me/johndoe"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/CrmEntityResponce"
+                  - $ref: "#/components/schemas/CrmEAdditionalFields"
+              example:
+                id: 14
+                title: New lead from website
+                owner: 1
+                created_by: 1
+                changed_by: 1
+                converted: false
+                first_name: ""
+                last_name: ""
+                patronymic: ""
+                company_name: ""
+                position: ""
+                utm_source: ""
+                utm_medium: ""
+                utm_campaign: ""
+                utm_content: ""
+                utm_term: ""
+                source:
+                  title: Website
+                  value: website
+                  color: "#2196F3"
+                  sort: 20
+                  selected: false
+                email:
+                  - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+                    type: main
+                    value: john.doe@example.com
+                    main: true
+                phone:
+                  - id: "01gdnpddf5xgzxqvcn4x83bn2s"
+                    type: MOBILE
+                    value: "+380501234567"
+                    code: "+380"
+                messengers:
+                  - id: "01gdnpddf5xgzxqvcn4x83cn2s"
+                    type: telegram
+                    link: "https://t.me/johndoe"
+                kanban_status: IN_WORK
+                kanban_reason_id: null
+                kanban_stage_id: 22
+                created_at: 1674970100
+                updated_at: 1674970100
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - items
+      summary: Get CRM entity item
+      description: |
+        Returns a single CRM entity item by ID.
+        Example: `GET /crm/v1/entities/leads/14`
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/CrmEntity"
+                  - $ref: "#/components/schemas/CrmEAdditionalFields"
+              example:
+                id: 14
+                title: New lead from website
+                owner: 1
+                source: website
+                email:
+                  - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+                    type: main
+                    value: john.doe@example.com
+                    main: true
+                phone:
+                  - id: "01gdnpddf5xgzxqvcn4x83bn2s"
+                    type: MOBILE
+                    value: "+380501234567"
+                    code: "+380"
+                messengers: []
+                created_by: 1
+                changed_by: 1
+                created_at: 1674970100
+                updated_at: 1674970100
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - items
+      summary: Edit CRM entity item
+      description: |
+        Updates an existing CRM entity item. Only provided fields are updated.
+        Example: `PATCH /crm/v1/entities/leads/14`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrmEntity"
+            example:
+              title: Updated lead title
+              source: referral
+              phone:
+                - id: "01gdnpddf5xgzxqvcn4x83bn2s"
+                  type: WORK
+                  value: "+380441234567"
+                  code: "+380"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/CrmEntity"
+                  - $ref: "#/components/schemas/CrmEAdditionalFields"
+              example:
+                id: 14
+                title: Updated lead title
+                owner: 1
+                source: referral
+                email:
+                  - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+                    type: main
+                    value: john.doe@example.com
+                    main: true
+                phone:
+                  - id: "01gdnpddf5xgzxqvcn4x83bn2s"
+                    type: WORK
+                    value: "+380441234567"
+                    code: "+380"
+                messengers: []
+                created_by: 1
+                changed_by: 1
+                created_at: 1674970100
+                updated_at: 1674980100
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - items
+      summary: Delete CRM entity item
+      description: |
+        Moves a CRM entity item to trash. Use the trash endpoints to permanently delete or restore.
+        Example: `DELETE /crm/v1/entities/leads/14`
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/mass_edit:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    patch:
+      tags:
+        - items
+      summary: Mass edit CRM entity items
+      description: |
+        Updates multiple CRM entity items at once. Provide an array of entity IDs and the fields to update.
+        Example: `PATCH /crm/v1/entities/leads/mass_edit`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: IDs of entities to update
+                data:
+                  type: object
+                  description: Fields to update on all selected entities
+            example:
+              entity_ids: [12, 13, 14]
+              data:
+                owner: 3
+                source: website
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/mass_deletion:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    delete:
+      tags:
+        - items
+      summary: Mass delete CRM entity items
+      description: |
+        Moves multiple CRM entity items to trash at once.
+        Example: `DELETE /crm/v1/entities/leads/mass_deletion`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [12, 13, 14]
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/merge:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    post:
+      tags:
+        - items
+      summary: Merge CRM entities
+      description: |
+        Merges two or more CRM entity items into one. The primary entity retains its ID and is enriched with data from secondary entities, which are then deleted.
+        Example: `POST /crm/v1/entities/contacts/merge`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                primary_id:
+                  type: integer
+                  description: ID of the entity to keep
+                secondary_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: IDs of entities to merge into primary
+            example:
+              primary_id: 12
+              secondary_ids: [13, 14]
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/{itemId}/upload_avatar:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/itemId"
+    post:
+      tags:
+        - items
+      summary: Upload entity avatar
+      description: |
+        Uploads an avatar image for a CRM entity item (contact or company).
+        Send the image as `multipart/form-data` with the field name `avatar`.
+        Example: `POST /crm/v1/entities/contacts/14/upload_avatar`
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG). Max size 5MB.
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/tabs:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - items
+      summary: Get entity tabs
+      description: |
+        Returns the tab configuration for the entity card view.
+        Example: `GET /crm/v1/entities/leads/tabs`
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example:
+                - code: main
+                  title: Main
+                  sort: 1
+                - code: activities
+                  title: Activities
+                  sort: 2
+                - code: documents
+                  title: Documents
+                  sort: 3
+                - code: history
+                  title: History
+                  sort: 4
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/{itemId}/related/{entity_code}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/itemId"
+      - $ref: "#/components/parameters/entity_code"
+    get:
+      tags:
+        - items
+      summary: Get related entity items
+      description: |
+        Returns entity items related to the given entity item. For example, get all deals related to a contact.
+        Example: `GET /crm/v1/entities/contacts/14/related/deals`
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CrmEntity"
+              example:
+                - title: Website redesign deal
+                  owner: 1
+                  source: website
+                  email: []
+                  phone: []
+                  messengers: []
+                - title: Consulting deal
+                  owner: 2
+                  source: referral
+                  email: []
+                  phone: []
+                  messengers: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/converting/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/itemId"
+    post:
+      tags:
+        - items
+      summary: Convert CRM entity item
+      description: |
+        Converts a lead into other entity types (contacts, companies, deals).
+        You can convert to multiple entities at once.
+        Example: `POST /crm/v1/entities/leads/converting/14`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/conversionBody"
+                - $ref: "#/components/schemas/conversionBodyWithFunnelId"
+            examples:
+              convert_to_contact_and_company:
+                summary: Convert lead to contact and company
+                value:
+                  - table_name: contacts
+                  - table_name: companies
+              convert_to_deal_with_funnel:
+                summary: Convert lead to deal with specific funnel
+                value:
+                  - table_name: deals
+                    funnel_id: 11
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/companies:
+    get:
+      tags:
+        - items
+      summary: Get companies list (with filters)
+      description: Returns a paginated list of companies. Supports filtering via query parameters.
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/contacts:
+    get:
+      tags:
+        - items
+      summary: Get contacts list (with filters)
+      description: Returns a paginated list of contacts. Supports filtering via query parameters.
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/deals:
+    get:
+      tags:
+        - items
+      summary: Get deals list (with filters)
+      description: Returns a paginated list of deals. Supports filtering via query parameters.
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/leads:
+    get:
+      tags:
+        - items
+      summary: Get leads list (with filters)
+      description: Returns a paginated list of leads. Supports filtering via query parameters.
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/leads/fields:
+    get:
+      tags:
+        - items
+      summary: Get leads fields list
+      description: Returns the list of all fields configured for the leads entity.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Field"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/funnel:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - pipeline
+      summary: Get funnels
+      description: |
+        Returns all funnels (sales pipelines) for the entity. Optionally filter by funnel ID.
+        Example: `GET /crm/v1/entities/deals/funnel`
+      parameters:
+        - $ref: "#/components/parameters/filterFunnel"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Funnel"
+              example:
+                - title: Sales funnel
+                  funnel_code: sales_funnel
+                  active: true
+                  default: true
+                - title: Partnership funnel
+                  funnel_code: partnership_funnel
+                  active: true
+                  default: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - pipeline
+      summary: Create funnel
+      description: |
+        Creates a new funnel (sales pipeline) for the entity.
+        Example: `POST /crm/v1/entities/deals/funnel`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Funnel"
+            example:
+              title: Enterprise funnel
+              funnel_code: enterprise_funnel
+              active: true
+              default: false
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Funnel"
+              example:
+                title: Enterprise funnel
+                funnel_code: enterprise_funnel
+                active: true
+                default: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/funnel/{funnelId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/funnelId"
+    get:
+      tags:
+        - pipeline
+      summary: Get funnel by ID
+      description: Returns a single funnel by its ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Funnel"
+              example:
+                title: Sales funnel
+                funnel_code: sales_funnel
+                active: true
+                default: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - pipeline
+      summary: Edit funnel
+      description: Updates funnel properties. Only provided fields are changed.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFunnel"
+            example:
+              title: Main Sales funnel
+              active: true
+              default: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Funnel"
+              example:
+                title: Main Sales funnel
+                funnel_code: sales_funnel
+                active: true
+                default: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - pipeline
+      summary: Delete funnel
+      description: Deletes a funnel. Cannot delete the default funnel.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/kanban/stage:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - pipeline
+      summary: Get kanban stages
+      description: |
+        Returns all kanban stages for the entity, optionally filtered by funnel.
+        Example: `GET /crm/v1/entities/deals/kanban/stage?funnel_id=1`
+      parameters:
+        - $ref: "#/components/parameters/filterFunnel"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CrmStage"
+              example:
+                - title: New Deal
+                  color: "#6AD01F"
+                  stage_code: new_deal
+                  system_stage: true
+                  sort: 10
+                  reasons: []
+                - title: In Progress
+                  color: "#2196F3"
+                  stage_code: in_progress
+                  system_stage: false
+                  sort: 20
+                  reasons: []
+                - title: Negotiation
+                  color: "#FF9800"
+                  stage_code: negotiation
+                  system_stage: false
+                  sort: 30
+                  reasons: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - pipeline
+      summary: Create kanban stage
+      description: |
+        Creates a new kanban stage in the pipeline.
+        Example: `POST /crm/v1/entities/deals/kanban/stage`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCrmStage"
+            example:
+              title: Proposal Sent
+              color: "#9C27B0"
+              sort: 25
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmStage"
+              example:
+                title: Proposal Sent
+                color: "#9C27B0"
+                stage_code: proposal_sent
+                system_stage: false
+                sort: 25
+                reasons: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/kanban/stage/{stageId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/stageId"
+    get:
+      tags:
+        - pipeline
+      summary: Get kanban stage
+      description: Returns a single kanban stage by ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmStage"
+              example:
+                title: In Progress
+                color: "#2196F3"
+                stage_code: in_progress
+                system_stage: false
+                sort: 20
+                reasons: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - pipeline
+      summary: Edit kanban stage
+      description: Updates a kanban stage. Only provided fields are changed.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCrmStage"
+            example:
+              title: Work In Progress
+              color: "#03A9F4"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmStage"
+              example:
+                title: Work In Progress
+                color: "#03A9F4"
+                stage_code: in_progress
+                system_stage: false
+                sort: 20
+                reasons: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - pipeline
+      summary: Delete kanban stage
+      description: Deletes a kanban stage. System stages cannot be deleted.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/kanban/stage/{stageId}/amount:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/stageId"
+    get:
+      tags:
+        - pipeline
+      summary: Get stage items amount
+      description: |
+        Returns the count of items in a specific kanban stage.
+        Example: `GET /crm/v1/entities/deals/kanban/stage/22/amount`
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: integer
+              example:
+                amount: 15
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/{entity_id}/move/stage/{stageId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/entity_id"
+      - $ref: "#/components/parameters/stageId"
+    post:
+      tags:
+        - pipeline
+      summary: Move entity to stage
+      description: |
+        Moves a CRM entity item to a different kanban stage. Optionally set a reason for closing stages (SUCCESS/FAIL).
+        Example: `POST /crm/v1/entities/deals/15/move/stage/22`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kanban_status:
+                  type: string
+                  enum: [IN_WORK, SUCCESS, FAIL]
+                  description: Status when moving to system stages
+                kanban_reason_id:
+                  type: integer
+                  description: Reason ID when moving to SUCCESS or FAIL stage
+            example:
+              kanban_status: SUCCESS
+              kanban_reason_id: 11
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/reasons/{funnelId}:
+    parameters:
+      - $ref: "#/components/parameters/funnelId"
+    get:
+      tags:
+        - pipeline
+      summary: Get funnel reasons
+      description: |
+        Returns all reasons grouped by SUCCESS and FAIL for a specific funnel. Reasons explain why a deal was won or lost.
+        Example: `GET /crm/v1/reasons/1`
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReasonList"
+              example:
+                SUCCESS:
+                  - id: 11
+                    title: Won
+                    sort: 10
+                  - id: 12
+                    title: Converted to client
+                    sort: 20
+                FAIL:
+                  - id: 13
+                    title: Lost to competitor
+                    sort: 10
+                  - id: 14
+                    title: Budget too high
+                    sort: 20
+                  - id: 15
+                    title: No response
+                    sort: 30
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - pipeline
+      summary: Create reason
+      description: Creates a new reason for closing a deal (success or failure).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReason"
+            example:
+              title: Failed to contact
+              sort: 40
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+              example:
+                id: 16
+                title: Failed to contact
+                sort: 40
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/reasons/{reasonId}:
+    parameters:
+      - $ref: "#/components/parameters/reasonId"
+    patch:
+      tags:
+        - pipeline
+      summary: Edit reason
+      description: Updates a reason's title or sort order.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReason"
+            example:
+              title: Could not reach client
+              sort: 35
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+              example:
+                id: 16
+                title: Could not reach client
+                sort: 35
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - pipeline
+      summary: Delete reason
+      description: Deletes a reason. Existing entities referencing this reason will retain their historical data.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/tasks:
+    get:
+      tags:
+        - activities
+      summary: Get CRM activities list
+      description: |
+        Returns a paginated list of CRM activities (tasks, calls, meetings, chats, emails).
+        Example: `GET /crm/v1/static/tasks?page=1&list=20`
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmTaskEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+              example:
+                data:
+                  - id: 1
+                    createdBy: 5
+                    title: Follow up call with client
+                    type: call
+                    status: planned
+                    description: Discuss contract terms
+                    startTime: 1674950100
+                    endTime: 1674951000
+                    responsibleId: 5
+                    companyId: 67
+                    participants: [123, 234]
+                    contacts: []
+                    deals: []
+                    leads: []
+                    company: null
+                  - id: 2
+                    createdBy: 3
+                    title: Team meeting about new deal
+                    type: meeting
+                    status: planned
+                    description: Quarterly review
+                    startTime: 1674960100
+                    endTime: 1674963700
+                    responsibleId: 3
+                    companyId: null
+                    participants: [123, 234, 345]
+                    contacts: []
+                    deals: []
+                    leads: []
+                    company: null
+                meta:
+                  currentPage: 1
+                  from: 1
+                  lastPage: 1
+                  perPage: 20
+                  to: 2
+                  total: 2
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - activities
+      summary: Create CRM activity
+      description: |
+        Creates a new CRM activity (task, call, meeting, chat, or email).
+        Link it to deals, leads, contacts, or a company via their IDs.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateCrmTaskDto"
+            example:
+              title: Negotiate contract terms
+              createdBy: 5
+              type: meeting
+              status: planned
+              description: Discuss pricing and delivery timeline
+              startTime: 1674950100
+              endTime: 1674951000
+              responsibleId: 5
+              companyId: 67
+              participants: [123, 234, 345]
+              deals: [56]
+              leads: []
+              contacts: [12, 32]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmTaskEntity"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/tasks/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - activities
+      summary: Get CRM activity
+      description: Returns a single CRM activity by ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmTaskEntity"
+              example:
+                id: 1
+                createdBy: 5
+                title: Follow up call with client
+                type: call
+                status: planned
+                description: Discuss contract terms
+                startTime: 1674950100
+                endTime: 1674951000
+                responsibleId: 5
+                companyId: 67
+                participants: [123, 234]
+                contacts: []
+                deals: []
+                leads: []
+                company: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - activities
+      summary: Edit CRM activity
+      description: Updates an existing CRM activity. Only provided fields are changed.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateCrmTaskDto"
+            example:
+              title: Updated - Follow up call
+              status: done
+              description: Contract terms agreed upon
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmTaskEntity"
+              example:
+                id: 1
+                createdBy: 5
+                title: Updated - Follow up call
+                type: call
+                status: done
+                description: Contract terms agreed upon
+                startTime: 1674950100
+                endTime: 1674951000
+                responsibleId: 5
+                companyId: 67
+                participants: [123, 234]
+                contacts: []
+                deals: []
+                leads: []
+                company: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - activities
+      summary: Delete CRM activity
+      description: Permanently deletes a CRM activity.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/tasks/update_activity:
+    post:
+      tags:
+        - activities
+      summary: Update activity
+      description: Alternative endpoint for updating an activity by providing task data in the request body.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateCrmTaskDto"
+            example:
+              title: Updated activity title
+              type: task
+              status: done
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/tasks/mass_deletion:
+    delete:
+      tags:
+        - activities
+      summary: Mass delete CRM activities
+      description: Permanently deletes multiple CRM activities at once.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [1, 2, 3]
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/crm_tasks:
+    post:
+      tags:
+        - activities
+      summary: CRM task handler (internal)
+      description: Internal endpoint for handling CRM task events from other services.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              action: create
+              task_id: 1
+              entity_type: deals
+              entity_id: 56
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/events/call:
+    get:
+      tags:
+        - call events
+      summary: Get call events list
+      description: |
+        Returns a paginated list of call events (incoming and outgoing calls tracked in CRM).
+        Example: `GET /crm/v1/events/call?page=1&list=20`
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventCallList"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - call events
+      summary: Create call event
+      description: |
+        Creates a new call event. Used by telephony integrations to log calls in CRM.
+        If `task_id` is not provided, a task for missed incoming calls is created automatically.
+        If dynamic binding fields (deal_id, lead_id, etc.) are provided, automatic binding is skipped.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CallEventDto"
+            examples:
+              incoming_missed_call:
+                summary: Log a missed incoming call
+                value:
+                  integration_code: unitalk_integration
+                  external_id: 12345
+                  call_type: incoming
+                  ended_call_status: missed
+                  from: "380667654321"
+                  to: "380441234567"
+                  begin_time: 1681893335
+                  end_time: 1681893340
+                  duration: 5
+                  subject: Missed call
+                  employees: [1, 2]
+              outgoing_successful_call:
+                summary: Log a successful outgoing call
+                value:
+                  integration_code: unitalk_integration
+                  external_id: 12346
+                  call_type: outgoing
+                  ended_call_status: success
+                  from: "380441234567"
+                  to: "380667654321"
+                  begin_time: 1681893335
+                  end_time: 1681893685
+                  duration: 350
+                  subject: Sales contract negotiation
+                  deal_id: 1
+                  entity_table: deals
+                  note: Discussed delivery terms
+                  call_record_link: "https://storage.example.com/recordings/12346.mp3"
+      responses:
+        "201":
+          description: Created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/events/call/{call_event_id}:
+    parameters:
+      - $ref: "#/components/parameters/call_event_id"
+    get:
+      tags:
+        - call events
+      summary: Get call event
+      description: Returns a single call event by its ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: 1
+                task_id: 1
+                contact_id: null
+                company_id: null
+                deal_id: 1
+                lead_id: null
+                entity_table: deals
+                subject: Sales contract negotiation
+                call_type: incoming
+                ended_call_status: success
+                from: "380632232232"
+                to: "380632232232"
+                begin_time: 1681893335
+                end_time: 1681893685
+                duration: 350
+                call_record_link: null
+                note: Call from the client
+                integration_code: unitalk_integration
+                external_id: null
+                tmp_id: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - call events
+      summary: Update call event
+      description: Updates a call event. Typically used to finalize call data (duration, recording link, notes).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CallEventDto"
+            example:
+              integration_code: unitalk_integration
+              call_type: incoming
+              from: "380632232232"
+              ended_call_status: success
+              end_time: 1681893685
+              duration: 350
+              call_record_link: "https://storage.example.com/recordings/call_1.mp3"
+              note: Updated call notes - client agreed to terms
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - call events
+      summary: Delete call event
+      description: Permanently deletes a call event record.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/events/caller:
+    get:
+      tags:
+        - call events
+      summary: Get caller information
+      description: |
+        Looks up CRM entities matching a phone number. Used during incoming calls to display caller info.
+        Example: `GET /crm/v1/events/caller?phone=380667654321`
+      parameters:
+        - name: phone
+          in: query
+          schema:
+            type: string
+          example: "380667654321"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                found: true
+                contacts:
+                  - id: 12
+                    title: George Everest
+                    entity_type: contacts
+                companies:
+                  - id: 67
+                    title: Everest Corp
+                    entity_type: companies
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/crm_letters:
+    post:
+      tags:
+        - letters
+      summary: Handle CRM letter binding
+      description: Binds an email/letter to a CRM entity for tracking correspondence.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_type:
+                  type: string
+                  description: Target entity type
+                entity_id:
+                  type: integer
+                  description: Target entity ID
+                letter_id:
+                  type: integer
+                  description: Letter/email ID from the mail service
+            example:
+              entity_type: deals
+              entity_id: 56
+              letter_id: 789
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/crm_letters/{crm_letter_id}:
+    parameters:
+      - name: crm_letter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 789
+    patch:
+      tags:
+        - letters
+      summary: Mark letter as processed
+      description: Marks a CRM-bound letter as processed (read/handled).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processed:
+                  type: boolean
+            example:
+              processed: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - letters
+      summary: Unbind letter from CRM entity
+      description: Removes the binding between a letter and CRM entity. The letter itself is not deleted.
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/customer-contacts:
+    get:
+      tags:
+        - customer contacts
+      summary: Get customer contacts
+      description: |
+        Searches CRM entities by a contact identifier (phone, email, etc.).
+        Example: `GET /crm/v1/customer-contacts?contact=stark@gmail.com`
+      parameters:
+        - name: contact
+          in: query
+          schema:
+            type: string
+          example: "stark@gmail.com"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example:
+                - entity_type: contacts
+                  entity_id: 12
+                  title: Johnny Stark
+                  contact_type: email
+                  contact_value: stark@gmail.com
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/customer-contacts/entities:
+    post:
+      tags:
+        - customer contacts
+      summary: Bulk get entities by contacts
+      description: Returns CRM entities matching multiple contact identifiers at once (phones, emails).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contacts:
+                  type: array
+                  items:
+                    type: string
+            example:
+              contacts:
+                - "stark@gmail.com"
+                - "+380501234567"
+                - "benner@gmail.com"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example:
+                - contact: "stark@gmail.com"
+                  entities:
+                    - entity_type: contacts
+                      entity_id: 12
+                      title: Johnny Stark
+                - contact: "+380501234567"
+                  entities:
+                    - entity_type: leads
+                      entity_id: 14
+                      title: New lead from website
+                - contact: "benner@gmail.com"
+                  entities: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/customer-contacts/{contact}/entities:
+    parameters:
+      - name: contact
+        in: path
+        required: true
+        schema:
+          type: string
+        example: "stark@gmail.com"
+    get:
+      tags:
+        - customer contacts
+      summary: Get entities for a contact
+      description: |
+        Returns all CRM entities (leads, contacts, companies, deals) associated with a specific contact identifier.
+        Example: `GET /crm/v1/customer-contacts/stark@gmail.com/entities`
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CrmEntity"
+              example:
+                - title: Johnny Stark
+                  owner: 1
+                  source: shop
+                  email:
+                    - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+                      type: main
+                      value: stark@gmail.com
+                      main: true
+                  phone: []
+                  messengers: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/product-categories:
+    get:
+      tags:
+        - products
+      summary: Get product categories tree
+      description: Returns the hierarchical tree of product categories with nested child categories.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductCategory"
+              example:
+                - id: 1
+                  parent_id: null
+                  name: Electronics
+                  is_active: true
+                  created_at: 12156465
+                  updated_at: 12156465
+                  child_categories:
+                    - id: 2
+                      parent_id: 1
+                      name: Laptops
+                      is_active: true
+                      created_at: 12156465
+                      updated_at: 12156465
+                      child_categories: []
+                    - id: 3
+                      parent_id: 1
+                      name: Phones
+                      is_active: true
+                      created_at: 12156465
+                      updated_at: 12156465
+                      child_categories: []
+                - id: 4
+                  parent_id: null
+                  name: Services
+                  is_active: true
+                  created_at: 12156465
+                  updated_at: 12156465
+                  child_categories: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - products
+      summary: Create product category
+      description: Creates a new product category. Set `parent_id` to nest it under an existing category.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategoryDto"
+            example:
+              parent_id: 1
+              name: Tablets
+              is_active: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductCategory"
+              example:
+                id: 5
+                parent_id: 1
+                name: Tablets
+                is_active: true
+                created_at: 12156465
+                updated_at: 12156465
+                child_categories: []
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/product-categories/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - products
+      summary: Get product category
+      description: Returns a single product category by ID.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductCategory"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Edit product category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategoryDto"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductCategory"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete product category
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/products:
+    get:
+      tags:
+        - products
+      summary: Get products list (with many filters)
+      description: |
+        Returns a paginated list of products. Supports filtering by category, availability, type, etc.
+        Example: `GET /crm/v1/static/products?page=1&list=20`
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Product"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+              example:
+                data:
+                  - id: 1
+                    product_category_id: 2
+                    measurement_unit_id: 1
+                    title: MacBook Air 15
+                    article: ART-MBA15-2024
+                    type: goods
+                    is_active: true
+                    availability: available
+                    quantity: 50
+                    reserved_quantity: 5
+                    description: MacBook Air 15 inch M3 chip
+                    comment: Best seller
+                    link: ""
+                    created_at: 12156465
+                    updated_at: 12156465
+                    prices:
+                      - id: 1
+                        price: 129900
+                        currency: USD
+                        is_default: true
+                        tax: null
+                  - id: 2
+                    product_category_id: 4
+                    measurement_unit_id: 2
+                    title: Consulting hour
+                    article: SRV-CONS-001
+                    type: service
+                    is_active: true
+                    availability: available
+                    quantity: 0
+                    reserved_quantity: 0
+                    description: IT consulting service
+                    comment: ""
+                    link: ""
+                    created_at: 12156465
+                    updated_at: 12156465
+                    prices:
+                      - id: 2
+                        price: 15000
+                        currency: USD
+                        is_default: true
+                        tax: null
+                meta:
+                  currentPage: 1
+                  from: 1
+                  lastPage: 1
+                  perPage: 20
+                  to: 2
+                  total: 2
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - products
+      summary: Create product
+      description: Creates a new product in the catalog.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+            example:
+              product_category_id: 2
+              measurement_unit_id: 1
+              title: MacBook Pro 16
+              article: ART-MBP16-2024
+              type: goods
+              is_active: true
+              availability: available
+              quantity: 25
+              description: MacBook Pro 16 inch M3 Pro chip
+              comment: ""
+              link: "https://apple.com/macbook-pro"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+              example:
+                id: 3
+                product_category_id: 2
+                measurement_unit_id: 1
+                title: MacBook Pro 16
+                article: ART-MBP16-2024
+                type: goods
+                is_active: true
+                availability: available
+                quantity: 25
+                reserved_quantity: 0
+                description: MacBook Pro 16 inch M3 Pro chip
+                comment: ""
+                link: "https://apple.com/macbook-pro"
+                created_at: 12156465
+                updated_at: 12156465
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/products/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - products
+      summary: Get product
+      description: Returns a single product by its ID with full details including prices and category.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Update product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete product
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/products/bulk:
+    post:
+      tags:
+        - products
+      summary: Bulk create products
+      description: Creates multiple products at once. Send an array of product objects.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Product"
+            example:
+              - product_category_id: 2
+                measurement_unit_id: 1
+                title: iPhone 15 Pro
+                article: ART-IP15P
+                type: goods
+                is_active: true
+                availability: available
+                quantity: 100
+              - product_category_id: 2
+                measurement_unit_id: 1
+                title: iPhone 15
+                article: ART-IP15
+                type: goods
+                is_active: true
+                availability: available
+                quantity: 200
+      responses:
+        "201":
+          description: Created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/products/mass_deletion:
+    delete:
+      tags:
+        - products
+      summary: Mass delete products
+      description: Deletes multiple products at once.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [1, 2, 3]
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/measurement-units:
+    get:
+      tags:
+        - products
+      summary: Get measurement units
+      description: Returns all measurement units available for products (e.g., pcs, kg, hours).
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MeasurementUnit"
+              example:
+                - id: 1
+                  name: Pieces
+                  abbr: pcs
+                  is_default: true
+                - id: 2
+                  name: Kilograms
+                  abbr: Kg
+                  is_default: false
+                - id: 3
+                  name: Hours
+                  abbr: hrs
+                  is_default: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - products
+      summary: Create measurement unit
+      description: Creates a new measurement unit.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeasurementUnit"
+            example:
+              name: Liters
+              abbr: L
+              is_default: false
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeasurementUnit"
+              example:
+                id: 4
+                name: Liters
+                abbr: L
+                is_default: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/measurement-units/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    patch:
+      tags:
+        - products
+      summary: Update measurement unit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeasurementUnit"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeasurementUnit"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete measurement unit
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/taxes:
+    get:
+      tags:
+        - products
+      summary: Get taxes list
+      description: Returns all configured tax rates.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tax"
+              example:
+                - id: 1
+                  name: VAT 20%
+                  rate: 20
+                  is_active: true
+                - id: 2
+                  name: VAT 7%
+                  rate: 7
+                  is_active: true
+                - id: 3
+                  name: No tax
+                  rate: 0
+                  is_active: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - products
+      summary: Create tax
+      description: Creates a new tax rate configuration.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tax"
+            example:
+              name: VAT 25%
+              rate: 25.5
+              is_active: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tax"
+              example:
+                id: 4
+                name: VAT 25%
+                rate: 25.5
+                is_active: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/taxes/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    patch:
+      tags:
+        - products
+      summary: Update tax
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tax"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tax"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete tax
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/entity-product-lists:
+    get:
+      tags:
+        - products
+      summary: Get entity product list
+      description: Returns product lists attached to CRM entities (deals). Each list contains products with quantities, prices, and discounts.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityProductList"
+              example:
+                - id: 1
+                  entity_type: deals
+                  entity_id: 56
+                  is_automatic_calculation: true
+                  amount_before_discount_and_tax: 10000000
+                  amount_discount: 500000
+                  amount_tax: 1900000
+                  amount_before_tax: 9500000
+                  amount_total: 11400000
+                  list_products:
+                    - id: 1
+                      entity_product_list_id: 1
+                      product_id: 1
+                      title: MacBook Air 15
+                      price: 2000000
+                      currency: USD
+                      quantity: 5
+                      measurement_unit_abbr: pcs
+                      discount_value: 5
+                      discount_type: relative
+                      discount_price: 100000
+                      tax_rate: 20
+                      is_tax_included: false
+                      amount: 9500000
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/entity-product-lists/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    patch:
+      tags:
+        - products
+      summary: Update entity product list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityProductList"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityProductList"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/list-products/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - products
+      summary: Get list product
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProduct"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Update list product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListProduct"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProduct"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete list product
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/list-products:
+    post:
+      tags:
+        - products
+      summary: Create list product
+      description: Adds a product to an entity's product list with quantity, price, and discount configuration.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListProduct"
+            example:
+              entity_product_list_id: 1
+              product_id: 3
+              title: MacBook Pro 16
+              price: 2500000
+              currency: USD
+              quantity: 2
+              measurement_unit_abbr: pcs
+              discount_value: 10
+              discount_type: relative
+              tax_rate: 20
+              is_tax_included: false
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProduct"
+              example:
+                id: 5
+                entity_product_list_id: 1
+                product_id: 3
+                title: MacBook Pro 16
+                price: 2500000
+                currency: USD
+                quantity: 2
+                measurement_unit_abbr: pcs
+                discount_value: 10
+                discount_type: relative
+                discount_price: 250000
+                tax_rate: 20
+                is_tax_included: false
+                amount: 4500000
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/list-products/bulk:
+    post:
+      tags:
+        - products
+      summary: Bulk create list products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ListProduct"
+      responses:
+        "201":
+          description: Created
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - products
+      summary: Bulk update list products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ListProduct"
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Bulk delete list products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/product-price-types:
+    get:
+      tags:
+        - products
+      summary: Get product price types
+      description: Returns all configured price types (e.g., base price, wholesale price).
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductPriceType"
+              example:
+                - title: Base
+                  entity_code: leads
+                  active: true
+                  default: true
+                  sort: 10
+                - title: Wholesale
+                  entity_code: deals
+                  active: true
+                  default: false
+                  sort: 20
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - products
+      summary: Create product price type
+      description: Creates a new price type for products.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPriceType"
+            example:
+              title: VIP
+              entity_code: deals
+              active: true
+              default: false
+              sort: 30
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductPriceType"
+              example:
+                title: VIP
+                entity_code: deals
+                active: true
+                default: false
+                sort: 30
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/static/product-price-types/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+    patch:
+      tags:
+        - products
+      summary: Update product price type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPriceType"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductPriceType"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - products
+      summary: Delete product price type
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/templates:
+    get:
+      tags:
+        - documents
+      summary: Get document templates list
+      description: Returns a paginated list of document templates (invoices, contracts, etc.).
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/DocumentTemplate"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+              example:
+                data:
+                  - id: 1
+                    name: Invoice template
+                    is_active: true
+                    code: invoice_tpl
+                    disabled: false
+                    file:
+                      name: invoice.docx
+                      size: "15360"
+                      extension: docx
+                      download_link: /files/templates/invoice.docx
+                    binding_entities:
+                      - entity_id: 123
+                        funnels: [1, 2]
+                    access:
+                      departments: [1, 2]
+                      users: [5, 10]
+                    numerator_id: 1
+                    created_at: "2023-09-21"
+                    updated_at: "2023-09-21"
+                    created_by: 1
+                    updated_by: 1
+                meta:
+                  currentPage: 1
+                  from: 1
+                  lastPage: 1
+                  perPage: 20
+                  to: 1
+                  total: 1
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - documents
+      summary: Create document template
+      description: |
+        Creates a new document template by uploading a DOCX file with template variables.
+        Use `multipart/form-data` to send the file along with template configuration.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateDocumentTemplate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - documents
+      summary: Mass delete document templates
+      description: Deletes multiple document templates at once.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [1, 2]
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/templates/{template_id}:
+    parameters:
+      - name: template_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - documents
+      summary: Get document template
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - documents
+      summary: Update document template
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentTemplate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/templates/fields:
+    get:
+      tags:
+        - documents
+      summary: Get document available fields
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentTemplateField"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/templates/fields/filter-entities:
+    get:
+      tags:
+        - documents
+      summary: Get available entities for filter
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentTemplateFilterEntity"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents:
+    get:
+      tags:
+        - documents
+      summary: Get documents list
+      description: Returns a paginated list of generated documents.
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Document"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - documents
+      summary: Generate document
+      description: |
+        Generates a document from a template for a specific CRM entity.
+        The template variables are automatically filled with entity data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDocument"
+            example:
+              entity_type: deals
+              entity_id: 56
+              template_id: 1
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+              example:
+                name: "Invoice 05.07.23 #1"
+                template_id: 1
+                created_date: "2023-09-21"
+                updated_date: "2023-09-21"
+                from_date: 1695254400
+                requisite: null
+                bank_requisite: null
+                files:
+                  - extension: pdf
+                    file: 123
+                  - extension: docx
+                    file: 124
+                number: "1"
+                sign: false
+                created_by: 1
+                updated_by: 1
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/{document_id}:
+    parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags:
+        - documents
+      summary: Update document
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - documents
+      summary: Delete document
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/documents/{document_id}/fields:
+    parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - documents
+      summary: Get document fields
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - documents
+      summary: Update document fields (fill values)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/regions:
+    get:
+      tags:
+        - requisites
+      summary: Get available regions
+      description: Returns the list of available regions for requisite templates.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Region"
+              example:
+                - id: 1
+                  name: Ukraine
+                  code: UA
+                  image: 101
+                - id: 2
+                  name: European Union
+                  code: EU
+                  image: 102
+                - id: 3
+                  name: Brazil
+                  code: BR
+                  image: 103
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/regions/{region_id}/bank-requisites-fields/{requisite_template_id}:
+    parameters:
+      - name: region_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: requisite_template_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - requisites
+      summary: Get bank requisite fields for region
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Field"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/templates:
+    get:
+      tags:
+        - requisites
+      summary: Get requisite templates
+      description: Returns all requisite templates defining the structure of legal details for different regions.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RequisiteTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - requisites
+      summary: Create requisite template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequisiteTemplate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequisiteTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/templates/basic-templates:
+    get:
+      tags:
+        - requisites
+      summary: Get basic requisite templates
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RequisiteTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/templates/{requisite_id}:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags:
+        - requisites
+      summary: Update requisite template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequisiteTemplate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequisiteTemplate"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - requisites
+      summary: Delete requisite template
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites:
+    get:
+      tags:
+        - requisites
+      summary: Get requisites list
+      description: Returns a paginated list of company requisites (legal details, tax IDs, etc.).
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Requisite"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - requisites
+      summary: Create requisite
+      description: Creates a new requisite (company legal details) based on a template.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequisite"
+            example:
+              name: "Acme Corp requisite"
+              template_id: 1
+              is_basic: true
+              fields:
+                company_name: "Acme Corporation"
+                tax_id: "12345678"
+                legal_address: "123 Business Ave, Kyiv"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Requisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/values:
+    get:
+      tags:
+        - requisites
+      summary: Get requisite values
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/explore/find:
+    get:
+      tags:
+        - requisites
+      summary: Search/explore requisites
+      description: |
+        Searches requisites by company name, tax ID, or other fields.
+        Example: `GET /crm/v1/requisites/explore/find?query=Acme`
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          example: "Acme"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Requisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/{requisite_id}:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - requisites
+      summary: Get requisite by ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Requisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - requisites
+      summary: Update requisite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequisite"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Requisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - requisites
+      summary: Delete requisite
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/references/attach-reference:
+    post:
+      tags:
+        - requisites
+      summary: Attach requisite to entity reference
+      description: Links a requisite to a CRM entity (company or contact).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requisite_id:
+                  type: integer
+                entity_type:
+                  type: string
+                entity_id:
+                  type: integer
+            example:
+              requisite_id: 1
+              entity_type: companies
+              entity_id: 67
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/references/detach-reference:
+    delete:
+      tags:
+        - requisites
+      summary: Detach requisite from entity reference
+      description: Removes the link between a requisite and a CRM entity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requisite_id:
+                  type: integer
+                entity_type:
+                  type: string
+                entity_id:
+                  type: integer
+            example:
+              requisite_id: 1
+              entity_type: companies
+              entity_id: 67
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/{requisite_id}/bank_requisites:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - requisites
+      summary: Get bank requisites
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BankRequisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - requisites
+      summary: Create bank requisite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BankRequisite"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BankRequisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/{requisite_id}/bank_requisites/{bank_requisite_id}:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: bank_requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags:
+        - requisites
+      summary: Update bank requisite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BankRequisite"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BankRequisite"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - requisites
+      summary: Delete bank requisite
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/{requisite_id}/bank_requisites/references/attach-reference:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    post:
+      tags:
+        - requisites
+      summary: Attach bank requisite reference
+      description: Links a bank requisite to a CRM entity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_requisite_id:
+                  type: integer
+                entity_type:
+                  type: string
+                entity_id:
+                  type: integer
+            example:
+              bank_requisite_id: 1
+              entity_type: companies
+              entity_id: 67
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/requisites/{requisite_id}/bank_requisites/references/detach-reference:
+    parameters:
+      - name: requisite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    delete:
+      tags:
+        - requisites
+      summary: Detach bank requisite reference
+      description: Removes the link between a bank requisite and a CRM entity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_requisite_id:
+                  type: integer
+                entity_type:
+                  type: string
+                entity_id:
+                  type: integer
+            example:
+              bank_requisite_id: 1
+              entity_type: companies
+              entity_id: 67
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/permissions/funnels:
+    get:
+      tags:
+        - permissions
+      summary: Get funnel permissions list
+      description: Returns access permissions configured for each funnel.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example:
+                - funnel_id: 1
+                  funnel_title: Sales funnel
+                  permissions:
+                    - user_id: 5
+                      role: manager
+                      can_view: true
+                      can_edit: true
+                      can_delete: false
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/permissions:
+    post:
+      tags:
+        - permissions
+      summary: Create/update CRM permissions
+      description: Creates or updates CRM access permissions for users or departments.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_type:
+                  type: string
+                permissions:
+                  type: array
+                  items:
+                    type: object
+            example:
+              entity_type: deals
+              permissions:
+                - user_id: 5
+                  can_view: true
+                  can_edit: true
+                  can_delete: false
+                  can_export: false
+                - user_id: 10
+                  can_view: true
+                  can_edit: false
+                  can_delete: false
+                  can_export: false
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/trash:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    get:
+      tags:
+        - trash
+      summary: Get removed/deleted items
+      description: |
+        Returns a paginated list of items in the recycle bin for a specific entity type.
+        Example: `GET /crm/v1/entities/leads/trash?page=1&list=20`
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/list"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmEntity"
+                  - type: object
+                    properties:
+                      meta:
+                        $ref: "#/components/schemas/Meta"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - trash
+      summary: Permanently delete trashed items
+      description: Permanently deletes items from the recycle bin. This action cannot be undone.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [12, 13]
+      responses:
+        "204":
+          description: No content
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/trash/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+      - $ref: "#/components/parameters/itemId"
+    get:
+      tags:
+        - trash
+      summary: Get removed item details
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmEntity"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/entities/{entity}/trash/restore:
+    parameters:
+      - $ref: "#/components/parameters/entity"
+    patch:
+      tags:
+        - trash
+      summary: Restore removed items
+      description: |
+        Restores items from the recycle bin back to the active entity list.
+        Example: `PATCH /crm/v1/entities/leads/trash/restore`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity_ids:
+                  type: array
+                  items:
+                    type: integer
+            example:
+              entity_ids: [12, 13]
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/transfers/progress:
+    get:
+      tags:
+        - transfers
+      summary: Get transfer progress
+      description: Returns the progress of an ongoing CRM data transfer between users.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: in_progress
+                from_user_id: 5
+                to_user_id: 10
+                total_items: 150
+                transferred_items: 75
+                progress_percent: 50
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/transfers/quantity:
+    post:
+      tags:
+        - transfers
+      summary: Get quantity of items to transfer
+      description: Calculates how many CRM items would be transferred between users. Call this before initiating a transfer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_user_id:
+                  type: integer
+                to_user_id:
+                  type: integer
+                entity_types:
+                  type: array
+                  items:
+                    type: string
+            example:
+              from_user_id: 5
+              to_user_id: 10
+              entity_types:
+                - leads
+                - deals
+                - contacts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                leads: 45
+                deals: 30
+                contacts: 75
+                total: 150
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  /crm/v1/transfers/user:
+    post:
+      tags:
+        - transfers
+      summary: Transfer CRM data to another user
+      description: |
+        Initiates a transfer of CRM data (leads, deals, contacts, etc.) from one user to another.
+        Useful when an employee leaves or responsibilities are reassigned.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_user_id:
+                  type: integer
+                to_user_id:
+                  type: integer
+                entity_types:
+                  type: array
+                  items:
+                    type: string
+            example:
+              from_user_id: 5
+              to_user_id: 10
+              entity_types:
+                - leads
+                - deals
+                - contacts
+                - companies
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      security:
+        - bearerAuth: []
+  /crm/v1/transfers/stop:
+    get:
+      tags:
+        - transfers
+      summary: Stop ongoing transfer
+      description: Stops an in-progress CRM data transfer. Items already transferred will remain with the target user.
+      responses:
+        "200":
+          description: OK
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ValidationError:
+      description: Validation error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  field_name: ["The field_name field is required."]
+              status:
+                type: boolean
+                example: true
+  parameters:
+    entity:
+      name: entity
+      in: path
+      description: Entity table name
+      required: true
+      schema:
+        type: string
+        enum:
+          - leads
+          - deals
+          - contacts
+          - companies
+      example: leads
+    entityItem:
+      name: entityItem
+      in: path
+      description: Entity item identifier
+      required: true
+      schema:
+        type: string
+    itemId:
+      name: itemId
+      in: path
+      description: Item ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+    field:
+      name: field
+      in: path
+      description: Field code
+      required: true
+      schema:
+        type: string
+    value:
+      name: value
+      in: path
+      description: List item value
+      required: true
+      schema:
+        type: string
+    funnelId:
+      name: funnelId
+      in: path
+      description: Funnel ID
+      required: true
+      schema:
+        type: integer
+    reasonId:
+      name: reasonId
+      in: path
+      description: Reason ID
+      required: true
+      schema:
+        type: integer
+    stageId:
+      name: stageId
+      in: path
+      description: Stage ID
+      required: true
+      schema:
+        type: integer
+    entity_id:
+      name: entity_id
+      in: path
+      description: Entity item ID
+      required: true
+      schema:
+        type: integer
+    entity_code:
+      name: entity_code
+      in: path
+      description: Related entity code
+      required: true
+      schema:
+        type: string
+    call_event_id:
+      name: call_event_id
+      in: path
+      description: Call event ID
+      required: true
+      schema:
+        type: integer
+    filterFunnel:
+      name: funnel_id
+      in: query
+      description: Filter by funnel ID
+      required: false
+      schema:
+        type: integer
+    page:
+      name: page
+      in: query
+      description: Current page
+      required: false
+      schema:
+        type: integer
+        default: 1
+      example: 1
+    list:
+      name: list
+      in: query
+      description: How many items should be per page
+      required: false
+      schema:
+        type: integer
+        default: 20
+      example: 10
+  schemas:
+    Meta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        from:
+          type: integer
+          example: 1
+        lastPage:
+          type: integer
+          example: 1
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                example: null
+              label:
+                type: string
+                example: "Previous"
+              active:
+                type: boolean
+                example: false
+        path:
+          type: string
+          example: "https://domain.uspacy.ua/crm/v1/entities/leads"
+        perPage:
+          type: integer
+          example: 20
+        to:
+          type: integer
+          example: 2
+        total:
+          type: integer
+          example: 2
+    multipleEmail:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: "01gdnpddf5xgzxqvcn4x83mc2s"
+          type:
+            type: string
+            example: main
+          value:
+            type: string
+            example: "stark@gmail.com"
+          main:
+            type: boolean
+            example: true
+      example:
+        - id: ""
+          type: main
+          value: stark@gmail.com
+          main: true
+        - id: "01gdnpddf5xgzxqvcn4x83mc2s"
+          type: work
+          value: benner@gmail.com
+          main: false
+    Phone:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: "01gdnpddf5xgzxqvcn4x83mc2s"
+          type:
+            type: string
+            enum: [WORK, MOBILE, HOME]
+            example: WORK
+          value:
+            type: string
+            example: "+380123456789"
+          code:
+            type: string
+            example: "+380"
+    SocialMedia:
+      type: array
+      items:
+        properties:
+          id:
+            type: string
+            example: "01gdnpddf5xgzxqvcn4x83bn2s"
+          type:
+            type: string
+            example: facebook
+          link:
+            type: string
+            example: https://www.facebook.com
+    Files:
+      type: array
+      items:
+        type: string
+      example:
+        - path/to/image.jpg
+        - path/to/image.png
+    Entity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Leads
+        tableName:
+          type: string
+          example: leads
+        type:
+          type: string
+          example: leads
+        sort:
+          type: integer
+          example: 1
+    Field_Type:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: String
+        type:
+          type: string
+          example: string
+        multiple:
+          type: boolean
+          example: true
+    Field_Types_List:
+      type: array
+      items:
+        $ref: "#/components/schemas/Field_Type"
+      example:
+        - id: 1
+          name: String
+          type: string
+          multiple: false
+        - id: 2
+          name: Textarea
+          type: textarea
+          multiple: false
+        - id: 3
+          name: Integer
+          type: integer
+          multiple: false
+        - id: 4
+          name: List
+          type: list
+          multiple: false
+        - id: 5
+          name: Date and time
+          type: datetime
+          multiple: false
+        - id: 6
+          name: Money
+          type: money
+          multiple: false
+        - id: 7
+          name: Label
+          type: label
+          multiple: true
+        - id: 8
+          name: Phone
+          type: phone
+          multiple: true
+        - id: 9
+          name: Email
+          type: email
+          multiple: true
+        - id: 10
+          name: Social
+          type: social
+          multiple: true
+        - id: 11
+          name: Link
+          type: link
+          multiple: false
+        - id: 12
+          name: Boolean
+          type: boolean
+          multiple: false
+        - id: 13
+          name: User
+          type: user_id
+          multiple: false
+        - id: 14
+          name: Photo
+          type: photo
+          multiple: false
+        - id: 15
+          name: File
+          type: file
+          multiple: false
+        - id: 16
+          name: Address
+          type: address
+          multiple: false
+        - id: 17
+          name: Legal details
+          type: legal_details
+          multiple: false
+        - id: 18
+          name: Entity_reference
+          type: entity_reference
+          multiple: false
+        - id: 19
+          name: UTM
+          type: utm
+          multiple: false
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Source
+        code:
+          type: string
+          example: source
+        required:
+          type: boolean
+          example: false
+        editable:
+          type: boolean
+          example: true
+        show:
+          type: boolean
+          example: true
+        hidden:
+          type: boolean
+          example: false
+        multiple:
+          type: boolean
+          example: false
+        fieldSectionId:
+          type: integer
+          example: 11
+        default_value:
+          type: string
+          example: value
+        tooltip:
+          type: string
+          example: example
+        type:
+          type: string
+          example: entity_reference
+        entity_reference_id:
+          type: integer
+          example: 123
+        sort:
+          type: integer
+          example: 90
+    FieldSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: contacts
+        entity_table:
+          type: string
+          example: users
+        hidden:
+          type: boolean
+          example: false
+        sort:
+          type: integer
+          example: 10
+    CreateCrmEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        source:
+          type: string
+          example: shop
+        funnel_id:
+          type: integer
+          example: 5
+        email:
+          $ref: "#/components/schemas/multipleEmail"
+        phone:
+          $ref: "#/components/schemas/Phone"
+        messengers:
+          $ref: "#/components/schemas/SocialMedia"
+    CrmEntity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        source:
+          type: string
+          example: shop
+        email:
+          $ref: "#/components/schemas/multipleEmail"
+        phone:
+          $ref: "#/components/schemas/Phone"
+        messengers:
+          $ref: "#/components/schemas/SocialMedia"
+    CrmEntityResponce:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Lead example
+        owner:
+          type: integer
+          example: 1
+        created_by:
+          type: integer
+          example: 1
+        changed_by:
+          type: integer
+          example: 1
+        converted:
+          type: boolean
+          example: false
+        first_name:
+          type: string
+          example: Johnny
+        last_name:
+          type: string
+          example: Stark
+        patronymic:
+          type: string
+          example: ""
+        company_name:
+          type: string
+          example: ""
+        position:
+          type: string
+          example: Owner
+        utm_source:
+          type: string
+          example: ""
+        utm_medium:
+          type: string
+          example: ""
+        utm_campaign:
+          type: string
+          example: ""
+        utm_content:
+          type: string
+          example: ""
+        utm_term:
+          type: string
+          example: ""
+        source:
+          $ref: "#/components/schemas/SourceList"
+        email:
+          $ref: "#/components/schemas/multipleEmail"
+        phone:
+          $ref: "#/components/schemas/Phone"
+        messengers:
+          $ref: "#/components/schemas/SocialMedia"
+        kanban_status:
+          type: string
+          example: IN_WORK
+        kanban_reason_id:
+          type: integer
+          example: 11
+        kanban_stage_id:
+          type: integer
+          example: 22
+    CrmEAdditionalFields:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        created_by:
+          type: integer
+          example: 1
+        changed_by:
+          type: integer
+          example: 1
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+    CrmEntityField:
+      type: object
+      required:
+        - name
+        - code
+        - entity_reference_id
+        - type
+        - required
+        - editable
+        - show
+        - hidden
+        - multiple
+        - system_field
+        - base_field
+        - sort
+        - default_value
+        - tooltip
+        - display_in_tabs
+      properties:
+        name:
+          type: string
+          example: "Field name"
+        code:
+          type: string
+          example: "field_name"
+        entity_reference_id:
+          type: string
+          example: "2"
+        type:
+          $ref: "#/components/schemas/CrmEntityFieldType"
+        required:
+          type: boolean
+        editable:
+          type: boolean
+        show:
+          type: boolean
+        hidden:
+          type: boolean
+        multiple:
+          type: boolean
+        system_field:
+          type: boolean
+        base_field:
+          type: boolean
+        sort:
+          type: string
+          example: ""
+        default_value:
+          type: string
+          example: ""
+        tooltip:
+          type: string
+          example: ""
+        display_in_tabs:
+          type: boolean
+        values:
+          type: array
+          items:
+            type: object
+            required:
+              - title
+              - value
+              - color
+              - sort
+              - selected
+            properties:
+              title:
+                type: string
+                example: "Active customer"
+              value:
+                type: string
+                example: "active_customer"
+              color:
+                type: string
+                example: "#008000"
+              sort:
+                type: string
+                example: ""
+              selected:
+                type: boolean
+    CrmEntityFieldType:
+      type: string
+      enum:
+        - string
+        - textarea
+        - integer
+        - list
+        - datetime
+        - money
+        - label
+        - phone
+        - email
+        - social
+        - link
+        - boolean
+        - user_id
+        - photo
+        - file
+        - address
+        - legal_details
+        - entity_reference
+        - utm
+        - float
+    SourceList:
+      properties:
+        title:
+          type: string
+          example: "Shop"
+        value:
+          type: string
+          example: shop
+        color:
+          type: string
+          example: "#6AD01F"
+        sort:
+          type: integer
+          example: 20
+        selected:
+          type: boolean
+          example: true
+      example:
+        - title: "Shop"
+          value: shop
+          color: ""
+          sort: 10
+          selected: true
+        - title: "Site"
+          value: site
+          color: ""
+          sort: 20
+          selected: false
+    Funnel:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Sales funnel"
+        funnel_code:
+          type: string
+          example: "sales_funnel"
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: false
+    UpdateFunnel:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Sales funnel"
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: false
+    CreateCrmStage:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "New Deal"
+        color:
+          type: string
+          example: "#6AD01F"
+        sort:
+          type: integer
+          example: 10
+    CrmStage:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "New Deal"
+        color:
+          type: string
+          example: "#6AD01F"
+        stage_code:
+          type: string
+          example: "new_deal"
+        system_stage:
+          type: boolean
+          example: false
+        sort:
+          type: integer
+          example: 10
+        reasons:
+          type: string
+          example: []
+    CrmStageWithReason:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "New Deal"
+        color:
+          type: string
+          example: "#6AD01F"
+        stage_code:
+          type: string
+          example: "new_deal"
+        system_stage:
+          type: boolean
+          example: true
+        sort:
+          type: integer
+          example: 10
+        reasons:
+          $ref: "#/components/schemas/CrmReason"
+    CrmReason:
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "New"
+        sort:
+          type: integer
+          example: 20
+      example:
+        - id: 1
+          title: "Shop"
+          sort: 10
+        - id: 2
+          title: "Site"
+          sort: 20
+    CrmTaskTypes:
+      type: string
+      enum:
+        - task
+        - call
+        - meeting
+        - chat
+        - email
+    CrmTaskStatuses:
+      type: string
+      enum:
+        - planned
+        - done
+        - cancelled
+    CrmTaskEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdBy:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: Title example
+        type:
+          $ref: "#/components/schemas/CrmTaskTypes"
+        status:
+          $ref: "#/components/schemas/CrmTaskStatuses"
+        description:
+          type: string
+        startTime:
+          type: integer
+          format: int64
+          example: 1674950100
+        endTime:
+          type: integer
+          format: int64
+          example: 1674951000
+        responsibleId:
+          type: integer
+          format: int64
+          example: 5
+        companyId:
+          type: integer
+          format: int64
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [123, 234, 345]
+        contacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmEntity"
+        deals:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmEntity"
+        leads:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmEntity"
+        company:
+          $ref: "#/components/schemas/CrmEntity"
+    CreateUpdateCrmTaskDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Sed non massa
+        createdBy:
+          type: integer
+          format: int64
+          example: 5
+        type:
+          allOf:
+            - $ref: "#/components/schemas/CrmTaskTypes"
+            - example: meeting
+        status:
+          allOf:
+            - $ref: "#/components/schemas/CrmTaskStatuses"
+            - example: planned
+        description:
+          type: string
+          example: Duis id rutrum risus. Sed in urna.
+        startTime:
+          type: integer
+          format: int64
+          example: 1674950100
+        endTime:
+          type: integer
+          format: int64
+          example: 1674951000
+        responsibleId:
+          type: integer
+          format: int64
+          example: 5
+        companyId:
+          type: integer
+          format: int64
+          example: 67
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [123, 234, 345]
+        deals:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [56]
+        leads:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [34]
+        contacts:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [12, 32]
+    conversionBody:
+      type: array
+      items:
+        properties:
+          table_name:
+            type: string
+            example: "companies"
+      example:
+        - table_name: "contacts"
+        - table_name: "companies"
+    conversionBodyWithFunnelId:
+      type: array
+      items:
+        properties:
+          table_name:
+            type: string
+            example: "deals"
+          funnel_id:
+            type: integer
+            example: 11
+      example:
+        - table_name: "deals"
+          funnel_id: 11
+    ReasonList:
+      type: object
+      properties:
+        SUCCESS:
+          type: array
+          items:
+            properties:
+              id:
+                type: integer
+                example: 11
+              title:
+                type: string
+                example: "Won"
+              sort:
+                type: integer
+                example: 10
+        FAIL:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reason"
+    Reason:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 11
+        title:
+          type: string
+          example: "Other"
+        sort:
+          type: integer
+          example: 10
+    CreateReason:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Failed to contact"
+        sort:
+          type: integer
+          example: 10
+    EventCallList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          task_id:
+            type: integer
+            example: 1
+          contact_id:
+            type: integer
+            example: null
+          company_id:
+            type: integer
+            example: null
+          deal_id:
+            type: integer
+            example: 1
+          lead_id:
+            type: integer
+            example: null
+          entity_table:
+            type: string
+            example: deals
+          subject:
+            type: string
+            example: Sales contract negotiation
+          call_type:
+            type: string
+            example: incoming
+            enum:
+              - outgoing
+              - incoming
+          ended_call_status:
+            type: string
+            example: missed
+            enum:
+              - null
+              - success
+              - missed
+              - declined
+              - subscriber_unavailable
+              - number_not_exist
+              - call_failure
+          from:
+            type: string
+            example: 380632232232
+          to:
+            type: string
+            example: 380632232232
+          begin_time:
+            type: integer
+            example: 1681893335
+          end_time:
+            type: integer
+            example: 1681893685
+          duration:
+            type: integer
+            example: 350
+          call_record_link:
+            type: string
+            example: null
+          note:
+            type: string
+            example: Call from the client
+          integration_code:
+            type: string
+            example: unitalk_integration
+          external_id:
+            type: integer
+            example: null
+            description: Non-required. Used for communication with integrations
+          tmp_id:
+            type: integer
+            example: null
+            description: Non-required. Used for communication with integrations
+          contacts:
+            items:
+              $ref: "#/components/schemas/CallEventContacts"
+            type: array
+          companies:
+            type: array
+            example: []
+            description: Having same format as contacts field. Or could be empty array
+          employees:
+            type: array
+            description: Employees that have been dialed during the call. Could be omitted if don't have such information
+            example: [1, 2, 3]
+          tasks:
+            type: object
+            description: The task data for provided task_id
+            properties:
+              id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: Missed call from 380667654321
+    CallEventDto:
+      type: object
+      properties:
+        integration_code:
+          type: string
+          example: unitalk_integration
+          description: It could be integration_code or unique code of source where data are imported from
+        external_id:
+          type: integer
+          example: 1
+          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
+        tmp_id:
+          type: integer
+          example: 1
+          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
+        task_id:
+          type: integer
+          example: null
+          description: If task_id is provided the task's creation for missed incoming call is passing away
+        contact_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided the automatic binding with existing crm entities is passing away
+        company_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided the automatic binding with existing crm entities is passing away
+        lead_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided the automatic binding with existing crm entities is passing away
+        deal_id:
+          type: integer
+          example: null
+          description: If one of dynamic binding fields (deal_id, lead_id, contact_id, company_id) is provided the automatic binding with existing crm entities is passing away
+        entity_table:
+          type: string
+          description: The base entity the call event connected to could be provided or could be omitted in a case if just have usual call. In this the "empty" value will be automatically filled and the call event will be shown just in call logs history
+          enum:
+            - empty
+            - leads,
+            - deals
+            - contacts
+            - companies
+        employees:
+          type: array
+          description: Employees that have been dialed during the call. Could be omitted if don't have such information
+          example: [1, 2, 3]
+        contacts:
+          type: array
+          description: The contacts that have connection with particulat call event. Could be omitted if don't have such information
+          example: [1, 2, 3]
+        companies:
+          type: array
+          description: The companies that have connection with particulat call event. Could be omitted if don't have such information
+          example: [1, 2, 3]
+        subject:
+          type: string
+          example: First call
+          description: Could be omitted. In such case the default value will be "Call"
+        call_type:
+          type: string
+          enum:
+            - outgoing
+            - incoming
+        ended_call_status:
+          type: string
+          enum:
+            - null
+            - success
+            - missed
+            - declined
+            - subscriber_unavailable
+            - number_not_exist
+            - call_failure
+        from:
+          type: string
+          example: 380632232232
+        to:
+          type: string
+          example: null
+          description: Could be null cause on new event call from telephony we don't have "to" value for sure
+        begin_time:
+          type: integer
+          example: 1681893335
+        end_time:
+          type: integer
+          example: 1681893685
+        duration:
+          type: integer
+          example: 350
+        call_record_link:
+          type: string
+          example: null
+          description: It could be call link that telephony provides or link issued by import flow (via files-backend)
+        note:
+          type: string
+          example: Fixed agenda
+      required:
+        - integration_code
+        - call_type
+        - from
+    CallEventContacts:
+      properties:
+        id:
+          example: 1
+          type: integer
+        title:
+          example: George Everest
+          type: string
+      type: object
+    ProductCategory:
+      properties:
+        id:
+          type: integer
+          example: 2
+        parent_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Main category
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+        child_categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductCategory"
+    ProductCategoryDto:
+      properties:
+        parent_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Laptops
+        is_active:
+          type: boolean
+          example: true
+    Product:
+      properties:
+        id:
+          type: integer
+          example: 1
+        product_category_id:
+          type: integer
+          example: 1
+        measurement_unit_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Some laptop
+        article:
+          type: string
+          example: ART 123456789
+        type:
+          type: string
+          example: goods
+          enum:
+            - goods
+            - service
+        is_active:
+          type: boolean
+          example: true
+        availability:
+          type: string
+          example: available
+          enum:
+            - available
+            - not_available
+            - pending
+        quantity:
+          type: number
+          example: 1.0001
+        reserved_quantity:
+          type: number
+          example: 0.0001
+        description:
+          type: string
+          example: Some product description
+        comment:
+          type: string
+          example: Some product comment
+        link:
+          type: string
+          example: "www.youtube.com/some_link"
+        created_at:
+          type: integer
+          example: 12156465
+        updated_at:
+          type: integer
+          example: 12156465
+        product_category:
+          $ref: "#/components/schemas/ProductCategory"
+        measurement_unit:
+          $ref: "#/components/schemas/MeasurementUnit"
+        prices:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductPrice"
+        files:
+          $ref: "#/components/schemas/Files"
+    ProductPrice:
+      properties:
+        id:
+          type: integer
+          example: 1
+        price:
+          type: integer
+          example: 10000
+        currency:
+          type: string
+          example: USD
+        is_default:
+          type: boolean
+          example: true
+        tax:
+          $ref: "#/components/schemas/Tax"
+    ProductPriceType:
+      properties:
+        title:
+          type: string
+          example: base
+        entity_code:
+          type: string
+          example: leads
+        active:
+          type: boolean
+          example: true
+        default:
+          type: boolean
+          example: true
+        sort:
+          type: number
+          example: 10
+    MeasurementUnit:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Kilograms
+        abbr:
+          type: string
+          example: Kg
+        is_default:
+          type: boolean
+          example: true
+    Tax:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: NDS
+        rate:
+          type: number
+          example: 25.5
+        is_active:
+          type: boolean
+    EntityProductList:
+      properties:
+        id:
+          type: integer
+        entity_type:
+          type: string
+          example: deals
+        entity_id:
+          type: integer
+          example: 2
+        is_automatic_calculation:
+          type: boolean
+        amount_before_discount_and_tax:
+          type: integer
+        amount_discount:
+          type: integer
+        amount_tax:
+          type: integer
+        amount_before_tax:
+          type: integer
+        amount_total:
+          type: integer
+        list_products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ListProduct"
+    ListProduct:
+      properties:
+        id:
+          type: integer
+        entity_product_list_id:
+          type: integer
+        product_id:
+          type: integer
+        title:
+          type: string
+          example: "Macbook air 15 24gb"
+        price:
+          type: integer
+          example: 2000000
+        currency:
+          type: string
+          example: "USD"
+        quantity:
+          type: number
+          example: 5
+        measurement_unit_abbr:
+          type: string
+          example: "psc"
+        discount_value:
+          type: number
+          example: 25
+        discount_type:
+          type: string
+          enum:
+            - relative
+            - absolute
+        discount_price:
+          type: integer
+          example: 5000
+        tax_rate:
+          type: number
+          example: 20.5
+        is_tax_included:
+          type: boolean
+        amount:
+          type: integer
+          example: 1500
+        product:
+          $ref: "#/components/schemas/Product"
+    DocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        is_active:
+          type: boolean
+          required: true
+        code:
+          type: string
+          required: true
+        id:
+          type: number
+          required: true
+        disabled:
+          type: boolean
+          required: true
+        file:
+          type: object
+          properties:
+            name:
+              type: string
+            size:
+              type: string
+            extension:
+              type: string
+            download_link:
+              type: string
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        created_by:
+          type: integer
+          description: User who created
+        updated_by:
+          type: integer
+          description: User who updated
+    CreateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+        is_active:
+          type: boolean
+          required: true
+        file:
+          type: string
+          format: binary
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+    UpdateDocumentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        is_active:
+          type: boolean
+        file:
+          type: string
+          format: binary
+        binding_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: number
+                required: true
+                example: 123
+              funnels:
+                type: array
+                items:
+                  type: number
+                  example: 1
+        access:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                description: Department id
+                type: integer
+            users:
+              type: array
+              items:
+                description: User id
+                type: integer
+        numerator_id:
+          type: integer
+          required: true
+    DocumentTemplateField:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Дата створення"
+        entity:
+          type: string
+          example: "Угоди"
+        symbol_code:
+          type: string
+          example: "{DealDateCreate}"
+    DocumentTemplateFilterEntity:
+      type: object
+      properties:
+        for_all_users:
+          type: boolean
+        display_in_menu:
+          type: boolean
+        kanban:
+          type: boolean
+        is_static:
+          type: boolean
+        table_name:
+          type: string
+        funnels:
+          type: array
+        title:
+          type: string
+          required: true
+        title_singular:
+          type: string
+        type:
+          type: string
+          required: true
+        updated_at:
+          type: number
+          required: true
+          description: Updated at in timestamp format
+    CreateDocument:
+      type: object
+      properties:
+        entity_type:
+          type: string
+          required: true
+          example: "leads"
+        entity_id:
+          type: integer
+          required: true
+          example: "3425"
+        template_id:
+          type: integer
+          required: true
+          example: 2
+    Document:
+      type: object
+      properties:
+        name:
+          type: string
+          required: true
+          example: "Рахунок на оплату 05.07.23 №1"
+          description: Template name + document number
+        template_id:
+          type: number
+          required: true
+        created_date:
+          type: string
+          required: true
+          example: "2023-09-21"
+        updated_date:
+          type: string
+          required: true
+          example: "2023-09-21"
+        from_date:
+          type: number
+          required: true
+          description: Custom edition date, default = dateCreated in timestamp
+        requisite:
+          $ref: "#/components/schemas/Requisite"
+        bank_requisite:
+          $ref: "#/components/schemas/BankRequisite"
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              extension:
+                type: string
+                enum: [pdf, docx]
+                description: New formats will be added in the future
+                example: "pdf"
+              file:
+                type: number
+                required: true
+                description: id of file
+        number:
+          type: string
+          description: Editing number of document
+        sign:
+          type: boolean
+          default: false
+          description: Signature and seal
+        created_by:
+          type: integer
+          description: User who created
+        updated_by:
+          type: integer
+          description: User who updated
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    RequisiteTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Name of requisite
+        region:
+          type: object
+          properties:
+            name:
+              type: string
+            code:
+              type: string
+        fields:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/Field"
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [datetime, string, integer, boolean, file]
+    Requisite:
+      type: object
+      properties:
+        name:
+          type: string
+        seal_picture:
+          type: number
+        sign_picture:
+          type: number
+        template_name:
+          type: string
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity
+        is_basic:
+          type: boolean
+        id:
+          type: number
+        template_id:
+          type: integer
+        region:
+          $ref: "#/components/schemas/Region"
+        fields:
+          description: Fields list
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/Field"
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [datetime, string, integer, boolean, file]
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [string, array, object]
+                  description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: "#/components/schemas/BankRequisite"
+    CreateRequisite:
+      type: object
+      properties:
+        name:
+          type: string
+        template_id:
+          type: integer
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            field_code:
+              enum: [string, array, object]
+              description: Field code => field value
+        bank_requisites:
+          type: array
+          items:
+            $ref: "#/components/schemas/BankRequisite"
+    Region:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        image:
+          type: number
+        id:
+          type: number
+    BankRequisite:
+      type: object
+      properties:
+        id:
+          type: number
+        created_by:
+          type: number
+        requisite_id:
+          type: number
+          required: true
+        name:
+          type: string
+        is_basic:
+          type: boolean
+        fields:
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/Field"
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [string]
+            values:
+              type: object
+              properties:
+                field_code:
+                  enum: [string, array, object]
+                  description: Field code => field value
+        references_relations:
+          type: array
+          items:
+            type: number
+            description: Id of parent entity where requisite attach to child entity

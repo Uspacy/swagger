@@ -41,3 +41,8 @@ jobs:
         uses: readmeio/rdme@v8
         with:
           rdme: openapi schemas/activitiesService.yml --key=${{ secrets.README_API_KEY }} --id=697f0ab2d52da0dac0439132
+
+      - name: Run `openapi` command on crmService.yml 🚀
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi schemas/crmService.yml --key=${{ secrets.README_API_KEY }} --id=69916c1ca5a214942bf2eb38
