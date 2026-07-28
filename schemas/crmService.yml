@@ -1990,7 +1990,7 @@ paths:
                   integration_code: unitalk_integration
                   external_id: 12346
                   call_type: outgoing
-                  ended_call_status: success
+                  ended_call_status: successed
                   from: "380441234567"
                   to: "380667654321"
                   begin_time: 1681893335
@@ -2035,7 +2035,7 @@ paths:
                 entity_table: deals
                 subject: Sales contract negotiation
                 call_type: incoming
-                ended_call_status: success
+                ended_call_status: successed
                 from: "380632232232"
                 to: "380632232232"
                 begin_time: 1681893335
@@ -2064,7 +2064,7 @@ paths:
               integration_code: unitalk_integration
               call_type: incoming
               from: "380632232232"
-              ended_call_status: success
+              ended_call_status: successed
               end_time: 1681893685
               duration: 350
               call_record_link: "https://storage.example.com/recordings/call_1.mp3"
@@ -5415,7 +5415,7 @@ components:
             example: missed
             enum:
               - null
-              - success
+              - successed
               - missed
               - declined
               - subscriber_unavailable
@@ -5544,7 +5544,7 @@ components:
           type: string
           enum:
             - null
-            - success
+            - successed
             - missed
             - declined
             - subscriber_unavailable
