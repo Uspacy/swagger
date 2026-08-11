@@ -2045,7 +2045,6 @@ paths:
                 note: Call from the client
                 integration_code: your_integration_code
                 external_id: null
-                tmp_id: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
@@ -5449,10 +5448,6 @@ components:
             type: integer
             example: null
             description: Non-required. Used for communication with integrations
-          tmp_id:
-            type: integer
-            example: null
-            description: Non-required. Used for communication with integrations
           contacts:
             items:
               $ref: "#/components/schemas/CallEventContacts"
@@ -5483,10 +5478,6 @@ components:
           example: your_integration_code
           description: It could be integration_code or unique code of source where data are imported from
         external_id:
-          type: integer
-          example: 1
-          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-        tmp_id:
           type: integer
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
