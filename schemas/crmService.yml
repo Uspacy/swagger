@@ -1974,7 +1974,7 @@ paths:
                 summary: Log a missed incoming call
                 value:
                   integration_code: your_integration_code
-                  external_id: "12345"
+                  external_id: 12345
                   call_type: incoming
                   ended_call_status: missed
                   from: "380667654321"
