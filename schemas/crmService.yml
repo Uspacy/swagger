@@ -1973,7 +1973,7 @@ paths:
               incoming_missed_call:
                 summary: Log a missed incoming call
                 value:
-                  integration_code: unitalk_integration
+                  integration_code: your_integration_code
                   external_id: 12345
                   call_type: incoming
                   ended_call_status: missed
@@ -1987,7 +1987,7 @@ paths:
               outgoing_successful_call:
                 summary: Log a successful outgoing call
                 value:
-                  integration_code: unitalk_integration
+                  integration_code: your_integration_code
                   external_id: 12346
                   call_type: outgoing
                   ended_call_status: successed
@@ -2043,7 +2043,7 @@ paths:
                 duration: 350
                 call_record_link: null
                 note: Call from the client
-                integration_code: unitalk_integration
+                integration_code: your_integration_code
                 external_id: null
                 tmp_id: null
         "401":
@@ -2061,7 +2061,7 @@ paths:
             schema:
               $ref: "#/components/schemas/CallEventDto"
             example:
-              integration_code: unitalk_integration
+              integration_code: your_integration_code
               call_type: incoming
               from: "380632232232"
               ended_call_status: successed
@@ -5444,7 +5444,7 @@ components:
             example: Call from the client
           integration_code:
             type: string
-            example: unitalk_integration
+            example: your_integration_code
           external_id:
             type: integer
             example: null
@@ -5480,7 +5480,7 @@ components:
       properties:
         integration_code:
           type: string
-          example: unitalk_integration
+          example: your_integration_code
           description: It could be integration_code or unique code of source where data are imported from
         external_id:
           type: integer
