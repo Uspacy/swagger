@@ -1986,6 +1986,35 @@ paths:
                   employees: [1, 2]
                   summary: Missed call from customer
                   transcription: "Hello, this is a customer calling about the order. Please contact me back at your earliest convenience."
+                  crm_settings:
+                    - setting_name: incoming_unknown
+                      setting_value: do_nothing
+                    - setting_name: incoming_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: incoming_unknown_source
+                      setting_value: null
+                    - setting_name: missed_known
+                      setting_value: create_task
+                    - setting_name: missed_known_responsible
+                      setting_value: base_entity_responsible
+                    - setting_name: missed_known_source
+                      setting_value: null
+                    - setting_name: missed_responsible
+                      setting_value: 1
+                    - setting_name: missed_unknown
+                      setting_value: do_nothing
+                    - setting_name: missed_unknown_responsible
+                      setting_value: missed_responsible
+                    - setting_name: missed_unknown_source
+                      setting_value: null
+                    - setting_name: outgoing_unknown
+                      setting_value: do_nothing
+                    - setting_name: outgoing_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: outgoing_unknown_source
+                      setting_value: null
+                    - setting_name: binding_version
+                      setting_value: 1.0.0
               outgoing_successful_call:
                 summary: Log a successful outgoing call
                 value:
@@ -2005,6 +2034,35 @@ paths:
                   call_record_link: "https://storage.example.com/recordings/12346.mp3"
                   summary: Discussed delivery terms
                   transcription: "Customer confirmed the delivery schedule and requested a quote for the additional service package."
+                  crm_settings:
+                    - setting_name: incoming_unknown
+                      setting_value: do_nothing
+                    - setting_name: incoming_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: incoming_unknown_source
+                      setting_value: null
+                    - setting_name: missed_known
+                      setting_value: create_task
+                    - setting_name: missed_known_responsible
+                      setting_value: base_entity_responsible
+                    - setting_name: missed_known_source
+                      setting_value: null
+                    - setting_name: missed_responsible
+                      setting_value: 1
+                    - setting_name: missed_unknown
+                      setting_value: do_nothing
+                    - setting_name: missed_unknown_responsible
+                      setting_value: missed_responsible
+                    - setting_name: missed_unknown_source
+                      setting_value: null
+                    - setting_name: outgoing_unknown
+                      setting_value: do_nothing
+                    - setting_name: outgoing_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: outgoing_unknown_source
+                      setting_value: null
+                    - setting_name: binding_version
+                      setting_value: 1.0.0
       responses:
         "201":
           description: Created
@@ -2074,6 +2132,35 @@ paths:
               note: Updated call notes - client agreed to terms
               summary: Updated call summary
               transcription: "Client agreed to the proposed terms and asked for a follow-up email with the revised offer."
+              crm_settings:
+                - setting_name: incoming_unknown
+                  setting_value: do_nothing
+                - setting_name: incoming_unknown_responsible
+                  setting_value: current_operator
+                - setting_name: incoming_unknown_source
+                  setting_value: null
+                - setting_name: missed_known
+                  setting_value: create_task
+                - setting_name: missed_known_responsible
+                  setting_value: base_entity_responsible
+                - setting_name: missed_known_source
+                  setting_value: null
+                - setting_name: missed_responsible
+                  setting_value: 1
+                - setting_name: missed_unknown
+                  setting_value: do_nothing
+                - setting_name: missed_unknown_responsible
+                  setting_value: missed_responsible
+                - setting_name: missed_unknown_source
+                  setting_value: null
+                - setting_name: outgoing_unknown
+                  setting_value: do_nothing
+                - setting_name: outgoing_unknown_responsible
+                  setting_value: current_operator
+                - setting_name: outgoing_unknown_source
+                  setting_value: null
+                - setting_name: binding_version
+                  setting_value: 1.0.0
       responses:
         "200":
           description: OK
@@ -5584,6 +5671,11 @@ components:
           type: string
           example: "Hello, this is a customer calling about the order. Please contact me back at your earliest convenience."
           description: Optional transcription of the call content from audio or video
+        crm_settings:
+          type: array
+          description: Optional CRM settings used to create or bind CRM entities for different call scenarios
+          items:
+            $ref: "#/components/schemas/CallEventCrmSetting"
       required:
         - integration_code
         - call_type
@@ -5597,6 +5689,56 @@ components:
           example: George Everest
           type: string
       type: object
+    CallEventCrmSetting:
+      type: object
+      description: |
+        Optional scenario-specific CRM setting for call events.
+        This payload is sent to CRM so it can create or bind CRM entities for different call scenarios.
+
+        - `incoming_unknown`: `create_lead`, `create_contact`, `do_nothing`
+        - `incoming_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `incoming_unknown_source`: source name or `null`
+
+        - `missed_known`: `create_task`, `create_lead`, `create_deal`, `create_task_and_lead`, `create_task_and_deal`, `do_nothing`
+        - `missed_known_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `missed_known_source`: source name or `null`
+        - `missed_responsible`: default responsible user ID
+
+        - `missed_unknown`: `create_lead`, `create_contact`, `create_task_and_lead`, `create_task_and_contact`, `do_nothing`
+        - `missed_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `missed_unknown_source`: source name or `null`
+
+        - `outgoing_unknown`: `create_lead`, `create_contact`, `do_nothing`
+        - `outgoing_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `outgoing_unknown_source`: source name or `null`
+
+        - `binding_version`: always `1.0.0`
+      properties:
+        setting_name:
+          type: string
+          enum:
+            - incoming_unknown
+            - incoming_unknown_responsible
+            - incoming_unknown_source
+            - missed_known
+            - missed_known_responsible
+            - missed_known_source
+            - missed_responsible
+            - missed_unknown
+            - missed_unknown_responsible
+            - missed_unknown_source
+            - outgoing_unknown
+            - outgoing_unknown_responsible
+            - outgoing_unknown_source
+            - binding_version
+          example: incoming_unknown
+        setting_value:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: null
+          example: do_nothing
+          description: Value depends on setting_name; allowed values include do_nothing, create_lead, create_contact, create_task, create_deal, create_task_and_lead, create_task_and_contact, create_task_and_deal, base_entity_responsible, missed_responsible, current_operator, null, and 1.0.0 for binding_version.
     ProductCategory:
       properties:
         id:
