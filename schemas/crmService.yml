@@ -5510,8 +5510,6 @@ components:
               - successed
               - missed
               - declined
-              - subscriber_unavailable
-              - number_not_exist
               - call_failure
           from:
             type: string
@@ -5637,8 +5635,6 @@ components:
             - successed
             - missed
             - declined
-            - subscriber_unavailable
-            - number_not_exist
             - call_failure
         from:
           type: string
