@@ -1973,9 +1973,10 @@ paths:
               incoming_missed_call:
                 summary: Log a missed incoming call
                 value:
-                  integration_code: unitalk_integration
+                  integration_code: your_integration_code
                   external_id: 12345
                   call_type: incoming
+                  status: ended
                   ended_call_status: missed
                   from: "380667654321"
                   to: "380441234567"
@@ -1984,12 +1985,44 @@ paths:
                   duration: 5
                   subject: Missed call
                   employees: [1, 2]
+                  summary: Missed call from customer
+                  transcription: "Hello, this is a customer calling about the order. Please contact me back at your earliest convenience."
+                  crm_settings:
+                    - setting_name: incoming_unknown
+                      setting_value: do_nothing
+                    - setting_name: incoming_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: incoming_unknown_source
+                      setting_value: null
+                    - setting_name: missed_known
+                      setting_value: create_task
+                    - setting_name: missed_known_responsible
+                      setting_value: base_entity_responsible
+                    - setting_name: missed_known_source
+                      setting_value: null
+                    - setting_name: missed_responsible
+                      setting_value: 1
+                    - setting_name: missed_unknown
+                      setting_value: do_nothing
+                    - setting_name: missed_unknown_responsible
+                      setting_value: missed_responsible
+                    - setting_name: missed_unknown_source
+                      setting_value: null
+                    - setting_name: outgoing_unknown
+                      setting_value: do_nothing
+                    - setting_name: outgoing_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: outgoing_unknown_source
+                      setting_value: null
+                    - setting_name: binding_version
+                      setting_value: 1.0.0
               outgoing_successful_call:
                 summary: Log a successful outgoing call
                 value:
-                  integration_code: unitalk_integration
+                  integration_code: your_integration_code
                   external_id: 12346
                   call_type: outgoing
+                  status: ended
                   ended_call_status: successed
                   from: "380441234567"
                   to: "380667654321"
@@ -2001,6 +2034,37 @@ paths:
                   entity_table: deals
                   note: Discussed delivery terms
                   call_record_link: "https://storage.example.com/recordings/12346.mp3"
+                  summary: Discussed delivery terms
+                  transcription: "Customer confirmed the delivery schedule and requested a quote for the additional service package."
+                  crm_settings:
+                    - setting_name: incoming_unknown
+                      setting_value: do_nothing
+                    - setting_name: incoming_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: incoming_unknown_source
+                      setting_value: null
+                    - setting_name: missed_known
+                      setting_value: create_task
+                    - setting_name: missed_known_responsible
+                      setting_value: base_entity_responsible
+                    - setting_name: missed_known_source
+                      setting_value: null
+                    - setting_name: missed_responsible
+                      setting_value: 1
+                    - setting_name: missed_unknown
+                      setting_value: do_nothing
+                    - setting_name: missed_unknown_responsible
+                      setting_value: missed_responsible
+                    - setting_name: missed_unknown_source
+                      setting_value: null
+                    - setting_name: outgoing_unknown
+                      setting_value: do_nothing
+                    - setting_name: outgoing_unknown_responsible
+                      setting_value: current_operator
+                    - setting_name: outgoing_unknown_source
+                      setting_value: null
+                    - setting_name: binding_version
+                      setting_value: 1.0.0
       responses:
         "201":
           description: Created
@@ -2035,6 +2099,7 @@ paths:
                 entity_table: deals
                 subject: Sales contract negotiation
                 call_type: incoming
+                status: ended
                 ended_call_status: successed
                 from: "380632232232"
                 to: "380632232232"
@@ -2043,9 +2108,8 @@ paths:
                 duration: 350
                 call_record_link: null
                 note: Call from the client
-                integration_code: unitalk_integration
+                integration_code: your_integration_code
                 external_id: null
-                tmp_id: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
       security:
@@ -2061,14 +2125,46 @@ paths:
             schema:
               $ref: "#/components/schemas/CallEventDto"
             example:
-              integration_code: unitalk_integration
+              integration_code: your_integration_code
               call_type: incoming
               from: "380632232232"
+              status: ended
               ended_call_status: successed
               end_time: 1681893685
               duration: 350
               call_record_link: "https://storage.example.com/recordings/call_1.mp3"
               note: Updated call notes - client agreed to terms
+              summary: Updated call summary
+              transcription: "Client agreed to the proposed terms and asked for a follow-up email with the revised offer."
+              crm_settings:
+                - setting_name: incoming_unknown
+                  setting_value: do_nothing
+                - setting_name: incoming_unknown_responsible
+                  setting_value: current_operator
+                - setting_name: incoming_unknown_source
+                  setting_value: null
+                - setting_name: missed_known
+                  setting_value: create_task
+                - setting_name: missed_known_responsible
+                  setting_value: base_entity_responsible
+                - setting_name: missed_known_source
+                  setting_value: null
+                - setting_name: missed_responsible
+                  setting_value: 1
+                - setting_name: missed_unknown
+                  setting_value: do_nothing
+                - setting_name: missed_unknown_responsible
+                  setting_value: missed_responsible
+                - setting_name: missed_unknown_source
+                  setting_value: null
+                - setting_name: outgoing_unknown
+                  setting_value: do_nothing
+                - setting_name: outgoing_unknown_responsible
+                  setting_value: current_operator
+                - setting_name: outgoing_unknown_source
+                  setting_value: null
+                - setting_name: binding_version
+                  setting_value: 1.0.0
       responses:
         "200":
           description: OK
@@ -5410,6 +5506,13 @@ components:
             enum:
               - outgoing
               - incoming
+          status:
+            type: string
+            example: ended
+            enum:
+              - initiated
+              - talking
+              - ended
           ended_call_status:
             type: string
             example: missed
@@ -5418,8 +5521,6 @@ components:
               - successed
               - missed
               - declined
-              - subscriber_unavailable
-              - number_not_exist
               - call_failure
           from:
             type: string
@@ -5442,16 +5543,18 @@ components:
           note:
             type: string
             example: Call from the client
+          summary:
+            type: string
+            example: Follow-up call summary
+          transcription:
+            type: string
+            example: Customer asked for a callback later today
           integration_code:
             type: string
-            example: unitalk_integration
+            example: your_integration_code
           external_id:
-            type: integer
-            example: null
-            description: Non-required. Used for communication with integrations
-          tmp_id:
-            type: integer
-            example: null
+            type: string
+            example: 12345
             description: Non-required. Used for communication with integrations
           contacts:
             items:
@@ -5480,14 +5583,10 @@ components:
       properties:
         integration_code:
           type: string
-          example: unitalk_integration
+          example: your_integration_code
           description: It could be integration_code or unique code of source where data are imported from
         external_id:
-          type: integer
-          example: 1
-          description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
-        tmp_id:
-          type: integer
+          type: string
           example: 1
           description: It should be unique for one particular integration_code or null if adding call event directly (e.g. import)
         task_id:
@@ -5540,6 +5639,13 @@ components:
           enum:
             - outgoing
             - incoming
+        status:
+          type: string
+          example: initiated
+          enum:
+            - initiated
+            - talking
+            - ended
         ended_call_status:
           type: string
           enum:
@@ -5547,8 +5653,6 @@ components:
             - successed
             - missed
             - declined
-            - subscriber_unavailable
-            - number_not_exist
             - call_failure
         from:
           type: string
@@ -5573,6 +5677,19 @@ components:
         note:
           type: string
           example: Fixed agenda
+        summary:
+          type: string
+          example: Follow-up call summary
+          description: Optional short summary of the call content
+        transcription:
+          type: string
+          example: "Hello, this is a customer calling about the order. Please contact me back at your earliest convenience."
+          description: Optional transcription of the call content from audio or video
+        crm_settings:
+          type: array
+          description: Optional CRM settings used to create or bind CRM entities for different call scenarios
+          items:
+            $ref: "#/components/schemas/CallEventCrmSetting"
       required:
         - integration_code
         - call_type
@@ -5586,6 +5703,56 @@ components:
           example: George Everest
           type: string
       type: object
+    CallEventCrmSetting:
+      type: object
+      description: |
+        Optional scenario-specific CRM setting for call events.
+        This payload is sent to CRM so it can create or bind CRM entities for different call scenarios.
+
+        - `incoming_unknown`: `create_lead`, `create_contact`, `do_nothing`
+        - `incoming_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `incoming_unknown_source`: source name or `null`
+
+        - `missed_known`: `create_task`, `create_lead`, `create_deal`, `create_task_and_lead`, `create_task_and_deal`, `do_nothing`
+        - `missed_known_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `missed_known_source`: source name or `null`
+        - `missed_responsible`: default responsible user ID
+
+        - `missed_unknown`: `create_lead`, `create_contact`, `create_task_and_lead`, `create_task_and_contact`, `do_nothing`
+        - `missed_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `missed_unknown_source`: source name or `null`
+
+        - `outgoing_unknown`: `create_lead`, `create_contact`, `do_nothing`
+        - `outgoing_unknown_responsible`: `base_entity_responsible`, `missed_responsible`, `current_operator`
+        - `outgoing_unknown_source`: source name or `null`
+
+        - `binding_version`: always `1.0.0`
+      properties:
+        setting_name:
+          type: string
+          enum:
+            - incoming_unknown
+            - incoming_unknown_responsible
+            - incoming_unknown_source
+            - missed_known
+            - missed_known_responsible
+            - missed_known_source
+            - missed_responsible
+            - missed_unknown
+            - missed_unknown_responsible
+            - missed_unknown_source
+            - outgoing_unknown
+            - outgoing_unknown_responsible
+            - outgoing_unknown_source
+            - binding_version
+          example: incoming_unknown
+        setting_value:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: null
+          example: do_nothing
+          description: Value depends on setting_name; allowed values include do_nothing, create_lead, create_contact, create_task, create_deal, create_task_and_lead, create_task_and_contact, create_task_and_deal, base_entity_responsible, missed_responsible, current_operator, null, and 1.0.0 for binding_version.
     ProductCategory:
       properties:
         id:
