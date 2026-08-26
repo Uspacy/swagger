@@ -2016,6 +2016,12 @@ paths:
                       setting_value: null
                     - setting_name: binding_version
                       setting_value: 1.0.0
+                  utm_tags:
+                    utm_source: google
+                    utm_medium: cpc
+                    utm_campaign: summer_sale
+                    utm_term: crm_software
+                    utm_content: banner_ad
               outgoing_successful_call:
                 summary: Log a successful outgoing call
                 value:
@@ -2065,6 +2071,12 @@ paths:
                       setting_value: null
                     - setting_name: binding_version
                       setting_value: 1.0.0
+                  utm_tags:
+                    utm_source: google
+                    utm_medium: cpc
+                    utm_campaign: summer_sale
+                    utm_term: crm_software
+                    utm_content: banner_ad
       responses:
         "201":
           description: Created
@@ -2165,6 +2177,12 @@ paths:
                   setting_value: null
                 - setting_name: binding_version
                   setting_value: 1.0.0
+              utm_tags:
+                utm_source: google
+                utm_medium: cpc
+                utm_campaign: summer_sale
+                utm_term: crm_software
+                utm_content: banner_ad
       responses:
         "200":
           description: OK
@@ -5690,10 +5708,38 @@ components:
           description: Optional CRM settings used to create or bind CRM entities for different call scenarios
           items:
             $ref: "#/components/schemas/CallEventCrmSetting"
+        utm_tags:
+          $ref: "#/components/schemas/CallEventUtmTags"
       required:
         - integration_code
         - call_type
         - from
+    CallEventUtmTags:
+      type: object
+      nullable: true
+      description: Optional UTM tags associated with the call event
+      properties:
+        utm_source:
+          type: string
+          example: google
+        utm_medium:
+          type: string
+          example: cpc
+        utm_campaign:
+          type: string
+          example: summer_sale
+        utm_term:
+          type: string
+          nullable: true
+          example: crm_software
+        utm_content:
+          type: string
+          nullable: true
+          example: banner_ad
+      required:
+        - utm_source
+        - utm_medium
+        - utm_campaign
     CallEventContacts:
       properties:
         id:
