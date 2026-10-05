@@ -6334,6 +6334,20 @@ components:
         - post
         - task
 
+    UploadEntityTypes:
+      oneOf:
+        - type: string
+          enum:
+            - comment
+            - post
+            - task
+            - deals
+            - product
+        - type: string
+          pattern: '^[a-zA-Z0-9_\-]+$'
+      description: |
+        Entity type name. You can use one of the predefined values (comment, post, task, product, deals) or provide any custom string value matching the pattern.
+
     UploadContainer:
       type: object
       properties:
@@ -6343,7 +6357,7 @@ components:
             type: string
             format: binary
         entityType:
-          $ref: "#/components/schemas/EntityTypes"
+          $ref: "#/components/schemas/UploadEntityTypes"
         entityId:
           type: integer
           format: int64
