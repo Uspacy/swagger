@@ -3479,92 +3479,6 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: []
-    post:
-      summary: Create app
-      description: Create app
-      tags:
-        - appService
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CreateUpdateAppDto"
-                - type: object
-                  properties:
-                    logo:
-                      type: string
-                      format: binary
-                      description: The file to upload.
-                  required:
-                    - name
-                    - code
-                    - short_description
-                    - redirect_url
-                    - callback_url
-                    - developer_name
-                    - logo
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/App"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-
-  /apps/v1/apps/{app_id}:
-    patch:
-      summary: Update app data
-      description: Update app data
-      tags:
-        - appService
-      parameters:
-        - $ref: "#/components/parameters/app_id"
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CreateUpdateAppDto"
-                - type: object
-                  properties:
-                    logo:
-                      type: string
-                      format: binary
-                      description: The file to upload.
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/App"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-      security:
-        - bearerAuth: []
-    delete:
-      summary: Delete app
-      description: Delete app
-      parameters:
-        - $ref: "#/components/parameters/app_id"
-      tags:
-        - appService
-      responses:
-        "204":
-          description: No content
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-      security:
-        - bearerAuth: []
   # appService end
 
   # emailService begin
@@ -4647,13 +4561,6 @@ components:
       required: true
       schema:
         type: integer
-    app_id:
-      name: app_id
-      in: path
-      description: App id
-      required: true
-      schema:
-        type: string
     archived:
       name: archived
       in: query
@@ -7230,31 +7137,6 @@ components:
           developer_link:
             type: string
             example: null
-
-    CreateUpdateAppDto:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Unitalk telelephony
-        code:
-          type: string
-          example: unitalk_integration
-        short_description:
-          type: string
-          example: Take customer interaction to the next level with industry-leading telephony capabilities
-        redirect_url:
-          type: string
-          example: http://localhost:8080
-        callback_url:
-          type: string
-          example: http://localhost:8080
-        developer_name:
-          type: string
-          example: Mahoney
-        developer_link:
-          type: string
-          example: https://blue-oyster.org
     # apps end
 
     # emailService begin
